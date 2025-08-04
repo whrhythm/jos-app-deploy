@@ -1,0 +1,12 @@
+apiVersion: ""
+generated: "0001-01-01T00:00:00Z"
+repositories:
+- caFile: ""
+  certFile: ""
+  insecure_skip_tls_verify: true
+  keyFile: ""
+  name: harbor
+  pass_credentials_all: true
+  password: P@88w0rd
+  url: https://harbor.joiningos.com/chartrepo/library
+  username: admin
