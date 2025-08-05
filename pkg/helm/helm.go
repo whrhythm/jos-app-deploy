@@ -3,6 +3,7 @@ package helm
 import (
 	"context"
 	"jos-deployment/pkg/logger"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -15,6 +16,22 @@ import (
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
+)
+
+const (
+	defaultRepositoryConfigPath = "/opt/helm/repositories.yaml"
+)
+
+// 默认配置
+var (
+	harborEntry = repo.Entry{
+		Name:                  "harbor",
+		URL:                   "https://harbor.joiningos.com/chartrepo/library",
+		Username:              "admin",
+		Password:              "P@88w0rd",
+		InsecureSkipTLSverify: true,
+	}
+	helmClient *HelmClient
 )
 
 type HelmManagerServer struct {
@@ -37,13 +54,37 @@ type HelmClient struct {
 	settings     *cli.EnvSettings
 }
 
-func initHelmClient() (*cli.EnvSettings, error) {
+func init() {
 	settings := cli.New()
+	if fileExists(defaultRepositoryConfigPath) {
+		settings.RepositoryConfig = defaultRepositoryConfigPath
+	} else {
+		err := createRespositoryConfig(settings)
+		if err != nil {
+			log.Fatal("Failed to create repository config:", err)
+		}
+	}
+
+	actionConfig := new(action.Configuration)
+	debugLog := func(format string, v ...interface{}) {
+		logger.L().Debug(fmt.Sprintf(format, v...))
+	}
+	if err := actionConfig.Init(settings.RESTClientGetter(), "default", "secret", debugLog); err != nil {
+		log.Fatal("Failed to initialize Helm action configuration:", err)
+	}
+
+	helmClient = &HelmClient{
+		actionConfig: actionConfig,
+		settings:     settings,
+	}
+}
+
+func initHelmClient(s *cli.EnvSettings) error {
 	helmHome := filepath.Join(os.Getenv("HOME"), ".helm")
 
 	// 确保目录存在
 	if err := os.MkdirAll(helmHome, 0755); err != nil {
-		return nil, fmt.Errorf("无法创建 Helm 目录: %v", err)
+		return fmt.Errorf("无法创建 Helm 目录: %v", err)
 	}
 
 	f := filepath.Join(helmHome, "repositories.yaml")
@@ -51,36 +92,29 @@ func initHelmClient() (*cli.EnvSettings, error) {
 		// 如果文件不存在，创建一个新的 repositories.yaml 文件
 		_, err := os.Create(f)
 		if err != nil {
-			return nil, fmt.Errorf("无法创建 repositories.yaml 文件: %v", err)
+			return fmt.Errorf("无法创建 repositories.yaml 文件: %v", err)
 		}
 	}
 
-	settings.RepositoryConfig = filepath.Join(helmHome, "repositories.yaml")
-	settings.RepositoryCache = filepath.Join(helmHome, "cache")
-	return settings, nil
+	s.RepositoryConfig = filepath.Join(helmHome, "repositories.yaml")
+	s.RepositoryCache = filepath.Join(helmHome, "cache")
+	return nil
 }
 
-// 实现 ListCharts 方法
-func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRequest) (*pb.ListChartsResponse, error) {
-	logger.L().Info("ListCharts called", zap.String("request", req.String()))
-	var repoFile *repo.File
-	settings, _ := initHelmClient()
-
-	harborEntry := repo.Entry{
-		Name:                  "harbor",
-		URL:                   "https://harbor.joiningos.com/chartrepo/library",
-		Username:              "admin",
-		Password:              "P@88w0rd",
-		InsecureSkipTLSverify: true,
+func createRespositoryConfig(s *cli.EnvSettings) error {
+	err := initHelmClient(s)
+	if err != nil {
+		logger.L().Info("initHelmClient failed")
+		return err
 	}
 
-	repoFile, err := repo.LoadFile(settings.RepositoryConfig)
+	repoFile, err := repo.LoadFile(s.RepositoryConfig)
 	if os.IsNotExist(err) {
 		logger.L().Info("Repository file does not exist, creating new one")
 		repoFile = repo.NewFile()
 	} else if err != nil {
 		logger.L().Error("Failed to load repository file", zap.Error(err))
-		return nil, err
+		return err
 	}
 
 	if !repoFile.Has(harborEntry.Name) {
@@ -88,13 +122,18 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 		repoFile.Add(&harborEntry)
 	}
 
-	if err := repoFile.WriteFile(settings.RepositoryConfig, 0644); err != nil {
+	if err := repoFile.WriteFile(s.RepositoryConfig, 0644); err != nil {
 		logger.L().Error("Failed to write repository file", zap.Error(err))
-		return nil, err
+		return err
 	} else {
-		logger.L().Info("Repository file written successfully", zap.String("path", settings.RepositoryConfig))
+		logger.L().Info("Repository file written successfully", zap.String("path", s.RepositoryConfig))
 	}
+	return nil
+}
 
+// 实现 ListCharts 方法
+func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRequest) (*pb.ListChartsResponse, error) {
+	logger.L().Info("ListCharts called", zap.String("request", req.String()))
 	providers := getter.All(cli.New())
 
 	chartRepo, err := repo.NewChartRepository(&harborEntry, providers)
@@ -104,23 +143,13 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 	}
 
 	// 打印索引内容
-	indexPath := ""
-
-	indexPath, err = chartRepo.DownloadIndexFile()
+	indexPath, err := chartRepo.DownloadIndexFile()
 	if err != nil {
 		logger.L().Error("Failed to download index file from chart repository", zap.Error(err))
 		return nil, err
 	} else {
 		logger.L().Info("Index file downloaded successfully", zap.String("repository", harborEntry.Name))
 	}
-
-	data, err := os.ReadFile(indexPath)
-	if err != nil {
-		logger.L().Error("Failed to read index file", zap.Error(err))
-		return nil, err
-	}
-	fmt.Println("=== 原始索引文件内容 ===")
-	fmt.Println(string(data))
 
 	// 解析索引文件
 	indexFile, err := repo.LoadIndexFile(indexPath)
@@ -149,21 +178,15 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 	}, nil
 }
 
-func New(namespace string) (*HelmClient, error) {
-	settings := cli.New()
-	actionConfig := new(action.Configuration)
-	debugLog := func(format string, v ...interface{}) {
-		logger.L().Debug(fmt.Sprintf(format, v...))
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true // 文件存在
 	}
-	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, "secret", debugLog); err != nil {
-		logger.L().Error("Failed to initialize Helm action configuration", zap.Error(err))
-		return nil, err
+	if os.IsNotExist(err) {
+		return false // 文件不存在
 	}
-
-	return &HelmClient{
-		actionConfig: actionConfig,
-		settings:     settings,
-	}, nil
+	return false // 其他错误（如权限问题）
 }
 
 // func (c *HelmClient) RemoveRepo(name string) error {
