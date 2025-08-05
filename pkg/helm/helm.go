@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
 
@@ -173,23 +174,71 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 		return nil, err
 	}
 
+	if req.Limit <= 0 || req.Size <= 0 {
+		return &pb.ListChartsResponse{
+			Code:    1,
+			Message: "Invalid limit or size",
+			Success: false,
+			Data:    nil,
+		}, nil
+	}
+
 	var chartInfos []*pb.ChartInfo
+
 	// 通过 indexFile 获取所有的 chart 信息
 	for _, entries := range indexFile.Entries {
 		for _, entry := range entries {
 			chartInfo := &pb.ChartInfo{
 				Name:         entry.Name,
 				ChartVersion: entry.Version,
+				IconUrl:      entry.Icon,
 				AppVersion:   entry.AppVersion,
 				Description:  entry.Description,
-				IconUrl:      entry.Icon,
+				UpdateDate:   entry.Created.String(),
+				UpdateUser:   "admin", // 这里可以根据实际情况修改
 			}
 			chartInfos = append(chartInfos, chartInfo)
 		}
 	}
 
+	totalCharts := len(chartInfos)
+	pageCount := int32(totalCharts) / req.Size
+	if int32(totalCharts)%req.Size != 0 {
+		pageCount++
+	}
+	start := (req.Limit - 1) * req.Size
+	end := req.Limit * req.Size
+	if int(start) > totalCharts {
+		start = int32(totalCharts)
+	}
+	if int(end) > totalCharts {
+		end = int32(totalCharts)
+	}
+	pagedCharts := chartInfos[int(start):int(end)]
+
+	listChartsData := &pb.ListChartsData{
+		Total:       int32(totalCharts),
+		PageSize:    req.Size,
+		TotalPage:   pageCount,
+		CurrentPage: req.Limit,
+		Charts:      pagedCharts,
+	}
+	anyData, err := anypb.New(listChartsData)
+	if err != nil {
+		logger.L().Error("Failed to marshal ListChartsData to Any", zap.Error(err))
+		return &pb.ListChartsResponse{
+			Code:    1,
+			Message: "Failed to marshal ListChartsData",
+			Success: false,
+			Data:    nil,
+		}, nil
+	}
+
 	return &pb.ListChartsResponse{
-		Charts: chartInfos, // 返回空列表
+		Code:    0,
+		Message: "Charts retrieved successfully",
+		Success: true,
+		Data:    anyData,
 	}, nil
 }
 
@@ -235,6 +284,7 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 		logger.L().Error("Failed to install chart", zap.Error(err))
 		return nil, err
 	}
+
 	return &pb.InstallChartResponse{
 		ReleaseName:   release.Name,
 		FirstDeployed: release.Info.FirstDeployed.String(),

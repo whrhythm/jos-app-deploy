@@ -81,10 +81,9 @@ service HelmManagerService {
 // 1. 获取 Chart 列表
 message ListChartsRequest {
   string repo_name = 1;  // 私有仓库名称（可选）
-}
-
-message ListChartsResponse {
-  repeated ChartInfo charts = 1;
+  string keyword   = 2;
+  int32 limit      = 3;
+  int32 size       = 4;
 }
 
 message ChartInfo {
@@ -95,6 +94,21 @@ message ChartInfo {
   string description = 5;    // 应用描述
   string updateDate = 6;     // 更新时间
   string updateUser = 7;     // 更新者
+}
+
+message ListChartsData {
+  int32 total = 1;
+  int32 page_size = 2;
+  int32 total_page = 3;
+  int32 current_page = 4;
+  repeated ChartInfo charts = 5;
+}
+
+message ListChartsResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+  google.protobuf.Any data = 4;
 }
 
 // 2. 配置私有仓库
