@@ -27,7 +27,7 @@ service HelmManagerService {
   // 3. 安装 Helm Chart
   rpc InstallChart (InstallChartRequest) returns (InstallChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{name}/install"
+      post: "/v1alpha1/{namespace}/charts/{release_name}/install"
       body: "*"
     };
   }
@@ -35,7 +35,7 @@ service HelmManagerService {
   // 4. 卸载 Helm Chart
   rpc UninstallChart (UninstallChartRequest) returns (UninstallChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{name}/uninstall"
+      post: "/v1alpha1/{namespace}/charts/{release_name}/uninstall"
       body: "*"
     };
   }
@@ -143,15 +143,16 @@ message K8sObjectList {
 // 3. 安装 Chart
 message InstallChartRequest {
   string name = 1;          // Chart 名称
-  string version = 2;       // Chart 版本
-  string namespace = 3;     // 目标命名空间
-  bool dry_run = 4;         // 检查chart文件是否合法
-  string values = 5;        // values.yaml 内容（JSON/YAML 字符串）
+  string release_name = 2;  // 安装的名称
+  string version = 3;       // Chart 版本
+  string namespace =4;     // 目标命名空间
+  bool dry_run = 5;         // 检查chart文件是否合法
+  string values = 6;        // values.yaml 内容（JSON/YAML 字符串）
 }
 
 message InstallChartResponse {
   int32 code = 1;
-  string release_name = 2;  // Helm Release 名称
+  string release_name = 2;  // 安装名称
   string first_deployed = 3;
   string last_deployed = 4;
   string deleted = 5;
@@ -162,9 +163,9 @@ message InstallChartResponse {
 
 // 4. 卸载请求参数
 message UninstallChartRequest {
-  string namespace = 1;  // 命名空间（从 URL 路径获取）
-  string name = 2;      // Chart 名称（从 URL 路径获取）
-  bool purge = 3;       // 是否彻底删除（从 Body 或 Query 获取）
+  string namespace = 1;             // 命名空间（从 URL 路径获取）
+  string release_name = 2;          // Chart 名称（从 URL 路径获取）
+  bool purge = 3;                   // 是否彻底删除（从 Body 或 Query 获取）
   map<string, string> options = 4;  // 其他卸载选项（如超时时间）
 }
 

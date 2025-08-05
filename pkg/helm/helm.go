@@ -35,6 +35,7 @@ var (
 		Username:              "admin",
 		Password:              "P@88w0rd",
 		InsecureSkipTLSverify: true,
+		PassCredentialsAll:    true,
 	}
 	helmClient *HelmClient
 )
@@ -60,6 +61,7 @@ type HelmClient struct {
 }
 
 func init() {
+	os.Setenv("XDG_CACHE_HOME", filepath.Join(os.Getenv("HOME"), ".helm"))
 	settings := cli.New()
 	if fileExists(defaultRepositoryConfigPath) {
 		settings.RepositoryConfig = defaultRepositoryConfigPath
@@ -86,10 +88,10 @@ func init() {
 
 func initHelmClient(s *cli.EnvSettings) error {
 	helmHome := filepath.Join(os.Getenv("HOME"), ".helm")
-
+	cacheDir := filepath.Join(helmHome, "helm", "repository")
 	// 确保目录存在
-	if err := os.MkdirAll(helmHome, 0755); err != nil {
-		return fmt.Errorf("无法创建 Helm 目录: %v", err)
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		return fmt.Errorf("无法创建 Helm Cache 目录: %v", err)
 	}
 
 	f := filepath.Join(helmHome, "repositories.yaml")
@@ -102,7 +104,7 @@ func initHelmClient(s *cli.EnvSettings) error {
 	}
 
 	s.RepositoryConfig = filepath.Join(helmHome, "repositories.yaml")
-	s.RepositoryCache = filepath.Join(helmHome, "cache")
+	s.RepositoryCache = cacheDir
 	return nil
 }
 
@@ -265,13 +267,21 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 	} else {
 		// 4. 安装 chart
 		install := action.NewInstall(helmClient.actionConfig)
-		install.ReleaseName = req.GetName()
+		install.ReleaseName = req.GetReleaseName()
 		install.Namespace = req.GetNamespace()
 		if req.Version != "" {
 			install.Version = req.Version
 		}
+		install.ChartPathOptions.InsecureSkipTLSverify = true
+
+		err := refreshChartRepository()
+		if err != nil {
+			logger.L().Error("Failed to refresh chart repository", zap.Error(err))
+			return nil, err
+		}
 
 		chartRef := fmt.Sprintf("%s/%s", harborEntry.Name, req.Name)
+
 		chartPath, err := install.ChartPathOptions.LocateChart(chartRef, helmClient.settings)
 		if err != nil {
 			logger.L().Error("Failed to locate chart", zap.Error(err))
@@ -317,7 +327,7 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 	uninstall := action.NewUninstall(helmClient.actionConfig)
 	uninstall.Wait = true
 
-	_, err := uninstall.Run(req.GetName())
+	_, err := uninstall.Run(req.GetReleaseName())
 	if err != nil {
 		logger.L().Error("Failed to uninstall chart", zap.Error(err))
 		return &pb.UninstallChartResponse{
@@ -330,4 +340,27 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 		Code:    0,
 		Message: "Chart uninstalled successfully",
 	}, nil
+}
+
+func refreshChartRepository() error {
+	logger.L().Info("RefreshChartRepository called")
+
+	repoFile := helmClient.settings.RepositoryConfig
+	repoObj, err := repo.LoadFile(repoFile)
+	if err == nil {
+		for _, entry := range repoObj.Repositories {
+			chartRepo, err := repo.NewChartRepository(entry, getter.All(helmClient.settings))
+			if err == nil {
+				path, err := chartRepo.DownloadIndexFile()
+				if err != nil {
+					logger.L().Error("Failed to download index file from chart repository", zap.Error(err))
+					return err
+				} else {
+					logger.L().Info("Index file downloaded successfully", zap.String("repository", entry.Name), zap.String("path", path))
+				}
+			}
+		}
+	}
+
+	return err
 }

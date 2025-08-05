@@ -117,13 +117,13 @@ func request_HelmManagerService_InstallChart_0(ctx context.Context, marshaler ru
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["name"]
+	val, ok = pathParams["release_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
 	}
-	protoReq.Name, err = runtime.String(val)
+	protoReq.ReleaseName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	msg, err := client.InstallChart(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -146,13 +146,13 @@ func local_request_HelmManagerService_InstallChart_0(ctx context.Context, marsha
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["name"]
+	val, ok = pathParams["release_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
 	}
-	protoReq.Name, err = runtime.String(val)
+	protoReq.ReleaseName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	msg, err := server.InstallChart(ctx, &protoReq)
 	return msg, metadata, err
@@ -178,13 +178,13 @@ func request_HelmManagerService_UninstallChart_0(ctx context.Context, marshaler 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["name"]
+	val, ok = pathParams["release_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
 	}
-	protoReq.Name, err = runtime.String(val)
+	protoReq.ReleaseName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	msg, err := client.UninstallChart(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -207,13 +207,13 @@ func local_request_HelmManagerService_UninstallChart_0(ctx context.Context, mars
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["name"]
+	val, ok = pathParams["release_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
 	}
-	protoReq.Name, err = runtime.String(val)
+	protoReq.ReleaseName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	msg, err := server.UninstallChart(ctx, &protoReq)
 	return msg, metadata, err
@@ -539,7 +539,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{name}/install"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/install"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -559,7 +559,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{name}/uninstall"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -732,7 +732,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{name}/install"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/install"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -749,7 +749,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{name}/uninstall"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -870,8 +870,8 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 var (
 	pattern_HelmManagerService_ListCharts_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "charts"}, ""))
 	pattern_HelmManagerService_ConfigureRepo_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "repos"}, ""))
-	pattern_HelmManagerService_InstallChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "name", "install"}, ""))
-	pattern_HelmManagerService_UninstallChart_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "name", "uninstall"}, ""))
+	pattern_HelmManagerService_InstallChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "install"}, ""))
+	pattern_HelmManagerService_UninstallChart_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "uninstall"}, ""))
 	pattern_HelmManagerService_WatchInstallStatus_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "name", "status"}, ""))
 	pattern_HelmManagerService_WatchPodStatus_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "name", "pods"}, ""))
 	pattern_HelmManagerService_CheckApisixRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1alpha1", "charts", "name", "apisix"}, ""))

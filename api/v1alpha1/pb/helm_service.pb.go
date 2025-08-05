@@ -540,11 +540,12 @@ func (x *K8SObjectList) GetItems() []*K8SObject {
 // 3. 安装 Chart
 type InstallChartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                    // Chart 名称
-	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`              // Chart 版本
-	Namespace     string                 `protobuf:"bytes,3,opt,name=namespace,proto3" json:"namespace,omitempty"`          // 目标命名空间
-	DryRun        bool                   `protobuf:"varint,4,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"` // 检查chart文件是否合法
-	Values        string                 `protobuf:"bytes,5,opt,name=values,proto3" json:"values,omitempty"`                // values.yaml 内容（JSON/YAML 字符串）
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                  // Chart 名称
+	ReleaseName   string                 `protobuf:"bytes,2,opt,name=release_name,json=releaseName,proto3" json:"release_name,omitempty"` // 安装的名称
+	Version       string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`                            // Chart 版本
+	Namespace     string                 `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`                        // 目标命名空间
+	DryRun        bool                   `protobuf:"varint,5,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`               // 检查chart文件是否合法
+	Values        string                 `protobuf:"bytes,6,opt,name=values,proto3" json:"values,omitempty"`                              // values.yaml 内容（JSON/YAML 字符串）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -586,6 +587,13 @@ func (x *InstallChartRequest) GetName() string {
 	return ""
 }
 
+func (x *InstallChartRequest) GetReleaseName() string {
+	if x != nil {
+		return x.ReleaseName
+	}
+	return ""
+}
+
 func (x *InstallChartRequest) GetVersion() string {
 	if x != nil {
 		return x.Version
@@ -617,7 +625,7 @@ func (x *InstallChartRequest) GetValues() string {
 type InstallChartResponse struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
 	Code          int32                     `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	ReleaseName   string                    `protobuf:"bytes,2,opt,name=release_name,json=releaseName,proto3" json:"release_name,omitempty"` // Helm Release 名称
+	ReleaseName   string                    `protobuf:"bytes,2,opt,name=release_name,json=releaseName,proto3" json:"release_name,omitempty"` // 安装名称
 	FirstDeployed string                    `protobuf:"bytes,3,opt,name=first_deployed,json=firstDeployed,proto3" json:"first_deployed,omitempty"`
 	LastDeployed  string                    `protobuf:"bytes,4,opt,name=last_deployed,json=lastDeployed,proto3" json:"last_deployed,omitempty"`
 	Deleted       string                    `protobuf:"bytes,5,opt,name=deleted,proto3" json:"deleted,omitempty"`
@@ -718,7 +726,7 @@ func (x *InstallChartResponse) GetEntries() map[string]*K8SObjectList {
 type UninstallChartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`                                                                       // 命名空间（从 URL 路径获取）
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                                                                 // Chart 名称（从 URL 路径获取）
+	ReleaseName   string                 `protobuf:"bytes,2,opt,name=release_name,json=releaseName,proto3" json:"release_name,omitempty"`                                                // Chart 名称（从 URL 路径获取）
 	Purge         bool                   `protobuf:"varint,3,opt,name=purge,proto3" json:"purge,omitempty"`                                                                              // 是否彻底删除（从 Body 或 Query 获取）
 	Options       map[string]string      `protobuf:"bytes,4,rep,name=options,proto3" json:"options,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // 其他卸载选项（如超时时间）
 	unknownFields protoimpl.UnknownFields
@@ -762,9 +770,9 @@ func (x *UninstallChartRequest) GetNamespace() string {
 	return ""
 }
 
-func (x *UninstallChartRequest) GetName() string {
+func (x *UninstallChartRequest) GetReleaseName() string {
 	if x != nil {
-		return x.Name
+		return x.ReleaseName
 	}
 	return ""
 }
@@ -1544,13 +1552,14 @@ const file_helm_service_proto_rawDesc = "" +
 	"\tK8sObject\x12,\n" +
 	"\x06object\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x06object\"?\n" +
 	"\rK8sObjectList\x12.\n" +
-	"\x05items\x18\x01 \x03(\v2\x18.helm.v1alpha1.K8sObjectR\x05items\"\x92\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x18.helm.v1alpha1.K8sObjectR\x05items\"\xb5\x01\n" +
 	"\x13InstallChartRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
-	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1c\n" +
-	"\tnamespace\x18\x03 \x01(\tR\tnamespace\x12\x17\n" +
-	"\adry_run\x18\x04 \x01(\bR\x06dryRun\x12\x16\n" +
-	"\x06values\x18\x05 \x01(\tR\x06values\"\x8b\x03\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12\x18\n" +
+	"\aversion\x18\x03 \x01(\tR\aversion\x12\x1c\n" +
+	"\tnamespace\x18\x04 \x01(\tR\tnamespace\x12\x17\n" +
+	"\adry_run\x18\x05 \x01(\bR\x06dryRun\x12\x16\n" +
+	"\x06values\x18\x06 \x01(\tR\x06values\"\x8b\x03\n" +
 	"\x14InstallChartResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12!\n" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12%\n" +
@@ -1562,10 +1571,10 @@ const file_helm_service_proto_rawDesc = "" +
 	"\aentries\x18\b \x03(\v20.helm.v1alpha1.InstallChartResponse.EntriesEntryR\aentries\x1aX\n" +
 	"\fEntriesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
-	"\x05value\x18\x02 \x01(\v2\x1c.helm.v1alpha1.K8sObjectListR\x05value:\x028\x01\"\xe8\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.helm.v1alpha1.K8sObjectListR\x05value:\x028\x01\"\xf7\x01\n" +
 	"\x15UninstallChartRequest\x12\x1c\n" +
-	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12\x14\n" +
 	"\x05purge\x18\x03 \x01(\bR\x05purge\x12K\n" +
 	"\aoptions\x18\x04 \x03(\v21.helm.v1alpha1.UninstallChartRequest.OptionsEntryR\aoptions\x1a:\n" +
 	"\fOptionsEntry\x12\x10\n" +
@@ -1614,13 +1623,13 @@ const file_helm_service_proto_rawDesc = "" +
 	"\tcontainer\x18\x03 \x01(\tR\tcontainer\"]\n" +
 	"\x18CheckPodTerminalResponse\x12\x1c\n" +
 	"\tsupported\x18\x01 \x01(\bR\tsupported\x12#\n" +
-	"\rwebsocket_url\x18\x02 \x01(\tR\fwebsocketUrl2\x87\v\n" +
+	"\rwebsocket_url\x18\x02 \x01(\tR\fwebsocketUrl2\x97\v\n" +
 	"\x12HelmManagerService\x12k\n" +
 	"\n" +
 	"ListCharts\x12 .helm.v1alpha1.ListChartsRequest\x1a!.helm.v1alpha1.ListChartsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1alpha1/charts\x12v\n" +
-	"\rConfigureRepo\x12#.helm.v1alpha1.ConfigureRepoRequest\x1a$.helm.v1alpha1.ConfigureRepoResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1alpha1/repos\x12\x8f\x01\n" +
-	"\fInstallChart\x12\".helm.v1alpha1.InstallChartRequest\x1a#.helm.v1alpha1.InstallChartResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/v1alpha1/{namespace}/charts/{name}/install\x12\x97\x01\n" +
-	"\x0eUninstallChart\x12$.helm.v1alpha1.UninstallChartRequest\x1a%.helm.v1alpha1.UninstallChartResponse\"8\x82\xd3\xe4\x93\x022:\x01*\"-/v1alpha1/{namespace}/charts/{name}/uninstall\x12\x92\x01\n" +
+	"\rConfigureRepo\x12#.helm.v1alpha1.ConfigureRepoRequest\x1a$.helm.v1alpha1.ConfigureRepoResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1alpha1/repos\x12\x97\x01\n" +
+	"\fInstallChart\x12\".helm.v1alpha1.InstallChartRequest\x1a#.helm.v1alpha1.InstallChartResponse\">\x82\xd3\xe4\x93\x028:\x01*\"3/v1alpha1/{namespace}/charts/{release_name}/install\x12\x9f\x01\n" +
+	"\x0eUninstallChart\x12$.helm.v1alpha1.UninstallChartRequest\x1a%.helm.v1alpha1.UninstallChartResponse\"@\x82\xd3\xe4\x93\x02::\x01*\"5/v1alpha1/{namespace}/charts/{release_name}/uninstall\x12\x92\x01\n" +
 	"\x12WatchInstallStatus\x12(.helm.v1alpha1.WatchInstallStatusRequest\x1a\x1c.helm.v1alpha1.InstallStatus\"2\x82\xd3\xe4\x93\x02,\x12*/v1alpha1/{namespace}/charts/{name}/status0\x01\x12\x84\x01\n" +
 	"\x0eWatchPodStatus\x12$.helm.v1alpha1.WatchPodStatusRequest\x1a\x18.helm.v1alpha1.PodStatus\"0\x82\xd3\xe4\x93\x02*\x12(/v1alpha1/{namespace}/charts/{name}/pods0\x01\x12\x8b\x01\n" +
 	"\x10CheckApisixRoute\x12&.helm.v1alpha1.CheckApisixRouteRequest\x1a'.helm.v1alpha1.CheckApisixRouteResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1alpha1/charts/{name}/apisix\x12\x98\x01\n" +
