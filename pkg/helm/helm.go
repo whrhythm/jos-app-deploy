@@ -245,54 +245,60 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 // 实现按照helm chart方法
 func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallChartRequest) (*pb.InstallChartResponse, error) {
 	// 1. 获取参数
-	logger.L().Info("InstallChart called", zap.String("name", req.Name), zap.String("namespace", req.Namespace), zap.String("version", req.Version))
-
+	dryRun := req.DryRun
 	// 2. 创建 Helm action 配置
 
 	// 3. 解析 values
 	var values map[string]interface{}
-	if req.Values != "" {
-		if err := unmarshalValues(req.Values, &values); err != nil {
-			logger.L().Error("Failed to parse values", zap.Error(err))
+	if dryRun {
+		var message string
+		if req.Values != "" {
+			if err := unmarshalValues(req.Values, &values); err != nil {
+				logger.L().Error("Failed to parse values", zap.Error(err))
+				return nil, err
+			}
+		}
+		return &pb.InstallChartResponse{
+			Code:    0,
+			Message: message,
+		}, nil
+	} else {
+		// 4. 安装 chart
+		install := action.NewInstall(helmClient.actionConfig)
+		install.ReleaseName = req.GetName()
+		install.Namespace = req.GetNamespace()
+		if req.Version != "" {
+			install.Version = req.Version
+		}
+
+		chartRef := fmt.Sprintf("%s/%s", harborEntry.Name, req.Name)
+		chartPath, err := install.ChartPathOptions.LocateChart(chartRef, helmClient.settings)
+		if err != nil {
+			logger.L().Error("Failed to locate chart", zap.Error(err))
 			return nil, err
 		}
-	}
 
-	// 4. 安装 chart
-	install := action.NewInstall(helmClient.actionConfig)
-	install.ReleaseName = req.Name
-	install.Namespace = req.Namespace
-	if req.Version != "" {
-		install.Version = req.Version
-	}
+		chart, err := loader.Load(chartPath)
+		if err != nil {
+			logger.L().Error("Failed to load chart", zap.Error(err))
+			return nil, err
+		}
 
-	chartRef := fmt.Sprintf("%s/%s", harborEntry.Name, req.Name)
-	chartPath, err := install.ChartPathOptions.LocateChart(chartRef, helmClient.settings)
-	if err != nil {
-		logger.L().Error("Failed to locate chart", zap.Error(err))
-		return nil, err
-	}
+		release, err := install.Run(chart, values)
+		if err != nil {
+			logger.L().Error("Failed to install chart", zap.Error(err))
+			return nil, err
+		}
 
-	chart, err := loader.Load(chartPath)
-	if err != nil {
-		logger.L().Error("Failed to load chart", zap.Error(err))
-		return nil, err
+		return &pb.InstallChartResponse{
+			ReleaseName:   release.Name,
+			FirstDeployed: release.Info.FirstDeployed.String(),
+			LastDeployed:  release.Info.LastDeployed.String(),
+			Deleted:       release.Info.Deleted.String(),
+			Message:       release.Info.Description,
+			Status:        release.Info.Status.String(),
+		}, nil
 	}
-
-	release, err := install.Run(chart, values)
-	if err != nil {
-		logger.L().Error("Failed to install chart", zap.Error(err))
-		return nil, err
-	}
-
-	return &pb.InstallChartResponse{
-		ReleaseName:   release.Name,
-		FirstDeployed: release.Info.FirstDeployed.String(),
-		LastDeployed:  release.Info.LastDeployed.String(),
-		Deleted:       release.Info.Deleted.String(),
-		Description:   release.Info.Description,
-		Status:        release.Info.Status.String(),
-	}, nil
 }
 
 // unmarshalValues tries to unmarshal a YAML or JSON string into a map[string]interface{}.
@@ -303,4 +309,25 @@ func unmarshalValues(data string, out *map[string]interface{}) error {
 	}
 	// Try JSON
 	return json.Unmarshal([]byte(data), out)
+}
+
+func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.UninstallChartRequest) (*pb.UninstallChartResponse, error) {
+	logger.L().Info("UninstallChart called", zap.String("request", req.String()))
+
+	uninstall := action.NewUninstall(helmClient.actionConfig)
+	uninstall.Wait = true
+
+	_, err := uninstall.Run(req.GetName())
+	if err != nil {
+		logger.L().Error("Failed to uninstall chart", zap.Error(err))
+		return &pb.UninstallChartResponse{
+			Code:    1,
+			Message: "Failed to uninstall chart",
+		}, err
+	}
+
+	return &pb.UninstallChartResponse{
+		Code:    0,
+		Message: "Chart uninstalled successfully",
+	}, nil
 }

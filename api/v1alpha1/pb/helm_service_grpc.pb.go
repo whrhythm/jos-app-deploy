@@ -22,6 +22,7 @@ const (
 	HelmManagerService_ListCharts_FullMethodName             = "/helm.v1alpha1.HelmManagerService/ListCharts"
 	HelmManagerService_ConfigureRepo_FullMethodName          = "/helm.v1alpha1.HelmManagerService/ConfigureRepo"
 	HelmManagerService_InstallChart_FullMethodName           = "/helm.v1alpha1.HelmManagerService/InstallChart"
+	HelmManagerService_UninstallChart_FullMethodName         = "/helm.v1alpha1.HelmManagerService/UninstallChart"
 	HelmManagerService_WatchInstallStatus_FullMethodName     = "/helm.v1alpha1.HelmManagerService/WatchInstallStatus"
 	HelmManagerService_WatchPodStatus_FullMethodName         = "/helm.v1alpha1.HelmManagerService/WatchPodStatus"
 	HelmManagerService_CheckApisixRoute_FullMethodName       = "/helm.v1alpha1.HelmManagerService/CheckApisixRoute"
@@ -40,17 +41,19 @@ type HelmManagerServiceClient interface {
 	ConfigureRepo(ctx context.Context, in *ConfigureRepoRequest, opts ...grpc.CallOption) (*ConfigureRepoResponse, error)
 	// 3. 安装 Helm Chart
 	InstallChart(ctx context.Context, in *InstallChartRequest, opts ...grpc.CallOption) (*InstallChartResponse, error)
-	// 4. 监控 Chart 安装状态
+	// 4. 卸载 Helm Chart
+	UninstallChart(ctx context.Context, in *UninstallChartRequest, opts ...grpc.CallOption) (*UninstallChartResponse, error)
+	// 5. 监控 Chart 安装状态
 	WatchInstallStatus(ctx context.Context, in *WatchInstallStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InstallStatus], error)
-	// 5. 监控 Chart 下 Pod 状态
+	// 6. 监控 Chart 下 Pod 状态
 	WatchPodStatus(ctx context.Context, in *WatchPodStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PodStatus], error)
-	// 6. 检查已安装 Chart 是否包含 ApisixRoute 资源
+	// 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
 	CheckApisixRoute(ctx context.Context, in *CheckApisixRouteRequest, opts ...grpc.CallOption) (*CheckApisixRouteResponse, error)
-	// 7. 创建 Helm Chart 应用
+	// 8. 创建 Helm Chart 应用
 	CreateChartApplication(ctx context.Context, in *CreateChartApplicationRequest, opts ...grpc.CallOption) (*CreateChartApplicationResponse, error)
-	// 8. 获取 Pod 日志
+	// 9. 获取 Pod 日志
 	GetPodLogs(ctx context.Context, in *GetPodLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogChunk], error)
-	// 9. 检查 Pod 是否支持终端交互
+	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(ctx context.Context, in *CheckPodTerminalRequest, opts ...grpc.CallOption) (*CheckPodTerminalResponse, error)
 }
 
@@ -86,6 +89,16 @@ func (c *helmManagerServiceClient) InstallChart(ctx context.Context, in *Install
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(InstallChartResponse)
 	err := c.cc.Invoke(ctx, HelmManagerService_InstallChart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helmManagerServiceClient) UninstallChart(ctx context.Context, in *UninstallChartRequest, opts ...grpc.CallOption) (*UninstallChartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UninstallChartResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_UninstallChart_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,17 +202,19 @@ type HelmManagerServiceServer interface {
 	ConfigureRepo(context.Context, *ConfigureRepoRequest) (*ConfigureRepoResponse, error)
 	// 3. 安装 Helm Chart
 	InstallChart(context.Context, *InstallChartRequest) (*InstallChartResponse, error)
-	// 4. 监控 Chart 安装状态
+	// 4. 卸载 Helm Chart
+	UninstallChart(context.Context, *UninstallChartRequest) (*UninstallChartResponse, error)
+	// 5. 监控 Chart 安装状态
 	WatchInstallStatus(*WatchInstallStatusRequest, grpc.ServerStreamingServer[InstallStatus]) error
-	// 5. 监控 Chart 下 Pod 状态
+	// 6. 监控 Chart 下 Pod 状态
 	WatchPodStatus(*WatchPodStatusRequest, grpc.ServerStreamingServer[PodStatus]) error
-	// 6. 检查已安装 Chart 是否包含 ApisixRoute 资源
+	// 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
 	CheckApisixRoute(context.Context, *CheckApisixRouteRequest) (*CheckApisixRouteResponse, error)
-	// 7. 创建 Helm Chart 应用
+	// 8. 创建 Helm Chart 应用
 	CreateChartApplication(context.Context, *CreateChartApplicationRequest) (*CreateChartApplicationResponse, error)
-	// 8. 获取 Pod 日志
+	// 9. 获取 Pod 日志
 	GetPodLogs(*GetPodLogsRequest, grpc.ServerStreamingServer[LogChunk]) error
-	// 9. 检查 Pod 是否支持终端交互
+	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(context.Context, *CheckPodTerminalRequest) (*CheckPodTerminalResponse, error)
 	mustEmbedUnimplementedHelmManagerServiceServer()
 }
@@ -219,6 +234,9 @@ func (UnimplementedHelmManagerServiceServer) ConfigureRepo(context.Context, *Con
 }
 func (UnimplementedHelmManagerServiceServer) InstallChart(context.Context, *InstallChartRequest) (*InstallChartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InstallChart not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) UninstallChart(context.Context, *UninstallChartRequest) (*UninstallChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UninstallChart not implemented")
 }
 func (UnimplementedHelmManagerServiceServer) WatchInstallStatus(*WatchInstallStatusRequest, grpc.ServerStreamingServer[InstallStatus]) error {
 	return status.Errorf(codes.Unimplemented, "method WatchInstallStatus not implemented")
@@ -309,6 +327,24 @@ func _HelmManagerService_InstallChart_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HelmManagerServiceServer).InstallChart(ctx, req.(*InstallChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelmManagerService_UninstallChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UninstallChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).UninstallChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_UninstallChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).UninstallChart(ctx, req.(*UninstallChartRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -418,6 +454,10 @@ var HelmManagerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InstallChart",
 			Handler:    _HelmManagerService_InstallChart_Handler,
+		},
+		{
+			MethodName: "UninstallChart",
+			Handler:    _HelmManagerService_UninstallChart_Handler,
 		},
 		{
 			MethodName: "CheckApisixRoute",
