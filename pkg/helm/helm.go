@@ -2,10 +2,14 @@ package helm
 
 import (
 	"context"
+	"encoding/json"
 	"jos-deployment/pkg/logger"
 	"log"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v2"
+	"helm.sh/helm/v3/pkg/chart/loader"
 
 	pb "jos-deployment/api/v1alpha1/pb"
 
@@ -131,6 +135,17 @@ func createRespositoryConfig(s *cli.EnvSettings) error {
 	return nil
 }
 
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true // 文件存在
+	}
+	if os.IsNotExist(err) {
+		return false // 文件不存在
+	}
+	return false // 其他错误（如权限问题）
+}
+
 // 实现 ListCharts 方法
 func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRequest) (*pb.ListChartsResponse, error) {
 	logger.L().Info("ListCharts called", zap.String("request", req.String()))
@@ -178,142 +193,64 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 	}, nil
 }
 
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true // 文件存在
+// 实现按照helm chart方法
+func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallChartRequest) (*pb.InstallChartResponse, error) {
+	// 1. 获取参数
+	logger.L().Info("InstallChart called", zap.String("name", req.Name), zap.String("namespace", req.Namespace), zap.String("version", req.Version))
+
+	// 2. 创建 Helm action 配置
+
+	// 3. 解析 values
+	var values map[string]interface{}
+	if req.Values != "" {
+		if err := unmarshalValues(req.Values, &values); err != nil {
+			logger.L().Error("Failed to parse values", zap.Error(err))
+			return nil, err
+		}
 	}
-	if os.IsNotExist(err) {
-		return false // 文件不存在
+
+	// 4. 安装 chart
+	install := action.NewInstall(helmClient.actionConfig)
+	install.ReleaseName = req.Name
+	install.Namespace = req.Namespace
+	if req.Version != "" {
+		install.Version = req.Version
 	}
-	return false // 其他错误（如权限问题）
+
+	chartRef := fmt.Sprintf("%s/%s", harborEntry.Name, req.Name)
+	chartPath, err := install.ChartPathOptions.LocateChart(chartRef, helmClient.settings)
+	if err != nil {
+		logger.L().Error("Failed to locate chart", zap.Error(err))
+		return nil, err
+	}
+
+	chart, err := loader.Load(chartPath)
+	if err != nil {
+		logger.L().Error("Failed to load chart", zap.Error(err))
+		return nil, err
+	}
+
+	release, err := install.Run(chart, values)
+	if err != nil {
+		logger.L().Error("Failed to install chart", zap.Error(err))
+		return nil, err
+	}
+	return &pb.InstallChartResponse{
+		ReleaseName:   release.Name,
+		FirstDeployed: release.Info.FirstDeployed.String(),
+		LastDeployed:  release.Info.LastDeployed.String(),
+		Deleted:       release.Info.Deleted.String(),
+		Description:   release.Info.Description,
+		Status:        release.Info.Status.String(),
+	}, nil
 }
 
-// func (c *HelmClient) RemoveRepo(name string) error {
-// 	repoFile := filepath.Join(c.settings.RepositoryConfig, "repositories.yaml")
-// 	rf, err := repo.LoadFile(repoFile)
-// 	if err != nil {
-// 		logger.L().Error("Failed to load repositories file", zap.Error(err))
-// 		return err
-// 	}
-
-// 	if !rf.Has(name) {
-// 		logger.L().Info("Repository does not exist", zap.String("name", name))
-// 		return nil
-// 	}
-
-// 	if err := rf.Remove(name); err != nil {
-// 		logger.L().Error("Failed to remove repository", zap.Error(err))
-// 		return err
-// 	}
-
-// 	if err := rf.WriteFile(repoFile, 0644); err != nil {
-// 		logger.L().Error("Failed to write repositories file", zap.Error(err))
-// 		return err
-// 	}
-
-// 	logger.L().Info("Helm repository removed successfully", zap.String("name", name))
-// 	return nil
-// }
-
-// func (c *HelmClient) InstallOrUpgrade(chartName, releaseName, namespace string) error {
-// 	install := action.NewInstall(c.actionConfig)
-// 	install.ReleaseName = releaseName
-// 	install.Namespace = namespace
-
-// 	logger.L().Info("Installing or upgrading chart", zap.String("chart", chartName), zap.String("release", releaseName), zap.String("namespace", namespace))
-
-// 	// Load the chart
-// 	chartPath, err := filepath.Abs(chartName)
-// 	if err != nil {
-// 		logger.L().Error("Failed to get absolute path for chart", zap.Error(err))
-// 		return err
-// 	}
-
-// 	chart, err := install.ChartPathOptions.LocateChart(chartPath, c.settings)
-// 	if err != nil {
-// 		logger.L().Error("Failed to locate chart", zap.Error(err))
-// 		return err
-// 	}
-
-// 	if _, err := install.Run(chart, nil); err != nil {
-// 		logger.L().Error("Failed to install or upgrade chart", zap.Error(err))
-// 		return err
-// 	}
-
-// 	logger.L().Info("Chart installed or upgraded successfully", zap.String("chart", chartPath))
-// 	return nil
-// }
-
-// func (c *HelmClient) Uninstall(releaseName, namespace string) error {
-// 	uninstall := action.NewUninstall(c.actionConfig)
-// 	uninstall.Namespace = namespace
-
-// 	logger.L().Info("Uninstalling release", zap.String("release", releaseName), zap.String("namespace", namespace))
-
-// 	// Uninstall the release
-// 	_, err := uninstall.Run(releaseName)
-// 	if err != nil {
-// 		logger.L().Error("Failed to uninstall release", zap.Error(err))
-// 		return err
-// 	}
-
-// 	logger.L().Info("Release uninstalled successfully", zap.String("release", releaseName))
-// 	return nil
-// }
-
-// func (c *HelmClient) ListReleases(namespace string) ([]*pb.ReleaseInfo, error) {
-// 	list := action.NewList(c.actionConfig)
-// 	list.Namespace = namespace
-
-// 	logger.L().Info("Listing releases", zap.String("namespace", namespace))
-
-// 	// List the releases
-// 	releases, err := list.Run()
-// 	if err != nil {
-// 		logger.L().Error("Failed to list releases", zap.Error(err))
-// 		return nil, err
-// 	}
-
-// 	var releaseInfos []*pb.ReleaseInfo
-// 	for _, rel := range releases {
-// 		releaseInfos = append(releaseInfos, &pb.ReleaseInfo{
-// 			Name:      rel.Name,
-// 			Namespace: rel.Namespace,
-// 			Status:    rel.Info.Status.String(),
-// 		})
-// 	}
-
-// 	logger.L().Info("Releases listed successfully", zap.Int("count", len(releaseInfos)))
-// 	return releaseInfos, nil
-// }
-
-// func (c *HelmClient) GetRelease(releaseName, namespace string) (*pb.ReleaseInfo, error) {
-// 	get := action.NewGet(c.actionConfig)
-// 	get.Namespace = namespace
-
-// 	logger.L().Info("Getting release", zap.String("release", releaseName), zap.String("namespace", namespace))
-
-// 	// Get the release
-// 	release, err := get.Run(releaseName)
-// 	if err != nil {
-// 		logger.L().Error("Failed to get release", zap.Error(err))
-// 		return nil, err
-// 	}
-
-// 	releaseInfo := &pb.ReleaseInfo{
-// 		Name:      release.Name,
-// 		Namespace: release.Namespace,
-// 		Status:    release.Info.Status.String(),
-// 	}
-
-// 	logger.L().Info("Release retrieved successfully", zap.String("release", release.Name))
-// 	return releaseInfo, nil
-// }
-
-// func (c *HelmClient) WatchPods(namespace string) error {
-// 	// 这里可以实现 Pod 监控逻辑
-// 	logger.L().Info("Watching pods in namespace", zap.String("namespace", namespace))
-// 	// 目前仅返回 nil，实际实现需要使用 Kubernetes 客户端库来监控 Pods
-// 	return nil
-// }
+// unmarshalValues tries to unmarshal a YAML or JSON string into a map[string]interface{}.
+func unmarshalValues(data string, out *map[string]interface{}) error {
+	// Try YAML first
+	if err := yaml.Unmarshal([]byte(data), out); err == nil {
+		return nil
+	}
+	// Try JSON
+	return json.Unmarshal([]byte(data), out)
+}
