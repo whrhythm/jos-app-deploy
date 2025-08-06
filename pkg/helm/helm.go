@@ -7,10 +7,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	pb "jos-deployment/api/v1alpha1/pb"
 
@@ -272,6 +274,9 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 		if req.Version != "" {
 			install.Version = req.Version
 		}
+		if install.Namespace == "" {
+			install.Namespace = "default" // 默认命名空间
+		}
 		install.ChartPathOptions.InsecureSkipTLSverify = true
 
 		err := refreshChartRepository()
@@ -294,11 +299,16 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 			return nil, err
 		}
 
+		// 确保 namespace 存在，如果不存在则创建
+		install.CreateNamespace = true
+
 		release, err := install.Run(chart, values)
 		if err != nil {
 			logger.L().Error("Failed to install chart", zap.Error(err))
 			return nil, err
 		}
+		// 获取release info 中的 k8s 资源信息
+		parseAndPrintManifest(release.Manifest)
 
 		return &pb.InstallChartResponse{
 			ReleaseName:   release.Name,
@@ -323,8 +333,26 @@ func unmarshalValues(data string, out *map[string]interface{}) error {
 
 func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.UninstallChartRequest) (*pb.UninstallChartResponse, error) {
 	logger.L().Info("UninstallChart called", zap.String("request", req.String()))
+	nameSpace := req.GetNamespace()
+	if nameSpace == "" {
+		nameSpace = "default"
+	}
 
-	uninstall := action.NewUninstall(helmClient.actionConfig)
+	// 为指定 namespace 创建新的 action configuration
+	actionConfig := new(action.Configuration)
+	debugLog := func(format string, v ...interface{}) {
+		logger.L().Debug(fmt.Sprintf(format, v...))
+	}
+	if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), nameSpace, "secret", debugLog); err != nil {
+		logger.L().Error("Failed to initialize Helm action configuration for uninstall", zap.Error(err))
+		return &pb.UninstallChartResponse{
+			Code:    1,
+			Message: "Failed to initialize Helm configuration",
+		}, err
+	}
+
+	// 创建 Uninstall action
+	uninstall := action.NewUninstall(actionConfig)
 	uninstall.Wait = true
 
 	_, err := uninstall.Run(req.GetReleaseName())
@@ -363,4 +391,30 @@ func refreshChartRepository() error {
 	}
 
 	return err
+}
+
+func parseAndPrintManifest(manifest string) error {
+	// 按 "---" 分割多个资源
+	resources := strings.Split(manifest, "---")
+	for _, res := range resources {
+		if strings.TrimSpace(res) == "" {
+			continue
+		}
+
+		// 将 YAML 解析为 unstructured.Unstructured 对象
+		obj := &unstructured.Unstructured{}
+		if err := yaml.Unmarshal([]byte(res), obj); err != nil {
+			return fmt.Errorf("failed to decode YAML: %v", err)
+		}
+
+		// 打印资源关键信息
+		fmt.Printf(
+			"Resource: %s/%s (Kind: %s, API: %s)\n",
+			obj.GetNamespace(),
+			obj.GetName(),
+			obj.GetKind(),
+			obj.GetAPIVersion(),
+		)
+	}
+	return nil
 }

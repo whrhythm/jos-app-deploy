@@ -82,6 +82,14 @@ service HelmManagerService {
       get: "/v1alpha1/pods/{namespace}/{pod_name}/terminal"
     };
   }
+
+  // 11. 上传helm chart文件到默认仓库
+  rpc UploadChartPackage(stream UploadChartPackageRequest) returns (UploadChartPackageResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/chart/upload"
+      body: "*"
+    };
+  }
 }
 
 // ========== 请求/响应结构定义 ==========
@@ -245,3 +253,22 @@ message CheckPodTerminalResponse {
   string websocket_url = 2; // WebSocket 连接地址（如 ws://service/terminal）
 }
 
+message UploadChartPackageRequest {
+  oneof data {
+    ChartMetadata metadata = 1;  // 首次请求发送元数据
+    bytes chunk = 2;             // 后续请求发送文件分片
+  }
+}
+
+message ChartMetadata {
+  string chart_name = 1;      // Chart 名称（如 "nginx"）
+  string chart_version = 2;   // Chart 版本（如 "1.2.3"）
+  string repo_name = 3;       // 目标仓库名（如 "stable"）
+  string content_type = 4;    // 文件类型（如 "application/x-tar"）
+}
+
+message UploadChartPackageResponse {
+  string chart_url = 1;       // 上传后的 Chart 访问路径
+  uint64 size_received = 2;   // 服务端实际接收的字节数
+  string digest = 3;          // 文件摘要（如 SHA256）
+}
