@@ -4,6 +4,7 @@ package helm.v1alpha1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
 // import "google/protobuf/empty.proto";
 option go_package = "./pkg/pb/;pb";
 
@@ -43,21 +44,21 @@ service HelmManagerService {
   // 5. 监控 Chart 安装状态
   rpc WatchInstallStatus (WatchInstallStatusRequest) returns (stream InstallStatus) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/charts/{name}/status"
+      get: "/v1alpha1/{namespace}/charts/{release_name}/status"
     };
   }
 
   // 6. 监控 Chart 下 Pod 状态
-  rpc WatchPodStatus (WatchPodStatusRequest) returns (stream PodStatus) {
+  rpc ListPodStatus (ListPodStatusRequest) returns (ListPodStatusResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/charts/{name}/pods"
+      get: "/v1alpha1/{namespace}/charts/{release_name}/pods"
     };
   }
 
   // 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
   rpc CheckApisixRoute (CheckApisixRouteRequest) returns (CheckApisixRouteResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/charts/{name}/apisix"
+      get: "/v1alpha1/charts/{release_name}/apisix"
     };
   }
 
@@ -88,6 +89,36 @@ service HelmManagerService {
     option (google.api.http) = {
       post: "/v1alpha1/chart/upload"
       body: "*"
+    };
+  }
+
+  // 12. 升级 Helm Chart
+  rpc UpgradeChart (UpgradeChartRequest) returns (UpgradeChartResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{namespace}/charts/{release_name}/upgrade"
+      body: "*"
+    };
+  }
+
+  // 13. 回滚 Helm Chart
+  rpc RollbackChart (RollbackChartRequest) returns (RollbackChartResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{namespace}/charts/{release_name}/rollback"
+      body: "*"
+    };
+  }
+
+  // 14. 查询 Chart 所有版本信息
+  rpc ListChartVersions (ListChartVersionsRequest) returns (ListChartVersionsResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/charts/{repo_name}/{chart_name}/versions"
+    };
+  }
+
+  // 15. 获取应用列表
+  rpc ListInstalledCharts (ListInstalledChartsRequest) returns (ListInstalledChartsResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/{namespace}/charts"
     };
   }
 }
@@ -185,7 +216,7 @@ message UninstallChartResponse {
 
 // 5. 监控安装状态
 message WatchInstallStatusRequest {
-  string name = 1;          // Chart 名称
+  string release_name = 1;
   string namespace = 2;     // 命名空间
 }
 
@@ -195,20 +226,39 @@ message InstallStatus {
 }
 
 // 6. 监控 Pod 状态
-message WatchPodStatusRequest {
-  string name = 1;          // Chart 名称
-  string namespace = 2;     // 命名空间
+message ListPodStatusRequest {
+  string namespace = 1;      // 目标命名空间
+  string release_name = 2;    // Helm Release 名称
 }
 
 message PodStatus {
-  string pod_name = 1;
-  string status = 2;       // Running | Pending | Failed
-  string message = 3;
+  string name = 1;          // Pod 名称
+  string phase = 2;         // 当前阶段（Pending/Running/Succeeded/Failed）
+  string ready = 3;         // 就绪状态（如 "1/2"）
+  int32 restarts = 4;       // 容器重启次数
+  string ip = 5;            // Pod IP 地址
+  string node = 6;          // 所在节点名称
+  google.protobuf.Timestamp timestamp = 7; // 状态更新时间
+  map<string, string> labels = 8;         // Pod 标签
+  repeated ContainerStatus containers = 9; // 容器状态详情
+}
+
+message ContainerStatus {
+  string name = 1;
+  bool ready = 2;
+  int32 restart_count = 3;
+  string state = 4;          // waiting/running/terminated
+  string image = 5;
+}
+
+message ListPodStatusResponse {
+  repeated PodStatus pods = 1; // Pod 状态数组
+  string chart_version = 2;  // Helm Chart 版本
 }
 
 // 7. 检查 ApisixRoute
 message CheckApisixRouteRequest {
-  string name = 1;          // Chart 名称
+  string release_name = 1;
   string namespace = 2;     // 命名空间
 }
 
@@ -253,6 +303,7 @@ message CheckPodTerminalResponse {
   string websocket_url = 2; // WebSocket 连接地址（如 ws://service/terminal）
 }
 
+// 11. 上传文件
 message UploadChartPackageRequest {
   oneof data {
     ChartMetadata metadata = 1;  // 首次请求发送元数据
@@ -271,4 +322,81 @@ message UploadChartPackageResponse {
   string chart_url = 1;       // 上传后的 Chart 访问路径
   uint64 size_received = 2;   // 服务端实际接收的字节数
   string digest = 3;          // 文件摘要（如 SHA256）
+}
+
+// ========== 通用消息定义 ==========
+message ChartSpec {
+  string chart_name = 1;       // Chart 名称（如 "nginx"）
+  string chart_version = 2;    // Chart 版本（如 "1.2.3"）
+  string repo_url = 3;         // 仓库地址（可选）
+  map<string, string> values = 4; // 自定义 Values
+}
+
+// ========== 升级请求/响应 ==========
+message UpgradeChartRequest {
+  string namespace = 1;
+  string release_name = 2;
+  ChartSpec chart = 3;
+  bool force = 4;             // 是否强制升级（--force）
+  bool recreate_pods = 5;     // 是否重启 Pod（--recreate-pods）
+}
+
+message UpgradeChartResponse {
+  string status = 1;
+  string revision = 2;       // 新版本号（如 "2"）
+}
+
+// ========== 回滚请求/响应 ==========
+message RollbackChartRequest {
+  string namespace = 1;
+  string release_name = 2;
+  string revision = 3;       // 目标回滚版本号（如 "1"）
+  bool wait = 4;             // 是否等待回滚完成（--wait）
+}
+
+message RollbackChartResponse {
+  string status = 1;
+  string current_revision = 2; // 回滚后的版本号
+}
+
+// ========== 请求/响应定义 ==========
+message ListChartVersionsRequest {
+  string repo_name = 1;      // 仓库名称（如 "stable"）
+  string chart_name = 2;     // Chart 名称（如 "nginx"）
+  bool with_details = 3;     // 是否返回详细元数据（如更新时间）
+}
+
+message ChartVersionInfo {
+  string version = 1;        // 版本号（如 "1.2.3"）
+  string app_version = 2;    // 应用版本（如 "1.20.0"）
+  string description = 3;    // 版本描述
+  string created = 4;        // 创建时间（RFC3339 格式）
+}
+
+message ListChartVersionsResponse {
+  repeated ChartVersionInfo versions = 1;
+  string repo_url = 2;       // 仓库地址（如 "https://charts.helm.sh/stable"）
+}
+
+message ListInstalledChartsRequest {
+  string namespace = 1;          // 目标命名空间（空表示所有命名空间）
+  string release_name = 2;
+  bool with_status = 3;          // 是否包含状态信息
+  bool with_manifest = 4;        // 是否包含资源清单
+}
+
+message ListInstalledChartsResponse {
+  repeated InstalledChart charts = 1;
+}
+
+message InstalledChart {
+  string name = 1;               // Release 名称
+  string namespace = 2;          // 所属命名空间
+  string chart_name = 3;         // Chart 名称（如 nginx）
+  string chart_version = 4;      // Chart 版本（如 1.2.3）
+  string app_version = 5;         // 应用版本
+  string status = 6;              // 状态（DEPLOYED/FAILED/PENDING）
+  string manifest = 7;
+  google.protobuf.Timestamp updated = 8; // 最后更新时间
+  map<string, string> values = 9; // 用户自定义 values
 }

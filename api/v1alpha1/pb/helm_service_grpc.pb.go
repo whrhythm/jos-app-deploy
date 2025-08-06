@@ -24,11 +24,16 @@ const (
 	HelmManagerService_InstallChart_FullMethodName           = "/helm.v1alpha1.HelmManagerService/InstallChart"
 	HelmManagerService_UninstallChart_FullMethodName         = "/helm.v1alpha1.HelmManagerService/UninstallChart"
 	HelmManagerService_WatchInstallStatus_FullMethodName     = "/helm.v1alpha1.HelmManagerService/WatchInstallStatus"
-	HelmManagerService_WatchPodStatus_FullMethodName         = "/helm.v1alpha1.HelmManagerService/WatchPodStatus"
+	HelmManagerService_ListPodStatus_FullMethodName          = "/helm.v1alpha1.HelmManagerService/ListPodStatus"
 	HelmManagerService_CheckApisixRoute_FullMethodName       = "/helm.v1alpha1.HelmManagerService/CheckApisixRoute"
 	HelmManagerService_CreateChartApplication_FullMethodName = "/helm.v1alpha1.HelmManagerService/CreateChartApplication"
 	HelmManagerService_GetPodLogs_FullMethodName             = "/helm.v1alpha1.HelmManagerService/GetPodLogs"
 	HelmManagerService_CheckPodTerminal_FullMethodName       = "/helm.v1alpha1.HelmManagerService/CheckPodTerminal"
+	HelmManagerService_UploadChartPackage_FullMethodName     = "/helm.v1alpha1.HelmManagerService/UploadChartPackage"
+	HelmManagerService_UpgradeChart_FullMethodName           = "/helm.v1alpha1.HelmManagerService/UpgradeChart"
+	HelmManagerService_RollbackChart_FullMethodName          = "/helm.v1alpha1.HelmManagerService/RollbackChart"
+	HelmManagerService_ListChartVersions_FullMethodName      = "/helm.v1alpha1.HelmManagerService/ListChartVersions"
+	HelmManagerService_ListInstalledCharts_FullMethodName    = "/helm.v1alpha1.HelmManagerService/ListInstalledCharts"
 )
 
 // HelmManagerServiceClient is the client API for HelmManagerService service.
@@ -46,7 +51,7 @@ type HelmManagerServiceClient interface {
 	// 5. 监控 Chart 安装状态
 	WatchInstallStatus(ctx context.Context, in *WatchInstallStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[InstallStatus], error)
 	// 6. 监控 Chart 下 Pod 状态
-	WatchPodStatus(ctx context.Context, in *WatchPodStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PodStatus], error)
+	ListPodStatus(ctx context.Context, in *ListPodStatusRequest, opts ...grpc.CallOption) (*ListPodStatusResponse, error)
 	// 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
 	CheckApisixRoute(ctx context.Context, in *CheckApisixRouteRequest, opts ...grpc.CallOption) (*CheckApisixRouteResponse, error)
 	// 8. 创建 Helm Chart 应用
@@ -55,6 +60,16 @@ type HelmManagerServiceClient interface {
 	GetPodLogs(ctx context.Context, in *GetPodLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogChunk], error)
 	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(ctx context.Context, in *CheckPodTerminalRequest, opts ...grpc.CallOption) (*CheckPodTerminalResponse, error)
+	// 11. 上传helm chart文件到默认仓库
+	UploadChartPackage(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse], error)
+	// 12. 升级 Helm Chart
+	UpgradeChart(ctx context.Context, in *UpgradeChartRequest, opts ...grpc.CallOption) (*UpgradeChartResponse, error)
+	// 13. 回滚 Helm Chart
+	RollbackChart(ctx context.Context, in *RollbackChartRequest, opts ...grpc.CallOption) (*RollbackChartResponse, error)
+	// 14. 查询 Chart 所有版本信息
+	ListChartVersions(ctx context.Context, in *ListChartVersionsRequest, opts ...grpc.CallOption) (*ListChartVersionsResponse, error)
+	// 15. 获取应用列表
+	ListInstalledCharts(ctx context.Context, in *ListInstalledChartsRequest, opts ...grpc.CallOption) (*ListInstalledChartsResponse, error)
 }
 
 type helmManagerServiceClient struct {
@@ -124,24 +139,15 @@ func (c *helmManagerServiceClient) WatchInstallStatus(ctx context.Context, in *W
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelmManagerService_WatchInstallStatusClient = grpc.ServerStreamingClient[InstallStatus]
 
-func (c *helmManagerServiceClient) WatchPodStatus(ctx context.Context, in *WatchPodStatusRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[PodStatus], error) {
+func (c *helmManagerServiceClient) ListPodStatus(ctx context.Context, in *ListPodStatusRequest, opts ...grpc.CallOption) (*ListPodStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelmManagerService_ServiceDesc.Streams[1], HelmManagerService_WatchPodStatus_FullMethodName, cOpts...)
+	out := new(ListPodStatusResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_ListPodStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[WatchPodStatusRequest, PodStatus]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type HelmManagerService_WatchPodStatusClient = grpc.ServerStreamingClient[PodStatus]
 
 func (c *helmManagerServiceClient) CheckApisixRoute(ctx context.Context, in *CheckApisixRouteRequest, opts ...grpc.CallOption) (*CheckApisixRouteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -165,7 +171,7 @@ func (c *helmManagerServiceClient) CreateChartApplication(ctx context.Context, i
 
 func (c *helmManagerServiceClient) GetPodLogs(ctx context.Context, in *GetPodLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogChunk], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelmManagerService_ServiceDesc.Streams[2], HelmManagerService_GetPodLogs_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &HelmManagerService_ServiceDesc.Streams[1], HelmManagerService_GetPodLogs_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +198,59 @@ func (c *helmManagerServiceClient) CheckPodTerminal(ctx context.Context, in *Che
 	return out, nil
 }
 
+func (c *helmManagerServiceClient) UploadChartPackage(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &HelmManagerService_ServiceDesc.Streams[2], HelmManagerService_UploadChartPackage_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[UploadChartPackageRequest, UploadChartPackageResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type HelmManagerService_UploadChartPackageClient = grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse]
+
+func (c *helmManagerServiceClient) UpgradeChart(ctx context.Context, in *UpgradeChartRequest, opts ...grpc.CallOption) (*UpgradeChartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpgradeChartResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_UpgradeChart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helmManagerServiceClient) RollbackChart(ctx context.Context, in *RollbackChartRequest, opts ...grpc.CallOption) (*RollbackChartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RollbackChartResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_RollbackChart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helmManagerServiceClient) ListChartVersions(ctx context.Context, in *ListChartVersionsRequest, opts ...grpc.CallOption) (*ListChartVersionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListChartVersionsResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_ListChartVersions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helmManagerServiceClient) ListInstalledCharts(ctx context.Context, in *ListInstalledChartsRequest, opts ...grpc.CallOption) (*ListInstalledChartsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListInstalledChartsResponse)
+	err := c.cc.Invoke(ctx, HelmManagerService_ListInstalledCharts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelmManagerServiceServer is the server API for HelmManagerService service.
 // All implementations must embed UnimplementedHelmManagerServiceServer
 // for forward compatibility.
@@ -207,7 +266,7 @@ type HelmManagerServiceServer interface {
 	// 5. 监控 Chart 安装状态
 	WatchInstallStatus(*WatchInstallStatusRequest, grpc.ServerStreamingServer[InstallStatus]) error
 	// 6. 监控 Chart 下 Pod 状态
-	WatchPodStatus(*WatchPodStatusRequest, grpc.ServerStreamingServer[PodStatus]) error
+	ListPodStatus(context.Context, *ListPodStatusRequest) (*ListPodStatusResponse, error)
 	// 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
 	CheckApisixRoute(context.Context, *CheckApisixRouteRequest) (*CheckApisixRouteResponse, error)
 	// 8. 创建 Helm Chart 应用
@@ -216,6 +275,16 @@ type HelmManagerServiceServer interface {
 	GetPodLogs(*GetPodLogsRequest, grpc.ServerStreamingServer[LogChunk]) error
 	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(context.Context, *CheckPodTerminalRequest) (*CheckPodTerminalResponse, error)
+	// 11. 上传helm chart文件到默认仓库
+	UploadChartPackage(grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]) error
+	// 12. 升级 Helm Chart
+	UpgradeChart(context.Context, *UpgradeChartRequest) (*UpgradeChartResponse, error)
+	// 13. 回滚 Helm Chart
+	RollbackChart(context.Context, *RollbackChartRequest) (*RollbackChartResponse, error)
+	// 14. 查询 Chart 所有版本信息
+	ListChartVersions(context.Context, *ListChartVersionsRequest) (*ListChartVersionsResponse, error)
+	// 15. 获取应用列表
+	ListInstalledCharts(context.Context, *ListInstalledChartsRequest) (*ListInstalledChartsResponse, error)
 	mustEmbedUnimplementedHelmManagerServiceServer()
 }
 
@@ -241,8 +310,8 @@ func (UnimplementedHelmManagerServiceServer) UninstallChart(context.Context, *Un
 func (UnimplementedHelmManagerServiceServer) WatchInstallStatus(*WatchInstallStatusRequest, grpc.ServerStreamingServer[InstallStatus]) error {
 	return status.Errorf(codes.Unimplemented, "method WatchInstallStatus not implemented")
 }
-func (UnimplementedHelmManagerServiceServer) WatchPodStatus(*WatchPodStatusRequest, grpc.ServerStreamingServer[PodStatus]) error {
-	return status.Errorf(codes.Unimplemented, "method WatchPodStatus not implemented")
+func (UnimplementedHelmManagerServiceServer) ListPodStatus(context.Context, *ListPodStatusRequest) (*ListPodStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPodStatus not implemented")
 }
 func (UnimplementedHelmManagerServiceServer) CheckApisixRoute(context.Context, *CheckApisixRouteRequest) (*CheckApisixRouteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckApisixRoute not implemented")
@@ -255,6 +324,21 @@ func (UnimplementedHelmManagerServiceServer) GetPodLogs(*GetPodLogsRequest, grpc
 }
 func (UnimplementedHelmManagerServiceServer) CheckPodTerminal(context.Context, *CheckPodTerminalRequest) (*CheckPodTerminalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPodTerminal not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) UploadChartPackage(grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method UploadChartPackage not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) UpgradeChart(context.Context, *UpgradeChartRequest) (*UpgradeChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeChart not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) RollbackChart(context.Context, *RollbackChartRequest) (*RollbackChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackChart not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) ListChartVersions(context.Context, *ListChartVersionsRequest) (*ListChartVersionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListChartVersions not implemented")
+}
+func (UnimplementedHelmManagerServiceServer) ListInstalledCharts(context.Context, *ListInstalledChartsRequest) (*ListInstalledChartsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListInstalledCharts not implemented")
 }
 func (UnimplementedHelmManagerServiceServer) mustEmbedUnimplementedHelmManagerServiceServer() {}
 func (UnimplementedHelmManagerServiceServer) testEmbeddedByValue()                            {}
@@ -360,16 +444,23 @@ func _HelmManagerService_WatchInstallStatus_Handler(srv interface{}, stream grpc
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type HelmManagerService_WatchInstallStatusServer = grpc.ServerStreamingServer[InstallStatus]
 
-func _HelmManagerService_WatchPodStatus_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(WatchPodStatusRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _HelmManagerService_ListPodStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPodStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(HelmManagerServiceServer).WatchPodStatus(m, &grpc.GenericServerStream[WatchPodStatusRequest, PodStatus]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).ListPodStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_ListPodStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).ListPodStatus(ctx, req.(*ListPodStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type HelmManagerService_WatchPodStatusServer = grpc.ServerStreamingServer[PodStatus]
 
 func _HelmManagerService_CheckApisixRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckApisixRouteRequest)
@@ -436,6 +527,85 @@ func _HelmManagerService_CheckPodTerminal_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelmManagerService_UploadChartPackage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(HelmManagerServiceServer).UploadChartPackage(&grpc.GenericServerStream[UploadChartPackageRequest, UploadChartPackageResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type HelmManagerService_UploadChartPackageServer = grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]
+
+func _HelmManagerService_UpgradeChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpgradeChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).UpgradeChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_UpgradeChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).UpgradeChart(ctx, req.(*UpgradeChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelmManagerService_RollbackChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).RollbackChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_RollbackChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).RollbackChart(ctx, req.(*RollbackChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelmManagerService_ListChartVersions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListChartVersionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).ListChartVersions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_ListChartVersions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).ListChartVersions(ctx, req.(*ListChartVersionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelmManagerService_ListInstalledCharts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListInstalledChartsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelmManagerServiceServer).ListInstalledCharts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelmManagerService_ListInstalledCharts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelmManagerServiceServer).ListInstalledCharts(ctx, req.(*ListInstalledChartsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HelmManagerService_ServiceDesc is the grpc.ServiceDesc for HelmManagerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -460,6 +630,10 @@ var HelmManagerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _HelmManagerService_UninstallChart_Handler,
 		},
 		{
+			MethodName: "ListPodStatus",
+			Handler:    _HelmManagerService_ListPodStatus_Handler,
+		},
+		{
 			MethodName: "CheckApisixRoute",
 			Handler:    _HelmManagerService_CheckApisixRoute_Handler,
 		},
@@ -471,6 +645,22 @@ var HelmManagerService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "CheckPodTerminal",
 			Handler:    _HelmManagerService_CheckPodTerminal_Handler,
 		},
+		{
+			MethodName: "UpgradeChart",
+			Handler:    _HelmManagerService_UpgradeChart_Handler,
+		},
+		{
+			MethodName: "RollbackChart",
+			Handler:    _HelmManagerService_RollbackChart_Handler,
+		},
+		{
+			MethodName: "ListChartVersions",
+			Handler:    _HelmManagerService_ListChartVersions_Handler,
+		},
+		{
+			MethodName: "ListInstalledCharts",
+			Handler:    _HelmManagerService_ListInstalledCharts_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -479,14 +669,14 @@ var HelmManagerService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "WatchPodStatus",
-			Handler:       _HelmManagerService_WatchPodStatus_Handler,
-			ServerStreams: true,
-		},
-		{
 			StreamName:    "GetPodLogs",
 			Handler:       _HelmManagerService_GetPodLogs_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "UploadChartPackage",
+			Handler:       _HelmManagerService_UploadChartPackage_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "helm_service.proto",

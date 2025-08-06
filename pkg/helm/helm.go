@@ -2,16 +2,22 @@ package helm
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
+	"io"
 	"jos-deployment/pkg/logger"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/release"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	pb "jos-deployment/api/v1alpha1/pb"
@@ -302,15 +308,43 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 		// 确保 namespace 存在，如果不存在则创建
 		install.CreateNamespace = true
 
-		release, err := install.Run(chart, values)
-		if err != nil {
-			logger.L().Error("Failed to install chart", zap.Error(err))
+		// 为指定 namespace 创建专用的 action configuration
+		actionConfig := new(action.Configuration)
+		debugLog := func(format string, v ...interface{}) {
+			logger.L().Debug(fmt.Sprintf(format, v...))
+		}
+		if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), install.Namespace, "secret", debugLog); err != nil {
+			logger.L().Error("Failed to initialize Helm action configuration", zap.Error(err))
 			return nil, err
 		}
+
+		var release *release.Release
+		get := action.NewGet(actionConfig)
+
+		if _, err := get.Run(install.ReleaseName); err == nil {
+			// Release 已经存在则退出安装
+			logger.L().Info("Release already exists, skipping installation", zap.String("release_name", install.ReleaseName))
+			return &pb.InstallChartResponse{
+				Code:        0,
+				Message:     "Release already exists, skipping installation",
+				ReleaseName: install.ReleaseName,
+			}, nil
+		} else {
+			// Release 不存在，执行安装
+			release, err = install.Run(chart, values)
+			if err != nil {
+				logger.L().Error("Failed to install chart", zap.Error(err))
+				return nil, err
+			}
+
+			logger.L().Info("Chart installed successfully", zap.String("release", release.Name))
+		}
+
 		// 获取release info 中的 k8s 资源信息
 		parseAndPrintManifest(release.Manifest)
 
 		return &pb.InstallChartResponse{
+			Code:          0,
 			ReleaseName:   release.Name,
 			FirstDeployed: release.Info.FirstDeployed.String(),
 			LastDeployed:  release.Info.LastDeployed.String(),
@@ -370,6 +404,67 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 	}, nil
 }
 
+func (s *HelmManagerServer) UploadChartPackage(stream pb.HelmManagerService_UploadChartPackageServer) error {
+	logger.L().Info("UploadChartPackage called")
+	// 1. 接收元数据
+	firstReq, err := stream.Recv()
+	if err != nil {
+		return fmt.Errorf("failed to receive metadata: %v", err)
+	}
+
+	metadata := firstReq.GetMetadata()
+	if metadata == nil {
+		return fmt.Errorf("first request must contain metadata")
+	}
+
+	// 2. 创建目标文件
+	chartFileName := fmt.Sprintf("%s-%s.tgz", metadata.ChartName, metadata.ChartVersion)
+	savePath := filepath.Join("/charts", metadata.RepoName, chartFileName)
+	if err := os.MkdirAll(filepath.Dir(savePath), 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %v", err)
+	}
+
+	file, err := os.Create(savePath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %v", err)
+	}
+	defer file.Close()
+
+	// 3. 接收分片并写入文件
+	hasher := sha256.New()
+	var totalSize uint64
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("failed to receive chunk: %v", err)
+		}
+
+		chunk := req.GetChunk()
+		if chunk == nil {
+			return fmt.Errorf("expected data chunk")
+		}
+
+		n, err := file.Write(chunk)
+		if err != nil {
+			return fmt.Errorf("failed to write chunk: %v", err)
+		}
+
+		hasher.Write(chunk)
+		totalSize += uint64(n)
+	}
+
+	// 4. 返回响应
+	return stream.SendAndClose(&pb.UploadChartPackageResponse{
+		ChartUrl:     fmt.Sprintf("/charts/%s/%s", metadata.RepoName, chartFileName),
+		SizeReceived: totalSize,
+		Digest:       fmt.Sprintf("sha256:%x", hasher.Sum(nil)),
+	})
+}
+
 func refreshChartRepository() error {
 	logger.L().Info("RefreshChartRepository called")
 
@@ -417,4 +512,131 @@ func parseAndPrintManifest(manifest string) error {
 		)
 	}
 	return nil
+}
+
+func (s *HelmManagerServer) UpgradeChart(ctx context.Context, req *pb.UpgradeChartRequest) (*pb.UpgradeChartResponse, error) {
+	logger.L().Info("UpgradeChart called", zap.String("request", req.String()))
+	nameSpace := req.GetNamespace()
+	if nameSpace == "" {
+		nameSpace = "default"
+	}
+
+	// 创建 Upgrade Action
+	actionConfig := new(action.Configuration)
+	debugLog := func(format string, v ...interface{}) {
+		logger.L().Debug(fmt.Sprintf(format, v...))
+	}
+	if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), nameSpace, "secret", debugLog); err != nil {
+		logger.L().Error("Failed to initialize Helm action configuration for upgrade", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "initialize helm action failed: %v", err)
+	}
+
+	upgrade := action.NewUpgrade(actionConfig)
+	upgrade.Namespace = nameSpace
+	upgrade.Force = req.Force
+	upgrade.ChartPathOptions.InsecureSkipTLSverify = true
+	upgrade.ChartPathOptions.Version = req.Chart.ChartVersion
+
+	// 2. 获取 Chart
+	chartRef := fmt.Sprintf("%s/%s", harborEntry.Name, req.Chart.ChartName)
+
+	chartPath, err := upgrade.ChartPathOptions.LocateChart(chartRef, helmClient.settings)
+	if err != nil {
+		logger.L().Error("Failed to locate chart", zap.Error(err))
+		return nil, err
+	}
+
+	chart, err := loader.Load(chartPath)
+	if err != nil {
+		logger.L().Error("Failed to load chart", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "load chart failed: %v", err)
+	}
+
+	// 3. 转换 values 类型
+	stringValues := req.GetChart().GetValues()
+	values := make(map[string]interface{})
+	for k, v := range stringValues {
+		values[k] = v
+	}
+
+	// 4. 执行升级
+	release, err := upgrade.Run(req.GetReleaseName(), chart, values)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "upgrade failed: %v", err)
+	}
+
+	return &pb.UpgradeChartResponse{
+		Status:   release.Info.Status.String(),
+		Revision: strconv.Itoa(release.Version),
+	}, nil
+}
+
+func (s *HelmManagerServer) RollbackChart(ctx context.Context, req *pb.RollbackChartRequest) (*pb.RollbackChartResponse, error) {
+	// 1. 创建 Rollback Action
+	rollback := action.NewRollback(helmClient.actionConfig)
+	// rollback.Recreate = false // Default value, can be set based on available fields in req
+
+	// Convert revision string to int and set it
+	revision, err := strconv.Atoi(req.GetRevision())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid revision: %v", err)
+	}
+	rollback.Version = revision
+
+	// 2. 执行回滚
+	if err := rollback.Run(req.GetReleaseName()); err != nil {
+		return nil, status.Errorf(codes.Internal, "rollback failed: %v", err)
+	}
+
+	return &pb.RollbackChartResponse{}, nil
+}
+
+func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.ListInstalledChartsRequest) (*pb.ListInstalledChartsResponse, error) {
+	logger.L().Info("ListInstalledCharts called", zap.String("request", req.String()))
+
+	list := action.NewList(helmClient.actionConfig)
+	list.All = true
+	list.AllNamespaces = req.GetNamespace() == ""
+	releaseName := req.GetReleaseName()
+
+	logger.L().Info("Listing installed charts", zap.String("namespace", req.GetNamespace()), zap.String("release_name", releaseName))
+
+	releases, err := list.Run()
+	if len(releases) == 0 {
+		logger.L().Info("No installed charts found")
+		return &pb.ListInstalledChartsResponse{
+			Charts: nil,
+		}, nil
+	}
+
+	if err != nil {
+		logger.L().Error("Failed to list installed charts", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "list installed charts failed: %v", err)
+	}
+
+	var chartInfos []*pb.InstalledChart
+	for _, rel := range releases {
+		if req.GetNamespace() != "" && rel.Namespace != req.GetNamespace() {
+			continue
+		}
+
+		info := &pb.InstalledChart{
+			Name:         rel.Name,
+			Namespace:    rel.Namespace,
+			ChartVersion: rel.Chart.Metadata.Version,
+			AppVersion:   rel.Chart.Metadata.AppVersion,
+			ChartName:    rel.Chart.Metadata.Name,
+			Status:       rel.Info.Status.String(),
+		}
+
+		if req.WithManifest {
+			info.Manifest = rel.Manifest
+		}
+
+		chartInfos = append(chartInfos, info)
+	}
+
+	return &pb.ListInstalledChartsResponse{
+		Charts: chartInfos,
+	}, nil
 }
