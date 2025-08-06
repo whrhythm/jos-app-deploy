@@ -1,0 +1,13 @@
+artificial_intelligence
+hpa-test-chart
+ingress_controller
+joiningos
+low_code
+rancher
+simple-helloworld-chart
+sonarqube
+device_gather
+kubesphere
+metrics_server
+monitor
+nginx

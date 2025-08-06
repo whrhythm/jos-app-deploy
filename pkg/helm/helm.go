@@ -1,12 +1,15 @@
 package helm
 
 import (
+	"bytes"
 	"context"
-	"crypto/sha256"
+	"crypto/tls"
 	"encoding/json"
 	"io"
 	"jos-deployment/pkg/logger"
 	"log"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -406,65 +409,69 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 	}, nil
 }
 
-func (s *HelmManagerServer) UploadChartPackage(stream pb.HelmManagerService_UploadChartPackageServer) error {
-	logger.L().Info("UploadChartPackage called")
-	// 1. 接收元数据
-	firstReq, err := stream.Recv()
+// PushChartToHarbor 将 chart 文件推送到 Harbor 仓库
+func PushChartToHarbor(filePath, repoName, fileName string) (string, error) {
+	// 打开文件
+	file, err := os.Open(filePath)
 	if err != nil {
-		return fmt.Errorf("failed to receive metadata: %v", err)
-	}
-
-	metadata := firstReq.GetMetadata()
-	if metadata == nil {
-		return fmt.Errorf("first request must contain metadata")
-	}
-
-	// 2. 创建目标文件
-	chartFileName := fmt.Sprintf("%s-%s.tgz", metadata.ChartName, metadata.ChartVersion)
-	savePath := filepath.Join("/charts", metadata.RepoName, chartFileName)
-	if err := os.MkdirAll(filepath.Dir(savePath), 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %v", err)
-	}
-
-	file, err := os.Create(savePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file: %v", err)
+		return "", fmt.Errorf("failed to open file: %v", err)
 	}
 	defer file.Close()
 
-	// 3. 接收分片并写入文件
-	hasher := sha256.New()
-	var totalSize uint64
+	// 创建 multipart form
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
 
-	for {
-		req, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("failed to receive chunk: %v", err)
-		}
-
-		chunk := req.GetChunk()
-		if chunk == nil {
-			return fmt.Errorf("expected data chunk")
-		}
-
-		n, err := file.Write(chunk)
-		if err != nil {
-			return fmt.Errorf("failed to write chunk: %v", err)
-		}
-
-		hasher.Write(chunk)
-		totalSize += uint64(n)
+	// 添加文件字段
+	part, err := writer.CreateFormFile("chart", fileName)
+	if err != nil {
+		return "", fmt.Errorf("failed to create form file: %v", err)
 	}
 
-	// 4. 返回响应
-	return stream.SendAndClose(&pb.UploadChartPackageResponse{
-		ChartUrl:     fmt.Sprintf("/charts/%s/%s", metadata.RepoName, chartFileName),
-		SizeReceived: totalSize,
-		Digest:       fmt.Sprintf("sha256:%x", hasher.Sum(nil)),
-	})
+	if _, err := io.Copy(part, file); err != nil {
+		return "", fmt.Errorf("failed to copy file to form: %v", err)
+	}
+
+	writer.Close()
+
+	// 构建 Harbor API URL
+	harborApiUrl := fmt.Sprintf("%s/api/chartrepo/%s/charts",
+		strings.TrimSuffix(harborEntry.URL, "/chartrepo/library"), repoName)
+
+	// 创建 HTTP 请求
+	req, err := http.NewRequest("POST", harborApiUrl, &body)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %v", err)
+	}
+
+	// 设置请求头
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.SetBasicAuth(harborEntry.Username, harborEntry.Password)
+
+	// 发送请求
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 检查响应状态
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("harbor API error: status %d, body: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	logger.L().Info("Chart pushed to Harbor successfully",
+		zap.String("fileName", fileName),
+		zap.String("repoName", repoName))
+
+	// 返回 chart URL
+	return fmt.Sprintf("%s/charts/%s", harborEntry.URL, fileName), nil
 }
 
 func refreshChartRepository() error {

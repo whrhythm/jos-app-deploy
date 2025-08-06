@@ -1,0 +1,261 @@
+apiVersion: v1
+entries:
+  artificial_intelligence:
+  - apiVersion: v2
+    appVersion: 2.3.0
+    created: "2025-04-09T09:10:18.394474395Z"
+    description: A Helm chart for Kubernetes
+    digest: 364f388d74a80a5674e01adc472d3fd02fd03613f918e08d1997e080a8dab33d
+    name: artificial_intelligence
+    type: application
+    urls:
+    - charts/artificial_intelligence-2.3.0.tgz
+    version: 2.3.0
+  device_gather:
+  - apiVersion: v2
+    appVersion: 2.3.0
+    created: "2025-04-09T09:10:18.889448673Z"
+    description: A Helm chart for Kubernetes
+    digest: 4fc8535637a08ffa728758b87415c75db34193cb1ff8762712d7e509b1037b12
+    name: device_gather
+    type: application
+    urls:
+    - charts/device_gather-2.3.0.tgz
+    version: 2.3.0
+  hpa-test-chart:
+  - apiVersion: v2
+    created: "2025-04-12T09:43:26.394434989Z"
+    description: A simple Helm chart for HPA
+    digest: 406e0e2df60ac2a34ba7f6b9b66014225c48c4feba82c4039295768c3d687681
+    name: hpa-test-chart
+    urls:
+    - charts/hpa-test-chart-0.1.1.tgz
+    version: 0.1.1
+  ingress_controller:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-04-10T04:02:51.764822707Z"
+    description: A Helm chart for Kubernetes
+    digest: 9e0f1b2f786c9bacb210683d553d4dc26078b6fdd5fc9171b88e199d337ee870
+    name: ingress_controller
+    type: application
+    urls:
+    - charts/ingress_controller-0.1.0.tgz
+    version: 0.1.0
+  joiningos:
+  - apiVersion: v2
+    appVersion: 2.5.0
+    created: "2025-04-09T09:10:19.880922685Z"
+    description: A Helm chart for Kubernetes
+    digest: c79b56d282206c09e0bc63ee91c97a238526d823751eaf48117fb516164bcf40
+    name: joiningos
+    type: application
+    urls:
+    - charts/joiningos-2.5.0.tgz
+    version: 2.5.0
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-04-10T04:02:52.181085021Z"
+    description: A Helm chart for Kubernetes
+    digest: fee6bbe2e6c8b2419ff7bbe2ab5ed83138a9d3e6c8371d4e4af8718b95f2cfab
+    name: joiningos
+    type: application
+    urls:
+    - charts/joiningos-1.0.0.tgz
+    version: 1.0.0
+  kubesphere:
+  - apiVersion: v2
+    appVersion: 3.4.0
+    created: "2025-04-10T04:02:54.24509807Z"
+    description: A Helm chart for Kubernetes
+    digest: 226ccba2bbe3358a7bd699afaeb95d55ba40ca227b0ccfd889560710c845b7a9
+    name: kubesphere
+    type: application
+    urls:
+    - charts/kubesphere-3.4.0.tgz
+    version: 3.4.0
+  low_code:
+  - apiVersion: v2
+    appVersion: 2.3.6
+    created: "2025-04-09T09:10:20.340538995Z"
+    description: A Helm chart for Kubernetes
+    digest: 7a4fe1471acf94e46857b1914b8166aa461e65a49a8ff585cc3ceffb023d8dd0
+    name: low_code
+    type: application
+    urls:
+    - charts/low_code-2.3.6.tgz
+    version: 2.3.6
+  metrics_server:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-04-10T04:02:52.983463041Z"
+    description: A Helm chart for Kubernetes
+    digest: 28c7a4bd01c5ec6b2d34b30215cc32e4529dc54405f8fe917f7876bbe92afe7f
+    name: metrics_server
+    type: application
+    urls:
+    - charts/metrics_server-0.1.0.tgz
+    version: 0.1.0
+  monitor:
+  - apiVersion: v2
+    appVersion: 2.3.7
+    created: "2025-04-10T04:02:53.409958803Z"
+    description: A Helm chart for Kubernetes
+    digest: 5b25720a4f1e337fb3b990f8d9d6db428a319ffb1815c1baa6331d423f407f9b
+    name: monitor
+    type: application
+    urls:
+    - charts/monitor-2.3.7.tgz
+    version: 2.3.7
+  nginx:
+  - annotations:
+      category: Infrastructure
+      images: |
+        - name: git
+          image: docker.io/bitnami/git:2.50.1-debian-12-r1
+        - name: nginx
+          image: docker.io/bitnami/nginx:1.29.0-debian-12-r5
+        - name: nginx-exporter
+          image: docker.io/bitnami/nginx-exporter:1.4.2-debian-12-r7
+      licenses: Apache-2.0
+      tanzuCategory: clusterUtility
+    apiVersion: v2
+    appVersion: 1.29.0
+    created: "2025-08-05T13:56:43.244085157Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: NGINX Open Source is a web server that can be also used as a reverse
+      proxy, load balancer, and HTTP cache. Recommended for high-demanding sites due
+      to its ability to provide faster content.
+    digest: aee5f7b1700984b9d63ad3167b170c38a297fac1c33e2de78d2b203d9069b773
+    home: https://bitnami.com
+    icon: https://dyltqmyl993wv.cloudfront.net/assets/stacks/nginx/img/nginx-stack-220x234.png
+    keywords:
+    - nginx
+    - http
+    - web
+    - www
+    - reverse proxy
+    maintainers:
+    - name: Broadcom, Inc. All Rights Reserved.
+      url: https://github.com/bitnami/charts
+    name: nginx
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/nginx
+    urls:
+    - charts/nginx-21.1.1.tgz
+    version: 21.1.1
+  - annotations:
+      category: Infrastructure
+      images: |
+        - name: git
+          image: docker.io/bitnami/git:2.50.1-debian-12-r1
+        - name: nginx
+          image: docker.io/bitnami/nginx:1.29.0-debian-12-r5
+        - name: nginx-exporter
+          image: docker.io/bitnami/nginx-exporter:1.4.2-debian-12-r7
+      licenses: Apache-2.0
+      tanzuCategory: clusterUtility
+    apiVersion: v2
+    appVersion: 1.29.0
+    created: "2025-08-06T02:54:32.259638628Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: NGINX Open Source is a web server that can be also used as a reverse
+      proxy, load balancer, and HTTP cache. Recommended for high-demanding sites due
+      to its ability to provide faster content.
+    digest: 89fce0ec0c28d1524505e312f0b1b62ae590a6070b1706081293952719a4b181
+    home: https://bitnami.com
+    icon: https://dyltqmyl993wv.cloudfront.net/assets/stacks/nginx/img/nginx-stack-220x234.png
+    keywords:
+    - nginx
+    - http
+    - web
+    - www
+    - reverse proxy
+    maintainers:
+    - name: Broadcom, Inc. All Rights Reserved.
+      url: https://github.com/bitnami/charts
+    name: nginx
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/nginx
+    urls:
+    - charts/nginx-20.0.0.tgz
+    version: 20.0.0
+  rancher:
+  - apiVersion: v2
+    appVersion: v2.8.5
+    created: "2025-04-10T04:02:52.57988802Z"
+    description: Install Rancher Server to manage Kubernetes clusters across providers.
+    digest: 48702239eb889be4aae1c26032623f170cc6765ea5f6a80aa8c03317ab25705f
+    home: https://rancher.com
+    icon: https://github.com/rancher/ui/blob/master/public/assets/images/logos/welcome-cow.svg
+    keywords:
+    - rancher
+    kubeVersion: < 1.29.0-0
+    maintainers:
+    - email: charts@rancher.com
+      name: Rancher Labs
+    name: rancher
+    sources:
+    - https://github.com/rancher/rancher
+    - https://github.com/rancher/server-chart
+    urls:
+    - charts/rancher-2.8.5.tgz
+    version: 2.8.5
+  simple-helloworld-chart:
+  - apiVersion: v2
+    created: "2025-04-12T09:43:47.471052327Z"
+    description: A simple Helm chart to print Hello World
+    digest: 1fd587d0540e302856d8603fdc5164b8584ff69f4f4a1829ddc602dfeea82189
+    name: simple-helloworld-chart
+    urls:
+    - charts/simple-helloworld-chart-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    created: "2025-04-12T09:43:40.632574362Z"
+    description: A simple Helm chart to print Hello World
+    digest: c697741e2f081595895df3094bdbb79185bcccff3fa9ae4ce6f4b02a8e7644d4
+    name: simple-helloworld-chart
+    urls:
+    - charts/simple-helloworld-chart-0.1.2.tgz
+    version: 0.1.2
+  sonarqube:
+  - apiVersion: v1
+    appVersion: 8.9-community
+    created: "2025-04-10T04:02:53.826766056Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.6.4
+    description: SonarQube is an open sourced code quality scanning tool
+    digest: bcaa6a828cc317b4dcf4f6eae41cd181e2d4c7edcb9dfe796670dd1cbe8fa1bc
+    home: https://www.sonarqube.org/
+    icon: https://www.sonarqube.org/assets/logo-31ad3115b1b4b120f3d1efd63e6b13ac9f1f89437f0cf6881cc4d8b5603a52b4.svg
+    keywords:
+    - coverage
+    - security
+    - code
+    - quality
+    maintainers:
+    - email: rjkernick@gmail.com
+      name: rjkernick
+    - email: tsiddique@live.com
+      name: tsiddique
+    name: sonarqube
+    sources:
+    - https://github.com/SonarSource/docker-sonarqube
+    urls:
+    - charts/sonarqube-6.7.0.tgz
+    version: 6.7.0
+generated: "2025-08-06T02:54:32Z"
+serverInfo: {}

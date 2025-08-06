@@ -29,7 +29,6 @@ const (
 	HelmManagerService_CreateChartApplication_FullMethodName = "/helm.v1alpha1.HelmManagerService/CreateChartApplication"
 	HelmManagerService_GetPodLogs_FullMethodName             = "/helm.v1alpha1.HelmManagerService/GetPodLogs"
 	HelmManagerService_CheckPodTerminal_FullMethodName       = "/helm.v1alpha1.HelmManagerService/CheckPodTerminal"
-	HelmManagerService_UploadChartPackage_FullMethodName     = "/helm.v1alpha1.HelmManagerService/UploadChartPackage"
 	HelmManagerService_UpgradeChart_FullMethodName           = "/helm.v1alpha1.HelmManagerService/UpgradeChart"
 	HelmManagerService_RollbackChart_FullMethodName          = "/helm.v1alpha1.HelmManagerService/RollbackChart"
 	HelmManagerService_ListChartVersions_FullMethodName      = "/helm.v1alpha1.HelmManagerService/ListChartVersions"
@@ -60,8 +59,6 @@ type HelmManagerServiceClient interface {
 	GetPodLogs(ctx context.Context, in *GetPodLogsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[LogChunk], error)
 	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(ctx context.Context, in *CheckPodTerminalRequest, opts ...grpc.CallOption) (*CheckPodTerminalResponse, error)
-	// 11. 上传helm chart文件到默认仓库
-	UploadChartPackage(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse], error)
 	// 12. 升级 Helm Chart
 	UpgradeChart(ctx context.Context, in *UpgradeChartRequest, opts ...grpc.CallOption) (*UpgradeChartResponse, error)
 	// 13. 回滚 Helm Chart
@@ -198,19 +195,6 @@ func (c *helmManagerServiceClient) CheckPodTerminal(ctx context.Context, in *Che
 	return out, nil
 }
 
-func (c *helmManagerServiceClient) UploadChartPackage(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &HelmManagerService_ServiceDesc.Streams[2], HelmManagerService_UploadChartPackage_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[UploadChartPackageRequest, UploadChartPackageResponse]{ClientStream: stream}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type HelmManagerService_UploadChartPackageClient = grpc.ClientStreamingClient[UploadChartPackageRequest, UploadChartPackageResponse]
-
 func (c *helmManagerServiceClient) UpgradeChart(ctx context.Context, in *UpgradeChartRequest, opts ...grpc.CallOption) (*UpgradeChartResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpgradeChartResponse)
@@ -275,8 +259,6 @@ type HelmManagerServiceServer interface {
 	GetPodLogs(*GetPodLogsRequest, grpc.ServerStreamingServer[LogChunk]) error
 	// 10. 检查 Pod 是否支持终端交互
 	CheckPodTerminal(context.Context, *CheckPodTerminalRequest) (*CheckPodTerminalResponse, error)
-	// 11. 上传helm chart文件到默认仓库
-	UploadChartPackage(grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]) error
 	// 12. 升级 Helm Chart
 	UpgradeChart(context.Context, *UpgradeChartRequest) (*UpgradeChartResponse, error)
 	// 13. 回滚 Helm Chart
@@ -324,9 +306,6 @@ func (UnimplementedHelmManagerServiceServer) GetPodLogs(*GetPodLogsRequest, grpc
 }
 func (UnimplementedHelmManagerServiceServer) CheckPodTerminal(context.Context, *CheckPodTerminalRequest) (*CheckPodTerminalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPodTerminal not implemented")
-}
-func (UnimplementedHelmManagerServiceServer) UploadChartPackage(grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method UploadChartPackage not implemented")
 }
 func (UnimplementedHelmManagerServiceServer) UpgradeChart(context.Context, *UpgradeChartRequest) (*UpgradeChartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpgradeChart not implemented")
@@ -527,13 +506,6 @@ func _HelmManagerService_CheckPodTerminal_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _HelmManagerService_UploadChartPackage_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(HelmManagerServiceServer).UploadChartPackage(&grpc.GenericServerStream[UploadChartPackageRequest, UploadChartPackageResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type HelmManagerService_UploadChartPackageServer = grpc.ClientStreamingServer[UploadChartPackageRequest, UploadChartPackageResponse]
-
 func _HelmManagerService_UpgradeChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpgradeChartRequest)
 	if err := dec(in); err != nil {
@@ -672,11 +644,6 @@ var HelmManagerService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "GetPodLogs",
 			Handler:       _HelmManagerService_GetPodLogs_Handler,
 			ServerStreams: true,
-		},
-		{
-			StreamName:    "UploadChartPackage",
-			Handler:       _HelmManagerService_UploadChartPackage_Handler,
-			ClientStreams: true,
 		},
 	},
 	Metadata: "helm_service.proto",
