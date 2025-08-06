@@ -2464,7 +2464,10 @@ func (x *ListInstalledChartsRequest) GetWithManifest() bool {
 
 type ListInstalledChartsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Charts        []*InstalledChart      `protobuf:"bytes,1,rep,name=charts,proto3" json:"charts,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Success       bool                   `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
+	Data          []*anypb.Any           `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2499,9 +2502,30 @@ func (*ListInstalledChartsResponse) Descriptor() ([]byte, []int) {
 	return file_helm_service_proto_rawDescGZIP(), []int{38}
 }
 
-func (x *ListInstalledChartsResponse) GetCharts() []*InstalledChart {
+func (x *ListInstalledChartsResponse) GetCode() int32 {
 	if x != nil {
-		return x.Charts
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListInstalledChartsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListInstalledChartsResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ListInstalledChartsResponse) GetData() []*anypb.Any {
+	if x != nil {
+		return x.Data
 	}
 	return nil
 }
@@ -2811,9 +2835,12 @@ const file_helm_service_proto_rawDesc = "" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12\x1f\n" +
 	"\vwith_status\x18\x03 \x01(\bR\n" +
 	"withStatus\x12#\n" +
-	"\rwith_manifest\x18\x04 \x01(\bR\fwithManifest\"T\n" +
-	"\x1bListInstalledChartsResponse\x125\n" +
-	"\x06charts\x18\x01 \x03(\v2\x1d.helm.v1alpha1.InstalledChartR\x06charts\"\x8f\x03\n" +
+	"\rwith_manifest\x18\x04 \x01(\bR\fwithManifest\"\x8f\x01\n" +
+	"\x1bListInstalledChartsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\asuccess\x18\x03 \x01(\bR\asuccess\x12(\n" +
+	"\x04data\x18\x04 \x03(\v2\x14.google.protobuf.AnyR\x04data\"\x8f\x03\n" +
 	"\x0eInstalledChart\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x1d\n" +
@@ -2925,7 +2952,7 @@ var file_helm_service_proto_depIdxs = []int32{
 	43, // 11: helm.v1alpha1.ChartSpec.values:type_name -> helm.v1alpha1.ChartSpec.ValuesEntry
 	29, // 12: helm.v1alpha1.UpgradeChartRequest.chart:type_name -> helm.v1alpha1.ChartSpec
 	35, // 13: helm.v1alpha1.ListChartVersionsResponse.versions:type_name -> helm.v1alpha1.ChartVersionInfo
-	39, // 14: helm.v1alpha1.ListInstalledChartsResponse.charts:type_name -> helm.v1alpha1.InstalledChart
+	45, // 14: helm.v1alpha1.ListInstalledChartsResponse.data:type_name -> google.protobuf.Any
 	46, // 15: helm.v1alpha1.InstalledChart.updated:type_name -> google.protobuf.Timestamp
 	44, // 16: helm.v1alpha1.InstalledChart.values:type_name -> helm.v1alpha1.InstalledChart.ValuesEntry
 	7,  // 17: helm.v1alpha1.InstallChartResponse.EntriesEntry.value:type_name -> helm.v1alpha1.K8sObjectList

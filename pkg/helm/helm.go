@@ -274,16 +274,31 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 		}, nil
 	} else {
 		// 4. 安装 chart
-		install := action.NewInstall(helmClient.actionConfig)
-		install.ReleaseName = req.GetReleaseName()
-		install.Namespace = req.GetNamespace()
+		releaseName := req.GetReleaseName()
+		namespace := req.GetNamespace()
+		if namespace == "" {
+			namespace = "default" // 默认命名空间
+		}
+
+		// 为指定 namespace 创建专用的 action configuration
+		actionConfig := new(action.Configuration)
+		debugLog := func(format string, v ...interface{}) {
+			logger.L().Debug(fmt.Sprintf(format, v...))
+		}
+		if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), namespace, "secret", debugLog); err != nil {
+			logger.L().Error("Failed to initialize Helm action configuration", zap.Error(err))
+			return nil, err
+		}
+
+		// 创建 Install action，使用专用的 actionConfig
+		install := action.NewInstall(actionConfig)
+		install.ReleaseName = releaseName
+		install.Namespace = namespace
 		if req.Version != "" {
 			install.Version = req.Version
 		}
-		if install.Namespace == "" {
-			install.Namespace = "default" // 默认命名空间
-		}
 		install.ChartPathOptions.InsecureSkipTLSverify = true
+		install.CreateNamespace = true // 确保 namespace 存在，如果不存在则创建
 
 		err := refreshChartRepository()
 		if err != nil {
@@ -305,29 +320,16 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 			return nil, err
 		}
 
-		// 确保 namespace 存在，如果不存在则创建
-		install.CreateNamespace = true
-
-		// 为指定 namespace 创建专用的 action configuration
-		actionConfig := new(action.Configuration)
-		debugLog := func(format string, v ...interface{}) {
-			logger.L().Debug(fmt.Sprintf(format, v...))
-		}
-		if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), install.Namespace, "secret", debugLog); err != nil {
-			logger.L().Error("Failed to initialize Helm action configuration", zap.Error(err))
-			return nil, err
-		}
-
 		var release *release.Release
 		get := action.NewGet(actionConfig)
 
-		if _, err := get.Run(install.ReleaseName); err == nil {
+		if _, err := get.Run(releaseName); err == nil {
 			// Release 已经存在则退出安装
-			logger.L().Info("Release already exists, skipping installation", zap.String("release_name", install.ReleaseName))
+			logger.L().Info("Release already exists, skipping installation", zap.String("release_name", releaseName))
 			return &pb.InstallChartResponse{
 				Code:        0,
 				Message:     "Release already exists, skipping installation",
-				ReleaseName: install.ReleaseName,
+				ReleaseName: releaseName,
 			}, nil
 		} else {
 			// Release 不存在，执行安装
@@ -594,18 +596,37 @@ func (s *HelmManagerServer) RollbackChart(ctx context.Context, req *pb.RollbackC
 func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.ListInstalledChartsRequest) (*pb.ListInstalledChartsResponse, error) {
 	logger.L().Info("ListInstalledCharts called", zap.String("request", req.String()))
 
-	list := action.NewList(helmClient.actionConfig)
+	namespace := req.GetNamespace()
+	if namespace == "" {
+		return nil, status.Errorf(codes.Internal, "namespace is required")
+	}
+
+	// 为指定 namespace 创建专用的 action configuration
+	actionConfig := new(action.Configuration)
+	debugLog := func(format string, v ...interface{}) {
+		logger.L().Debug(fmt.Sprintf(format, v...))
+	}
+	if err := actionConfig.Init(helmClient.settings.RESTClientGetter(), namespace, "secret", debugLog); err != nil {
+		logger.L().Error("Failed to initialize Helm action configuration for list", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "initialize helm action failed: %v", err)
+	}
+
+	list := action.NewList(actionConfig)
 	list.All = true
+	// 如果请求中没有指定 namespace，则查询所有 namespace
 	list.AllNamespaces = req.GetNamespace() == ""
 	releaseName := req.GetReleaseName()
 
-	logger.L().Info("Listing installed charts", zap.String("namespace", req.GetNamespace()), zap.String("release_name", releaseName))
+	logger.L().Info("Listing installed charts", zap.String("namespace", namespace), zap.String("release_name", releaseName))
 
 	releases, err := list.Run()
 	if len(releases) == 0 {
 		logger.L().Info("No installed charts found")
 		return &pb.ListInstalledChartsResponse{
-			Charts: nil,
+			Code:    0,
+			Message: "No installed charts found",
+			Success: true,
+			Data:    nil,
 		}, nil
 	}
 
@@ -636,7 +657,21 @@ func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.Lis
 		chartInfos = append(chartInfos, info)
 	}
 
+	// Convert to []*anypb.Any
+	var anyData []*anypb.Any
+	for _, chart := range chartInfos {
+		anyChart, err := anypb.New(chart)
+		if err != nil {
+			logger.L().Error("Failed to marshal InstalledChart to Any", zap.Error(err))
+			return nil, status.Errorf(codes.Internal, "marshal chart data failed: %v", err)
+		}
+		anyData = append(anyData, anyChart)
+	}
+
 	return &pb.ListInstalledChartsResponse{
-		Charts: chartInfos,
+		Code:    0,
+		Message: fmt.Sprintf("Found %d installed charts", len(chartInfos)),
+		Success: true,
+		Data:    anyData,
 	}, nil
 }

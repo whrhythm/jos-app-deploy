@@ -386,7 +386,10 @@ message ListInstalledChartsRequest {
 }
 
 message ListInstalledChartsResponse {
-  repeated InstalledChart charts = 1;
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+  repeated google.protobuf.Any data = 4;
 }
 
 message InstalledChart {
