@@ -3,11 +3,164 @@ syntax = "proto3";
 package pod.v1alpha1;
 
 import "google/api/annotations.proto";
-import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 option go_package = "./pkg/pb/;pb";
+
+// Pod 状态枚举
+enum PodState {
+  PENDING = 0;
+  RUNNING = 1;
+  SUCCEEDED = 2;
+  FAILED = 3;
+  UNKNOWN = 4;
+}
+
+// Pod 基本信息
+message Pod {
+  string name = 1;
+  string namespace = 2;
+  PodState state = 3;
+  string node_name = 4;
+  string pod_ip = 5;
+  google.protobuf.Timestamp start_time = 6;
+  map<string, string> labels = 7;
+  map<string, string> annotations = 8;
+}
+
+// 删除 Pod 请求
+message DeletePodRequest {
+  string namespace = 1;
+  string pod_name = 2;
+  bool force = 3;
+  int64 grace_period_seconds = 4;
+}
+
+// 删除 Pod 响应
+message DeletePodResponse {
+  string message = 1;
+  google.protobuf.Timestamp deletion_timestamp = 2;
+}
+
+// 获取 Pod 日志请求
+message GetPodLogsRequest {
+  string namespace = 1;
+  string pod_name = 2;
+  string container = 3;
+  bool follow = 4;
+  bool previous = 5;
+  int64 since_seconds = 6;
+  int64 tail_lines = 7;
+  bool timestamps = 8;
+}
+
+// 日志数据块
+message LogChunk {
+  bytes content = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+// 终端会话信息，应在流的第一个消息中发送
+message TerminalSessionInfo {
+  string namespace = 1;
+  string pod_name = 2;
+  string container = 3;      // 可选
+  repeated string command = 4; // 可选, e.g., ["/bin/sh"]
+}
+
+// 终端消息
+message TerminalMessage {
+  oneof payload {
+    TerminalSessionInfo session_info = 1; // 客户端发送的第一个消息
+    bytes data = 2;                       // 客户端 -> 服务端: stdin; 服务端 -> 客户端: stdout/stderr
+    Resize resize = 3;                    // 客户端发送的窗口大小调整
+  }
+}
+
+// 终端窗口大小
+message Resize {
+  uint32 width = 1;
+  uint32 height = 2;
+}
+
+// 配置 HPA 请求
+message ConfigureHPARequest {
+  string namespace = 1;
+  string deployment_name = 2;
+  int32 min_replicas = 3;
+  int32 max_replicas = 4;
+  map<string, string> metrics = 5;
+  int32 target_cpu_utilization = 6;
+}
+
+// 配置 HPA 响应
+message ConfigureHPAResponse {
+  string message = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+// 配置 VPA 请求
+message ConfigureVPARequest {
+  string namespace = 1;
+  string deployment_name = 2;
+  bool update_mode = 3;
+  map<string, string> resource_policies = 4;
+}
+
+// 配置 VPA 响应
+message ConfigureVPAResponse {
+  string message = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+// 创建金丝雀部署请求
+message CreateCanaryRequest {
+  string namespace = 1;
+  string rollout_name = 2;
+  int32 replica_count = 3;
+  string image = 4;
+  map<string, string> selector = 5;
+  map<string, string> traffic_routing = 6;
+  int32 steps = 7;
+}
+
+// 创建金丝雀部署响应
+message CreateCanaryResponse {
+  string message = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+// 创建蓝绿部署请求
+message CreateBlueGreenRequest {
+  string namespace = 1;
+  string rollout_name = 2;
+  string active_service = 3;
+  string preview_service = 4;
+  string image = 5;
+  int32 replica_count = 6;
+  map<string, string> selector = 7;
+  bool auto_promotion_enabled = 8;
+}
+
+// 创建蓝绿部署响应
+message CreateBlueGreenResponse {
+  string message = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+// 获取应用列表下所有pod的资源
+message PodsMetricsRequest {
+    string namespace = 1;
+    string release_name = 2;
+}
+
+message PodsMetricsResponse {
+    int32 code = 1;
+    int32 app_num = 2;
+    int32 pod_num = 3;
+    string cpu_usage = 4;
+    string mem_usage = 5;
+}
 
 service PodManagerService {
   // 删除 Pod
@@ -27,7 +180,11 @@ service PodManagerService {
   // 进入 Pod 终端 (WebSocket/流式)
   rpc ExecPodTerminal(stream TerminalMessage) returns (stream TerminalMessage) {
     option (google.api.http) = {
-      get: "/v1alpha1/namespaces/{namespace}/pods/{pod_name}/exec"
+      // 此流式接口不适合直接映射为标准的 RESTful GET/POST
+      // 通常通过 WebSocket 代理实现
+      // 这里移除 http option，或保留一个非标准的 POST 用于特定客户端
+      post: "/v1alpha1/pod/exec"
+      body: "*"
     };
   }
 
@@ -60,6 +217,13 @@ service PodManagerService {
     option (google.api.http) = {
       post: "/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/bluegreen"
       body: "*"
+    };
+  }
+
+  // 统计应用下所有pod的cpu/mem信息
+    rpc PodsMetrics(PodsMetricsRequest) returns (PodsMetricsResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/namespaces/{namespace}/{release_name}/pod/metrics"
     };
   }
 }

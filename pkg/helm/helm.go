@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,6 +22,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/release"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/client-go/kubernetes"
@@ -685,14 +687,7 @@ func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.Lis
 	}, nil
 }
 
-func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodStatusRequest) (*pb.ListPodStatusResponse, error) {
-	logger.L().Info("ListPodStatus called", zap.String("request", req.String()))
-
-	namespace := req.GetNamespace()
-	if namespace == "" {
-		namespace = "default"
-	}
-	// 通过标签获取 pod 列表
+func GetPodList(ctx context.Context, namespace, releaseName string) (*v1.PodList, error) {
 	restConfig, err := helmClient.settings.RESTClientGetter().ToRESTConfig()
 	if err != nil {
 		logger.L().Error("Failed to get REST config", zap.Error(err))
@@ -706,8 +701,24 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 	}
 
 	podList, err := clientset.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("app.kubernetes.io/instance=%s", req.GetReleaseName()),
+		LabelSelector: fmt.Sprintf("app.kubernetes.io/instance=%s", releaseName),
 	})
+	if err != nil {
+		logger.L().Error("Failed to list pods", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "list pods failed: %v", err)
+	}
+
+	return podList, nil
+}
+
+func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodStatusRequest) (*pb.ListPodStatusResponse, error) {
+	logger.L().Info("ListPodStatus called", zap.String("request", req.String()))
+
+	namespace := req.GetNamespace()
+	if namespace == "" {
+		namespace = "default"
+	}
+	podList, err := GetPodList(ctx, namespace, req.GetReleaseName())
 	if err != nil {
 		logger.L().Error("Failed to list pods", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "list pods failed: %v", err)
@@ -721,7 +732,6 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 			Phase:      string(pod.Status.Phase),
 			Ip:         pod.Status.PodIP,
 			Node:       pod.Spec.NodeName,
-			Timestamp:  pod.CreationTimestamp.String(),
 			Labels:     pod.Labels,
 			Containers: make([]*pb.ContainerStatus, 0, len(pod.Status.ContainerStatuses)),
 		}
@@ -741,12 +751,23 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 		}
 		readStatus := fmt.Sprintf("%d/%d", readyCount, len(pod.Status.ContainerStatuses))
 		podStatus.Ready = readStatus
+		age := metav1.Now().Sub(pod.CreationTimestamp.Time) // 计算 Pod 的年龄
+		// 根据age的大小，分别以秒/小时/天来统计
+		switch {
+		case age < time.Minute:
+			podStatus.Age = fmt.Sprintf("%d秒", int(age.Seconds()))
+		case age < time.Hour:
+			podStatus.Age = fmt.Sprintf("%d分钟", int(age.Minutes()))
+		default:
+			podStatus.Age = fmt.Sprintf("%d小时", int(age.Hours()))
+		}
 		podStatuses = append(podStatuses, podStatus)
 	}
 
 	return &pb.ListPodStatusResponse{
 		Code:    0,
 		Message: fmt.Sprintf("Found %d pods", len(podStatuses)),
-		Pods:    podStatuses,
+		Success: true,
+		Data:    &pb.PodsStatusList{Pods: podStatuses},
 	}, nil
 }

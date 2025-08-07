@@ -232,7 +232,7 @@ message PodStatus {
   int32 restarts = 4;       // 容器重启次数
   string ip = 5;            // Pod IP 地址
   string node = 6;          // 所在节点名称
-  string timestamp = 7; // 状态更新时间
+  string age = 7;
   map<string, string> labels = 8;         // Pod 标签
   repeated ContainerStatus containers = 9; // 容器状态详情
 }
@@ -245,10 +245,15 @@ message ContainerStatus {
   string image = 5;
 }
 
-message ListPodStatusResponse {
+message PodsStatusList {
   repeated PodStatus pods = 1; // Pod 状态数组
-  int32 code = 2;
-  string message = 3;
+}
+
+message ListPodStatusResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+  PodsStatusList data = 4;
 }
 
 // 7. 检查 ApisixRoute

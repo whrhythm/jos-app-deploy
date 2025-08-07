@@ -1005,13 +1005,13 @@ func (x *ListPodStatusRequest) GetReleaseName() string {
 
 type PodStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                                                               // Pod 名称
-	Phase         string                 `protobuf:"bytes,2,opt,name=phase,proto3" json:"phase,omitempty"`                                                                             // 当前阶段（Pending/Running/Succeeded/Failed）
-	Ready         string                 `protobuf:"bytes,3,opt,name=ready,proto3" json:"ready,omitempty"`                                                                             // 就绪状态（如 "1/2"）
-	Restarts      int32                  `protobuf:"varint,4,opt,name=restarts,proto3" json:"restarts,omitempty"`                                                                      // 容器重启次数
-	Ip            string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`                                                                                   // Pod IP 地址
-	Node          string                 `protobuf:"bytes,6,opt,name=node,proto3" json:"node,omitempty"`                                                                               // 所在节点名称
-	Timestamp     string                 `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                                                     // 状态更新时间
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`          // Pod 名称
+	Phase         string                 `protobuf:"bytes,2,opt,name=phase,proto3" json:"phase,omitempty"`        // 当前阶段（Pending/Running/Succeeded/Failed）
+	Ready         string                 `protobuf:"bytes,3,opt,name=ready,proto3" json:"ready,omitempty"`        // 就绪状态（如 "1/2"）
+	Restarts      int32                  `protobuf:"varint,4,opt,name=restarts,proto3" json:"restarts,omitempty"` // 容器重启次数
+	Ip            string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`              // Pod IP 地址
+	Node          string                 `protobuf:"bytes,6,opt,name=node,proto3" json:"node,omitempty"`          // 所在节点名称
+	Age           string                 `protobuf:"bytes,7,opt,name=age,proto3" json:"age,omitempty"`
 	Labels        map[string]string      `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Pod 标签
 	Containers    []*ContainerStatus     `protobuf:"bytes,9,rep,name=containers,proto3" json:"containers,omitempty"`                                                                   // 容器状态详情
 	unknownFields protoimpl.UnknownFields
@@ -1090,9 +1090,9 @@ func (x *PodStatus) GetNode() string {
 	return ""
 }
 
-func (x *PodStatus) GetTimestamp() string {
+func (x *PodStatus) GetAge() string {
 	if x != nil {
-		return x.Timestamp
+		return x.Age
 	}
 	return ""
 }
@@ -1187,18 +1187,63 @@ func (x *ContainerStatus) GetImage() string {
 	return ""
 }
 
-type ListPodStatusResponse struct {
+type PodsStatusList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pods          []*PodStatus           `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"` // Pod 状态数组
-	Code          int32                  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PodsStatusList) Reset() {
+	*x = PodsStatusList{}
+	mi := &file_helm_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PodsStatusList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PodsStatusList) ProtoMessage() {}
+
+func (x *PodsStatusList) ProtoReflect() protoreflect.Message {
+	mi := &file_helm_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PodsStatusList.ProtoReflect.Descriptor instead.
+func (*PodsStatusList) Descriptor() ([]byte, []int) {
+	return file_helm_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PodsStatusList) GetPods() []*PodStatus {
+	if x != nil {
+		return x.Pods
+	}
+	return nil
+}
+
+type ListPodStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Success       bool                   `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
+	Data          *PodsStatusList        `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListPodStatusResponse) Reset() {
 	*x = ListPodStatusResponse{}
-	mi := &file_helm_service_proto_msgTypes[17]
+	mi := &file_helm_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1210,7 +1255,7 @@ func (x *ListPodStatusResponse) String() string {
 func (*ListPodStatusResponse) ProtoMessage() {}
 
 func (x *ListPodStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[17]
+	mi := &file_helm_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1223,14 +1268,7 @@ func (x *ListPodStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPodStatusResponse.ProtoReflect.Descriptor instead.
 func (*ListPodStatusResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *ListPodStatusResponse) GetPods() []*PodStatus {
-	if x != nil {
-		return x.Pods
-	}
-	return nil
+	return file_helm_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListPodStatusResponse) GetCode() int32 {
@@ -1247,6 +1285,20 @@ func (x *ListPodStatusResponse) GetMessage() string {
 	return ""
 }
 
+func (x *ListPodStatusResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ListPodStatusResponse) GetData() *PodsStatusList {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 // 7. 检查 ApisixRoute
 type CheckApisixRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1258,7 +1310,7 @@ type CheckApisixRouteRequest struct {
 
 func (x *CheckApisixRouteRequest) Reset() {
 	*x = CheckApisixRouteRequest{}
-	mi := &file_helm_service_proto_msgTypes[18]
+	mi := &file_helm_service_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1270,7 +1322,7 @@ func (x *CheckApisixRouteRequest) String() string {
 func (*CheckApisixRouteRequest) ProtoMessage() {}
 
 func (x *CheckApisixRouteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[18]
+	mi := &file_helm_service_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1283,7 +1335,7 @@ func (x *CheckApisixRouteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckApisixRouteRequest.ProtoReflect.Descriptor instead.
 func (*CheckApisixRouteRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{18}
+	return file_helm_service_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CheckApisixRouteRequest) GetReleaseName() string {
@@ -1310,7 +1362,7 @@ type CheckApisixRouteResponse struct {
 
 func (x *CheckApisixRouteResponse) Reset() {
 	*x = CheckApisixRouteResponse{}
-	mi := &file_helm_service_proto_msgTypes[19]
+	mi := &file_helm_service_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1322,7 +1374,7 @@ func (x *CheckApisixRouteResponse) String() string {
 func (*CheckApisixRouteResponse) ProtoMessage() {}
 
 func (x *CheckApisixRouteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[19]
+	mi := &file_helm_service_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1335,7 +1387,7 @@ func (x *CheckApisixRouteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckApisixRouteResponse.ProtoReflect.Descriptor instead.
 func (*CheckApisixRouteResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{19}
+	return file_helm_service_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CheckApisixRouteResponse) GetExists() bool {
@@ -1365,7 +1417,7 @@ type CreateChartApplicationRequest struct {
 
 func (x *CreateChartApplicationRequest) Reset() {
 	*x = CreateChartApplicationRequest{}
-	mi := &file_helm_service_proto_msgTypes[20]
+	mi := &file_helm_service_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1377,7 +1429,7 @@ func (x *CreateChartApplicationRequest) String() string {
 func (*CreateChartApplicationRequest) ProtoMessage() {}
 
 func (x *CreateChartApplicationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[20]
+	mi := &file_helm_service_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1390,7 +1442,7 @@ func (x *CreateChartApplicationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChartApplicationRequest.ProtoReflect.Descriptor instead.
 func (*CreateChartApplicationRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{20}
+	return file_helm_service_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CreateChartApplicationRequest) GetNamespace() string {
@@ -1430,7 +1482,7 @@ type CreateChartApplicationResponse struct {
 
 func (x *CreateChartApplicationResponse) Reset() {
 	*x = CreateChartApplicationResponse{}
-	mi := &file_helm_service_proto_msgTypes[21]
+	mi := &file_helm_service_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1442,7 +1494,7 @@ func (x *CreateChartApplicationResponse) String() string {
 func (*CreateChartApplicationResponse) ProtoMessage() {}
 
 func (x *CreateChartApplicationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[21]
+	mi := &file_helm_service_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1455,7 +1507,7 @@ func (x *CreateChartApplicationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChartApplicationResponse.ProtoReflect.Descriptor instead.
 func (*CreateChartApplicationResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{21}
+	return file_helm_service_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateChartApplicationResponse) GetSuccess() bool {
@@ -1478,7 +1530,7 @@ type GetPodLogsRequest struct {
 
 func (x *GetPodLogsRequest) Reset() {
 	*x = GetPodLogsRequest{}
-	mi := &file_helm_service_proto_msgTypes[22]
+	mi := &file_helm_service_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1490,7 +1542,7 @@ func (x *GetPodLogsRequest) String() string {
 func (*GetPodLogsRequest) ProtoMessage() {}
 
 func (x *GetPodLogsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[22]
+	mi := &file_helm_service_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1503,7 +1555,7 @@ func (x *GetPodLogsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPodLogsRequest.ProtoReflect.Descriptor instead.
 func (*GetPodLogsRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{22}
+	return file_helm_service_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetPodLogsRequest) GetNamespace() string {
@@ -1543,7 +1595,7 @@ type LogChunk struct {
 
 func (x *LogChunk) Reset() {
 	*x = LogChunk{}
-	mi := &file_helm_service_proto_msgTypes[23]
+	mi := &file_helm_service_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1555,7 +1607,7 @@ func (x *LogChunk) String() string {
 func (*LogChunk) ProtoMessage() {}
 
 func (x *LogChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[23]
+	mi := &file_helm_service_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1568,7 +1620,7 @@ func (x *LogChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogChunk.ProtoReflect.Descriptor instead.
 func (*LogChunk) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{23}
+	return file_helm_service_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *LogChunk) GetContent() []byte {
@@ -1590,7 +1642,7 @@ type CheckPodTerminalRequest struct {
 
 func (x *CheckPodTerminalRequest) Reset() {
 	*x = CheckPodTerminalRequest{}
-	mi := &file_helm_service_proto_msgTypes[24]
+	mi := &file_helm_service_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1602,7 +1654,7 @@ func (x *CheckPodTerminalRequest) String() string {
 func (*CheckPodTerminalRequest) ProtoMessage() {}
 
 func (x *CheckPodTerminalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[24]
+	mi := &file_helm_service_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1615,7 +1667,7 @@ func (x *CheckPodTerminalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPodTerminalRequest.ProtoReflect.Descriptor instead.
 func (*CheckPodTerminalRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{24}
+	return file_helm_service_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CheckPodTerminalRequest) GetNamespace() string {
@@ -1649,7 +1701,7 @@ type CheckPodTerminalResponse struct {
 
 func (x *CheckPodTerminalResponse) Reset() {
 	*x = CheckPodTerminalResponse{}
-	mi := &file_helm_service_proto_msgTypes[25]
+	mi := &file_helm_service_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1661,7 +1713,7 @@ func (x *CheckPodTerminalResponse) String() string {
 func (*CheckPodTerminalResponse) ProtoMessage() {}
 
 func (x *CheckPodTerminalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[25]
+	mi := &file_helm_service_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1674,7 +1726,7 @@ func (x *CheckPodTerminalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPodTerminalResponse.ProtoReflect.Descriptor instead.
 func (*CheckPodTerminalResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{25}
+	return file_helm_service_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *CheckPodTerminalResponse) GetSupported() bool {
@@ -1704,7 +1756,7 @@ type ChartSpec struct {
 
 func (x *ChartSpec) Reset() {
 	*x = ChartSpec{}
-	mi := &file_helm_service_proto_msgTypes[26]
+	mi := &file_helm_service_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1716,7 +1768,7 @@ func (x *ChartSpec) String() string {
 func (*ChartSpec) ProtoMessage() {}
 
 func (x *ChartSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[26]
+	mi := &file_helm_service_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1729,7 +1781,7 @@ func (x *ChartSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChartSpec.ProtoReflect.Descriptor instead.
 func (*ChartSpec) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{26}
+	return file_helm_service_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ChartSpec) GetChartName() string {
@@ -1774,7 +1826,7 @@ type UpgradeChartRequest struct {
 
 func (x *UpgradeChartRequest) Reset() {
 	*x = UpgradeChartRequest{}
-	mi := &file_helm_service_proto_msgTypes[27]
+	mi := &file_helm_service_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1786,7 +1838,7 @@ func (x *UpgradeChartRequest) String() string {
 func (*UpgradeChartRequest) ProtoMessage() {}
 
 func (x *UpgradeChartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[27]
+	mi := &file_helm_service_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1799,7 +1851,7 @@ func (x *UpgradeChartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeChartRequest.ProtoReflect.Descriptor instead.
 func (*UpgradeChartRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{27}
+	return file_helm_service_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpgradeChartRequest) GetNamespace() string {
@@ -1847,7 +1899,7 @@ type UpgradeChartResponse struct {
 
 func (x *UpgradeChartResponse) Reset() {
 	*x = UpgradeChartResponse{}
-	mi := &file_helm_service_proto_msgTypes[28]
+	mi := &file_helm_service_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1859,7 +1911,7 @@ func (x *UpgradeChartResponse) String() string {
 func (*UpgradeChartResponse) ProtoMessage() {}
 
 func (x *UpgradeChartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[28]
+	mi := &file_helm_service_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1872,7 +1924,7 @@ func (x *UpgradeChartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpgradeChartResponse.ProtoReflect.Descriptor instead.
 func (*UpgradeChartResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{28}
+	return file_helm_service_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *UpgradeChartResponse) GetStatus() string {
@@ -1902,7 +1954,7 @@ type RollbackChartRequest struct {
 
 func (x *RollbackChartRequest) Reset() {
 	*x = RollbackChartRequest{}
-	mi := &file_helm_service_proto_msgTypes[29]
+	mi := &file_helm_service_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1914,7 +1966,7 @@ func (x *RollbackChartRequest) String() string {
 func (*RollbackChartRequest) ProtoMessage() {}
 
 func (x *RollbackChartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[29]
+	mi := &file_helm_service_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1927,7 +1979,7 @@ func (x *RollbackChartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollbackChartRequest.ProtoReflect.Descriptor instead.
 func (*RollbackChartRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{29}
+	return file_helm_service_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *RollbackChartRequest) GetNamespace() string {
@@ -1968,7 +2020,7 @@ type RollbackChartResponse struct {
 
 func (x *RollbackChartResponse) Reset() {
 	*x = RollbackChartResponse{}
-	mi := &file_helm_service_proto_msgTypes[30]
+	mi := &file_helm_service_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1980,7 +2032,7 @@ func (x *RollbackChartResponse) String() string {
 func (*RollbackChartResponse) ProtoMessage() {}
 
 func (x *RollbackChartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[30]
+	mi := &file_helm_service_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1993,7 +2045,7 @@ func (x *RollbackChartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollbackChartResponse.ProtoReflect.Descriptor instead.
 func (*RollbackChartResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{30}
+	return file_helm_service_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *RollbackChartResponse) GetStatus() string {
@@ -2022,7 +2074,7 @@ type ListChartVersionsRequest struct {
 
 func (x *ListChartVersionsRequest) Reset() {
 	*x = ListChartVersionsRequest{}
-	mi := &file_helm_service_proto_msgTypes[31]
+	mi := &file_helm_service_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2034,7 +2086,7 @@ func (x *ListChartVersionsRequest) String() string {
 func (*ListChartVersionsRequest) ProtoMessage() {}
 
 func (x *ListChartVersionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[31]
+	mi := &file_helm_service_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2047,7 +2099,7 @@ func (x *ListChartVersionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChartVersionsRequest.ProtoReflect.Descriptor instead.
 func (*ListChartVersionsRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{31}
+	return file_helm_service_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ListChartVersionsRequest) GetRepoName() string {
@@ -2083,7 +2135,7 @@ type ChartVersionInfo struct {
 
 func (x *ChartVersionInfo) Reset() {
 	*x = ChartVersionInfo{}
-	mi := &file_helm_service_proto_msgTypes[32]
+	mi := &file_helm_service_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2095,7 +2147,7 @@ func (x *ChartVersionInfo) String() string {
 func (*ChartVersionInfo) ProtoMessage() {}
 
 func (x *ChartVersionInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[32]
+	mi := &file_helm_service_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2108,7 +2160,7 @@ func (x *ChartVersionInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChartVersionInfo.ProtoReflect.Descriptor instead.
 func (*ChartVersionInfo) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{32}
+	return file_helm_service_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ChartVersionInfo) GetVersion() string {
@@ -2149,7 +2201,7 @@ type ListChartVersionsResponse struct {
 
 func (x *ListChartVersionsResponse) Reset() {
 	*x = ListChartVersionsResponse{}
-	mi := &file_helm_service_proto_msgTypes[33]
+	mi := &file_helm_service_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2161,7 +2213,7 @@ func (x *ListChartVersionsResponse) String() string {
 func (*ListChartVersionsResponse) ProtoMessage() {}
 
 func (x *ListChartVersionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[33]
+	mi := &file_helm_service_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2174,7 +2226,7 @@ func (x *ListChartVersionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChartVersionsResponse.ProtoReflect.Descriptor instead.
 func (*ListChartVersionsResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{33}
+	return file_helm_service_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ListChartVersionsResponse) GetVersions() []*ChartVersionInfo {
@@ -2203,7 +2255,7 @@ type ListInstalledChartsRequest struct {
 
 func (x *ListInstalledChartsRequest) Reset() {
 	*x = ListInstalledChartsRequest{}
-	mi := &file_helm_service_proto_msgTypes[34]
+	mi := &file_helm_service_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2215,7 +2267,7 @@ func (x *ListInstalledChartsRequest) String() string {
 func (*ListInstalledChartsRequest) ProtoMessage() {}
 
 func (x *ListInstalledChartsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[34]
+	mi := &file_helm_service_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2228,7 +2280,7 @@ func (x *ListInstalledChartsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListInstalledChartsRequest.ProtoReflect.Descriptor instead.
 func (*ListInstalledChartsRequest) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{34}
+	return file_helm_service_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ListInstalledChartsRequest) GetNamespace() string {
@@ -2271,7 +2323,7 @@ type ListInstalledChartsResponse struct {
 
 func (x *ListInstalledChartsResponse) Reset() {
 	*x = ListInstalledChartsResponse{}
-	mi := &file_helm_service_proto_msgTypes[35]
+	mi := &file_helm_service_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2283,7 +2335,7 @@ func (x *ListInstalledChartsResponse) String() string {
 func (*ListInstalledChartsResponse) ProtoMessage() {}
 
 func (x *ListInstalledChartsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[35]
+	mi := &file_helm_service_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2296,7 +2348,7 @@ func (x *ListInstalledChartsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListInstalledChartsResponse.ProtoReflect.Descriptor instead.
 func (*ListInstalledChartsResponse) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{35}
+	return file_helm_service_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ListInstalledChartsResponse) GetCode() int32 {
@@ -2344,7 +2396,7 @@ type InstalledChart struct {
 
 func (x *InstalledChart) Reset() {
 	*x = InstalledChart{}
-	mi := &file_helm_service_proto_msgTypes[36]
+	mi := &file_helm_service_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2356,7 +2408,7 @@ func (x *InstalledChart) String() string {
 func (*InstalledChart) ProtoMessage() {}
 
 func (x *InstalledChart) ProtoReflect() protoreflect.Message {
-	mi := &file_helm_service_proto_msgTypes[36]
+	mi := &file_helm_service_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2369,7 +2421,7 @@ func (x *InstalledChart) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InstalledChart.ProtoReflect.Descriptor instead.
 func (*InstalledChart) Descriptor() ([]byte, []int) {
-	return file_helm_service_proto_rawDescGZIP(), []int{36}
+	return file_helm_service_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *InstalledChart) GetName() string {
@@ -2520,15 +2572,15 @@ const file_helm_service_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"W\n" +
 	"\x14ListPodStatusRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
-	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xe2\x02\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xd6\x02\n" +
 	"\tPodStatus\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phase\x18\x02 \x01(\tR\x05phase\x12\x14\n" +
 	"\x05ready\x18\x03 \x01(\tR\x05ready\x12\x1a\n" +
 	"\brestarts\x18\x04 \x01(\x05R\brestarts\x12\x0e\n" +
 	"\x02ip\x18\x05 \x01(\tR\x02ip\x12\x12\n" +
-	"\x04node\x18\x06 \x01(\tR\x04node\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\tR\ttimestamp\x12<\n" +
+	"\x04node\x18\x06 \x01(\tR\x04node\x12\x10\n" +
+	"\x03age\x18\a \x01(\tR\x03age\x12<\n" +
 	"\x06labels\x18\b \x03(\v2$.helm.v1alpha1.PodStatus.LabelsEntryR\x06labels\x12>\n" +
 	"\n" +
 	"containers\x18\t \x03(\v2\x1e.helm.v1alpha1.ContainerStatusR\n" +
@@ -2541,11 +2593,14 @@ const file_helm_service_proto_rawDesc = "" +
 	"\x05ready\x18\x02 \x01(\bR\x05ready\x12#\n" +
 	"\rrestart_count\x18\x03 \x01(\x05R\frestartCount\x12\x14\n" +
 	"\x05state\x18\x04 \x01(\tR\x05state\x12\x14\n" +
-	"\x05image\x18\x05 \x01(\tR\x05image\"s\n" +
-	"\x15ListPodStatusResponse\x12,\n" +
-	"\x04pods\x18\x01 \x03(\v2\x18.helm.v1alpha1.PodStatusR\x04pods\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"Z\n" +
+	"\x05image\x18\x05 \x01(\tR\x05image\">\n" +
+	"\x0ePodsStatusList\x12,\n" +
+	"\x04pods\x18\x01 \x03(\v2\x18.helm.v1alpha1.PodStatusR\x04pods\"\x92\x01\n" +
+	"\x15ListPodStatusResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\asuccess\x18\x03 \x01(\bR\asuccess\x121\n" +
+	"\x04data\x18\x04 \x01(\v2\x1d.helm.v1alpha1.PodsStatusListR\x04data\"Z\n" +
 	"\x17CheckApisixRouteRequest\x12!\n" +
 	"\frelease_name\x18\x01 \x01(\tR\vreleaseName\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"O\n" +
@@ -2670,7 +2725,7 @@ func file_helm_service_proto_rawDescGZIP() []byte {
 	return file_helm_service_proto_rawDescData
 }
 
-var file_helm_service_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_helm_service_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_helm_service_proto_goTypes = []any{
 	(*ListChartsRequest)(nil),              // 0: helm.v1alpha1.ListChartsRequest
 	(*ChartInfo)(nil),                      // 1: helm.v1alpha1.ChartInfo
@@ -2689,84 +2744,86 @@ var file_helm_service_proto_goTypes = []any{
 	(*ListPodStatusRequest)(nil),           // 14: helm.v1alpha1.ListPodStatusRequest
 	(*PodStatus)(nil),                      // 15: helm.v1alpha1.PodStatus
 	(*ContainerStatus)(nil),                // 16: helm.v1alpha1.ContainerStatus
-	(*ListPodStatusResponse)(nil),          // 17: helm.v1alpha1.ListPodStatusResponse
-	(*CheckApisixRouteRequest)(nil),        // 18: helm.v1alpha1.CheckApisixRouteRequest
-	(*CheckApisixRouteResponse)(nil),       // 19: helm.v1alpha1.CheckApisixRouteResponse
-	(*CreateChartApplicationRequest)(nil),  // 20: helm.v1alpha1.CreateChartApplicationRequest
-	(*CreateChartApplicationResponse)(nil), // 21: helm.v1alpha1.CreateChartApplicationResponse
-	(*GetPodLogsRequest)(nil),              // 22: helm.v1alpha1.GetPodLogsRequest
-	(*LogChunk)(nil),                       // 23: helm.v1alpha1.LogChunk
-	(*CheckPodTerminalRequest)(nil),        // 24: helm.v1alpha1.CheckPodTerminalRequest
-	(*CheckPodTerminalResponse)(nil),       // 25: helm.v1alpha1.CheckPodTerminalResponse
-	(*ChartSpec)(nil),                      // 26: helm.v1alpha1.ChartSpec
-	(*UpgradeChartRequest)(nil),            // 27: helm.v1alpha1.UpgradeChartRequest
-	(*UpgradeChartResponse)(nil),           // 28: helm.v1alpha1.UpgradeChartResponse
-	(*RollbackChartRequest)(nil),           // 29: helm.v1alpha1.RollbackChartRequest
-	(*RollbackChartResponse)(nil),          // 30: helm.v1alpha1.RollbackChartResponse
-	(*ListChartVersionsRequest)(nil),       // 31: helm.v1alpha1.ListChartVersionsRequest
-	(*ChartVersionInfo)(nil),               // 32: helm.v1alpha1.ChartVersionInfo
-	(*ListChartVersionsResponse)(nil),      // 33: helm.v1alpha1.ListChartVersionsResponse
-	(*ListInstalledChartsRequest)(nil),     // 34: helm.v1alpha1.ListInstalledChartsRequest
-	(*ListInstalledChartsResponse)(nil),    // 35: helm.v1alpha1.ListInstalledChartsResponse
-	(*InstalledChart)(nil),                 // 36: helm.v1alpha1.InstalledChart
-	nil,                                    // 37: helm.v1alpha1.InstallChartResponse.EntriesEntry
-	nil,                                    // 38: helm.v1alpha1.UninstallChartRequest.OptionsEntry
-	nil,                                    // 39: helm.v1alpha1.PodStatus.LabelsEntry
-	nil,                                    // 40: helm.v1alpha1.ChartSpec.ValuesEntry
-	nil,                                    // 41: helm.v1alpha1.InstalledChart.ValuesEntry
-	(*anypb.Any)(nil),                      // 42: google.protobuf.Any
-	(*timestamppb.Timestamp)(nil),          // 43: google.protobuf.Timestamp
+	(*PodsStatusList)(nil),                 // 17: helm.v1alpha1.PodsStatusList
+	(*ListPodStatusResponse)(nil),          // 18: helm.v1alpha1.ListPodStatusResponse
+	(*CheckApisixRouteRequest)(nil),        // 19: helm.v1alpha1.CheckApisixRouteRequest
+	(*CheckApisixRouteResponse)(nil),       // 20: helm.v1alpha1.CheckApisixRouteResponse
+	(*CreateChartApplicationRequest)(nil),  // 21: helm.v1alpha1.CreateChartApplicationRequest
+	(*CreateChartApplicationResponse)(nil), // 22: helm.v1alpha1.CreateChartApplicationResponse
+	(*GetPodLogsRequest)(nil),              // 23: helm.v1alpha1.GetPodLogsRequest
+	(*LogChunk)(nil),                       // 24: helm.v1alpha1.LogChunk
+	(*CheckPodTerminalRequest)(nil),        // 25: helm.v1alpha1.CheckPodTerminalRequest
+	(*CheckPodTerminalResponse)(nil),       // 26: helm.v1alpha1.CheckPodTerminalResponse
+	(*ChartSpec)(nil),                      // 27: helm.v1alpha1.ChartSpec
+	(*UpgradeChartRequest)(nil),            // 28: helm.v1alpha1.UpgradeChartRequest
+	(*UpgradeChartResponse)(nil),           // 29: helm.v1alpha1.UpgradeChartResponse
+	(*RollbackChartRequest)(nil),           // 30: helm.v1alpha1.RollbackChartRequest
+	(*RollbackChartResponse)(nil),          // 31: helm.v1alpha1.RollbackChartResponse
+	(*ListChartVersionsRequest)(nil),       // 32: helm.v1alpha1.ListChartVersionsRequest
+	(*ChartVersionInfo)(nil),               // 33: helm.v1alpha1.ChartVersionInfo
+	(*ListChartVersionsResponse)(nil),      // 34: helm.v1alpha1.ListChartVersionsResponse
+	(*ListInstalledChartsRequest)(nil),     // 35: helm.v1alpha1.ListInstalledChartsRequest
+	(*ListInstalledChartsResponse)(nil),    // 36: helm.v1alpha1.ListInstalledChartsResponse
+	(*InstalledChart)(nil),                 // 37: helm.v1alpha1.InstalledChart
+	nil,                                    // 38: helm.v1alpha1.InstallChartResponse.EntriesEntry
+	nil,                                    // 39: helm.v1alpha1.UninstallChartRequest.OptionsEntry
+	nil,                                    // 40: helm.v1alpha1.PodStatus.LabelsEntry
+	nil,                                    // 41: helm.v1alpha1.ChartSpec.ValuesEntry
+	nil,                                    // 42: helm.v1alpha1.InstalledChart.ValuesEntry
+	(*anypb.Any)(nil),                      // 43: google.protobuf.Any
+	(*timestamppb.Timestamp)(nil),          // 44: google.protobuf.Timestamp
 }
 var file_helm_service_proto_depIdxs = []int32{
 	1,  // 0: helm.v1alpha1.ListChartsData.charts:type_name -> helm.v1alpha1.ChartInfo
-	42, // 1: helm.v1alpha1.ListChartsResponse.data:type_name -> google.protobuf.Any
-	42, // 2: helm.v1alpha1.K8sObject.object:type_name -> google.protobuf.Any
+	43, // 1: helm.v1alpha1.ListChartsResponse.data:type_name -> google.protobuf.Any
+	43, // 2: helm.v1alpha1.K8sObject.object:type_name -> google.protobuf.Any
 	6,  // 3: helm.v1alpha1.K8sObjectList.items:type_name -> helm.v1alpha1.K8sObject
-	37, // 4: helm.v1alpha1.InstallChartResponse.entries:type_name -> helm.v1alpha1.InstallChartResponse.EntriesEntry
-	38, // 5: helm.v1alpha1.UninstallChartRequest.options:type_name -> helm.v1alpha1.UninstallChartRequest.OptionsEntry
-	39, // 6: helm.v1alpha1.PodStatus.labels:type_name -> helm.v1alpha1.PodStatus.LabelsEntry
+	38, // 4: helm.v1alpha1.InstallChartResponse.entries:type_name -> helm.v1alpha1.InstallChartResponse.EntriesEntry
+	39, // 5: helm.v1alpha1.UninstallChartRequest.options:type_name -> helm.v1alpha1.UninstallChartRequest.OptionsEntry
+	40, // 6: helm.v1alpha1.PodStatus.labels:type_name -> helm.v1alpha1.PodStatus.LabelsEntry
 	16, // 7: helm.v1alpha1.PodStatus.containers:type_name -> helm.v1alpha1.ContainerStatus
-	15, // 8: helm.v1alpha1.ListPodStatusResponse.pods:type_name -> helm.v1alpha1.PodStatus
-	40, // 9: helm.v1alpha1.ChartSpec.values:type_name -> helm.v1alpha1.ChartSpec.ValuesEntry
-	26, // 10: helm.v1alpha1.UpgradeChartRequest.chart:type_name -> helm.v1alpha1.ChartSpec
-	32, // 11: helm.v1alpha1.ListChartVersionsResponse.versions:type_name -> helm.v1alpha1.ChartVersionInfo
-	42, // 12: helm.v1alpha1.ListInstalledChartsResponse.data:type_name -> google.protobuf.Any
-	43, // 13: helm.v1alpha1.InstalledChart.updated:type_name -> google.protobuf.Timestamp
-	41, // 14: helm.v1alpha1.InstalledChart.values:type_name -> helm.v1alpha1.InstalledChart.ValuesEntry
-	7,  // 15: helm.v1alpha1.InstallChartResponse.EntriesEntry.value:type_name -> helm.v1alpha1.K8sObjectList
-	0,  // 16: helm.v1alpha1.HelmManagerService.ListCharts:input_type -> helm.v1alpha1.ListChartsRequest
-	4,  // 17: helm.v1alpha1.HelmManagerService.ConfigureRepo:input_type -> helm.v1alpha1.ConfigureRepoRequest
-	8,  // 18: helm.v1alpha1.HelmManagerService.InstallChart:input_type -> helm.v1alpha1.InstallChartRequest
-	10, // 19: helm.v1alpha1.HelmManagerService.UninstallChart:input_type -> helm.v1alpha1.UninstallChartRequest
-	12, // 20: helm.v1alpha1.HelmManagerService.WatchInstallStatus:input_type -> helm.v1alpha1.WatchInstallStatusRequest
-	14, // 21: helm.v1alpha1.HelmManagerService.ListPodStatus:input_type -> helm.v1alpha1.ListPodStatusRequest
-	18, // 22: helm.v1alpha1.HelmManagerService.CheckApisixRoute:input_type -> helm.v1alpha1.CheckApisixRouteRequest
-	20, // 23: helm.v1alpha1.HelmManagerService.CreateChartApplication:input_type -> helm.v1alpha1.CreateChartApplicationRequest
-	22, // 24: helm.v1alpha1.HelmManagerService.GetPodLogs:input_type -> helm.v1alpha1.GetPodLogsRequest
-	24, // 25: helm.v1alpha1.HelmManagerService.CheckPodTerminal:input_type -> helm.v1alpha1.CheckPodTerminalRequest
-	27, // 26: helm.v1alpha1.HelmManagerService.UpgradeChart:input_type -> helm.v1alpha1.UpgradeChartRequest
-	29, // 27: helm.v1alpha1.HelmManagerService.RollbackChart:input_type -> helm.v1alpha1.RollbackChartRequest
-	31, // 28: helm.v1alpha1.HelmManagerService.ListChartVersions:input_type -> helm.v1alpha1.ListChartVersionsRequest
-	34, // 29: helm.v1alpha1.HelmManagerService.ListInstalledCharts:input_type -> helm.v1alpha1.ListInstalledChartsRequest
-	3,  // 30: helm.v1alpha1.HelmManagerService.ListCharts:output_type -> helm.v1alpha1.ListChartsResponse
-	5,  // 31: helm.v1alpha1.HelmManagerService.ConfigureRepo:output_type -> helm.v1alpha1.ConfigureRepoResponse
-	9,  // 32: helm.v1alpha1.HelmManagerService.InstallChart:output_type -> helm.v1alpha1.InstallChartResponse
-	11, // 33: helm.v1alpha1.HelmManagerService.UninstallChart:output_type -> helm.v1alpha1.UninstallChartResponse
-	13, // 34: helm.v1alpha1.HelmManagerService.WatchInstallStatus:output_type -> helm.v1alpha1.InstallStatus
-	17, // 35: helm.v1alpha1.HelmManagerService.ListPodStatus:output_type -> helm.v1alpha1.ListPodStatusResponse
-	19, // 36: helm.v1alpha1.HelmManagerService.CheckApisixRoute:output_type -> helm.v1alpha1.CheckApisixRouteResponse
-	21, // 37: helm.v1alpha1.HelmManagerService.CreateChartApplication:output_type -> helm.v1alpha1.CreateChartApplicationResponse
-	23, // 38: helm.v1alpha1.HelmManagerService.GetPodLogs:output_type -> helm.v1alpha1.LogChunk
-	25, // 39: helm.v1alpha1.HelmManagerService.CheckPodTerminal:output_type -> helm.v1alpha1.CheckPodTerminalResponse
-	28, // 40: helm.v1alpha1.HelmManagerService.UpgradeChart:output_type -> helm.v1alpha1.UpgradeChartResponse
-	30, // 41: helm.v1alpha1.HelmManagerService.RollbackChart:output_type -> helm.v1alpha1.RollbackChartResponse
-	33, // 42: helm.v1alpha1.HelmManagerService.ListChartVersions:output_type -> helm.v1alpha1.ListChartVersionsResponse
-	35, // 43: helm.v1alpha1.HelmManagerService.ListInstalledCharts:output_type -> helm.v1alpha1.ListInstalledChartsResponse
-	30, // [30:44] is the sub-list for method output_type
-	16, // [16:30] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	15, // 8: helm.v1alpha1.PodsStatusList.pods:type_name -> helm.v1alpha1.PodStatus
+	17, // 9: helm.v1alpha1.ListPodStatusResponse.data:type_name -> helm.v1alpha1.PodsStatusList
+	41, // 10: helm.v1alpha1.ChartSpec.values:type_name -> helm.v1alpha1.ChartSpec.ValuesEntry
+	27, // 11: helm.v1alpha1.UpgradeChartRequest.chart:type_name -> helm.v1alpha1.ChartSpec
+	33, // 12: helm.v1alpha1.ListChartVersionsResponse.versions:type_name -> helm.v1alpha1.ChartVersionInfo
+	43, // 13: helm.v1alpha1.ListInstalledChartsResponse.data:type_name -> google.protobuf.Any
+	44, // 14: helm.v1alpha1.InstalledChart.updated:type_name -> google.protobuf.Timestamp
+	42, // 15: helm.v1alpha1.InstalledChart.values:type_name -> helm.v1alpha1.InstalledChart.ValuesEntry
+	7,  // 16: helm.v1alpha1.InstallChartResponse.EntriesEntry.value:type_name -> helm.v1alpha1.K8sObjectList
+	0,  // 17: helm.v1alpha1.HelmManagerService.ListCharts:input_type -> helm.v1alpha1.ListChartsRequest
+	4,  // 18: helm.v1alpha1.HelmManagerService.ConfigureRepo:input_type -> helm.v1alpha1.ConfigureRepoRequest
+	8,  // 19: helm.v1alpha1.HelmManagerService.InstallChart:input_type -> helm.v1alpha1.InstallChartRequest
+	10, // 20: helm.v1alpha1.HelmManagerService.UninstallChart:input_type -> helm.v1alpha1.UninstallChartRequest
+	12, // 21: helm.v1alpha1.HelmManagerService.WatchInstallStatus:input_type -> helm.v1alpha1.WatchInstallStatusRequest
+	14, // 22: helm.v1alpha1.HelmManagerService.ListPodStatus:input_type -> helm.v1alpha1.ListPodStatusRequest
+	19, // 23: helm.v1alpha1.HelmManagerService.CheckApisixRoute:input_type -> helm.v1alpha1.CheckApisixRouteRequest
+	21, // 24: helm.v1alpha1.HelmManagerService.CreateChartApplication:input_type -> helm.v1alpha1.CreateChartApplicationRequest
+	23, // 25: helm.v1alpha1.HelmManagerService.GetPodLogs:input_type -> helm.v1alpha1.GetPodLogsRequest
+	25, // 26: helm.v1alpha1.HelmManagerService.CheckPodTerminal:input_type -> helm.v1alpha1.CheckPodTerminalRequest
+	28, // 27: helm.v1alpha1.HelmManagerService.UpgradeChart:input_type -> helm.v1alpha1.UpgradeChartRequest
+	30, // 28: helm.v1alpha1.HelmManagerService.RollbackChart:input_type -> helm.v1alpha1.RollbackChartRequest
+	32, // 29: helm.v1alpha1.HelmManagerService.ListChartVersions:input_type -> helm.v1alpha1.ListChartVersionsRequest
+	35, // 30: helm.v1alpha1.HelmManagerService.ListInstalledCharts:input_type -> helm.v1alpha1.ListInstalledChartsRequest
+	3,  // 31: helm.v1alpha1.HelmManagerService.ListCharts:output_type -> helm.v1alpha1.ListChartsResponse
+	5,  // 32: helm.v1alpha1.HelmManagerService.ConfigureRepo:output_type -> helm.v1alpha1.ConfigureRepoResponse
+	9,  // 33: helm.v1alpha1.HelmManagerService.InstallChart:output_type -> helm.v1alpha1.InstallChartResponse
+	11, // 34: helm.v1alpha1.HelmManagerService.UninstallChart:output_type -> helm.v1alpha1.UninstallChartResponse
+	13, // 35: helm.v1alpha1.HelmManagerService.WatchInstallStatus:output_type -> helm.v1alpha1.InstallStatus
+	18, // 36: helm.v1alpha1.HelmManagerService.ListPodStatus:output_type -> helm.v1alpha1.ListPodStatusResponse
+	20, // 37: helm.v1alpha1.HelmManagerService.CheckApisixRoute:output_type -> helm.v1alpha1.CheckApisixRouteResponse
+	22, // 38: helm.v1alpha1.HelmManagerService.CreateChartApplication:output_type -> helm.v1alpha1.CreateChartApplicationResponse
+	24, // 39: helm.v1alpha1.HelmManagerService.GetPodLogs:output_type -> helm.v1alpha1.LogChunk
+	26, // 40: helm.v1alpha1.HelmManagerService.CheckPodTerminal:output_type -> helm.v1alpha1.CheckPodTerminalResponse
+	29, // 41: helm.v1alpha1.HelmManagerService.UpgradeChart:output_type -> helm.v1alpha1.UpgradeChartResponse
+	31, // 42: helm.v1alpha1.HelmManagerService.RollbackChart:output_type -> helm.v1alpha1.RollbackChartResponse
+	34, // 43: helm.v1alpha1.HelmManagerService.ListChartVersions:output_type -> helm.v1alpha1.ListChartVersionsResponse
+	36, // 44: helm.v1alpha1.HelmManagerService.ListInstalledCharts:output_type -> helm.v1alpha1.ListInstalledChartsResponse
+	31, // [31:45] is the sub-list for method output_type
+	17, // [17:31] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_helm_service_proto_init() }
@@ -2780,7 +2837,7 @@ func file_helm_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_helm_service_proto_rawDesc), len(file_helm_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   42,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
