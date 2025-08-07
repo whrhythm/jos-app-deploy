@@ -1011,7 +1011,7 @@ type PodStatus struct {
 	Restarts      int32                  `protobuf:"varint,4,opt,name=restarts,proto3" json:"restarts,omitempty"`                                                                      // 容器重启次数
 	Ip            string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`                                                                                   // Pod IP 地址
 	Node          string                 `protobuf:"bytes,6,opt,name=node,proto3" json:"node,omitempty"`                                                                               // 所在节点名称
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                                                     // 状态更新时间
+	Timestamp     string                 `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                                                     // 状态更新时间
 	Labels        map[string]string      `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Pod 标签
 	Containers    []*ContainerStatus     `protobuf:"bytes,9,rep,name=containers,proto3" json:"containers,omitempty"`                                                                   // 容器状态详情
 	unknownFields protoimpl.UnknownFields
@@ -1090,11 +1090,11 @@ func (x *PodStatus) GetNode() string {
 	return ""
 }
 
-func (x *PodStatus) GetTimestamp() *timestamppb.Timestamp {
+func (x *PodStatus) GetTimestamp() string {
 	if x != nil {
 		return x.Timestamp
 	}
-	return nil
+	return ""
 }
 
 func (x *PodStatus) GetLabels() map[string]string {
@@ -1189,8 +1189,9 @@ func (x *ContainerStatus) GetImage() string {
 
 type ListPodStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pods          []*PodStatus           `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"`                                     // Pod 状态数组
-	ChartVersion  string                 `protobuf:"bytes,2,opt,name=chart_version,json=chartVersion,proto3" json:"chart_version,omitempty"` // Helm Chart 版本
+	Pods          []*PodStatus           `protobuf:"bytes,1,rep,name=pods,proto3" json:"pods,omitempty"` // Pod 状态数组
+	Code          int32                  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1232,9 +1233,16 @@ func (x *ListPodStatusResponse) GetPods() []*PodStatus {
 	return nil
 }
 
-func (x *ListPodStatusResponse) GetChartVersion() string {
+func (x *ListPodStatusResponse) GetCode() int32 {
 	if x != nil {
-		return x.ChartVersion
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListPodStatusResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
 	}
 	return ""
 }
@@ -2512,15 +2520,15 @@ const file_helm_service_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"W\n" +
 	"\x14ListPodStatusRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
-	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xfe\x02\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xe2\x02\n" +
 	"\tPodStatus\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phase\x18\x02 \x01(\tR\x05phase\x12\x14\n" +
 	"\x05ready\x18\x03 \x01(\tR\x05ready\x12\x1a\n" +
 	"\brestarts\x18\x04 \x01(\x05R\brestarts\x12\x0e\n" +
 	"\x02ip\x18\x05 \x01(\tR\x02ip\x12\x12\n" +
-	"\x04node\x18\x06 \x01(\tR\x04node\x128\n" +
-	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12<\n" +
+	"\x04node\x18\x06 \x01(\tR\x04node\x12\x1c\n" +
+	"\ttimestamp\x18\a \x01(\tR\ttimestamp\x12<\n" +
 	"\x06labels\x18\b \x03(\v2$.helm.v1alpha1.PodStatus.LabelsEntryR\x06labels\x12>\n" +
 	"\n" +
 	"containers\x18\t \x03(\v2\x1e.helm.v1alpha1.ContainerStatusR\n" +
@@ -2533,10 +2541,11 @@ const file_helm_service_proto_rawDesc = "" +
 	"\x05ready\x18\x02 \x01(\bR\x05ready\x12#\n" +
 	"\rrestart_count\x18\x03 \x01(\x05R\frestartCount\x12\x14\n" +
 	"\x05state\x18\x04 \x01(\tR\x05state\x12\x14\n" +
-	"\x05image\x18\x05 \x01(\tR\x05image\"j\n" +
+	"\x05image\x18\x05 \x01(\tR\x05image\"s\n" +
 	"\x15ListPodStatusResponse\x12,\n" +
-	"\x04pods\x18\x01 \x03(\v2\x18.helm.v1alpha1.PodStatusR\x04pods\x12#\n" +
-	"\rchart_version\x18\x02 \x01(\tR\fchartVersion\"Z\n" +
+	"\x04pods\x18\x01 \x03(\v2\x18.helm.v1alpha1.PodStatusR\x04pods\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"Z\n" +
 	"\x17CheckApisixRouteRequest\x12!\n" +
 	"\frelease_name\x18\x01 \x01(\tR\vreleaseName\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"O\n" +
@@ -2715,50 +2724,49 @@ var file_helm_service_proto_depIdxs = []int32{
 	6,  // 3: helm.v1alpha1.K8sObjectList.items:type_name -> helm.v1alpha1.K8sObject
 	37, // 4: helm.v1alpha1.InstallChartResponse.entries:type_name -> helm.v1alpha1.InstallChartResponse.EntriesEntry
 	38, // 5: helm.v1alpha1.UninstallChartRequest.options:type_name -> helm.v1alpha1.UninstallChartRequest.OptionsEntry
-	43, // 6: helm.v1alpha1.PodStatus.timestamp:type_name -> google.protobuf.Timestamp
-	39, // 7: helm.v1alpha1.PodStatus.labels:type_name -> helm.v1alpha1.PodStatus.LabelsEntry
-	16, // 8: helm.v1alpha1.PodStatus.containers:type_name -> helm.v1alpha1.ContainerStatus
-	15, // 9: helm.v1alpha1.ListPodStatusResponse.pods:type_name -> helm.v1alpha1.PodStatus
-	40, // 10: helm.v1alpha1.ChartSpec.values:type_name -> helm.v1alpha1.ChartSpec.ValuesEntry
-	26, // 11: helm.v1alpha1.UpgradeChartRequest.chart:type_name -> helm.v1alpha1.ChartSpec
-	32, // 12: helm.v1alpha1.ListChartVersionsResponse.versions:type_name -> helm.v1alpha1.ChartVersionInfo
-	42, // 13: helm.v1alpha1.ListInstalledChartsResponse.data:type_name -> google.protobuf.Any
-	43, // 14: helm.v1alpha1.InstalledChart.updated:type_name -> google.protobuf.Timestamp
-	41, // 15: helm.v1alpha1.InstalledChart.values:type_name -> helm.v1alpha1.InstalledChart.ValuesEntry
-	7,  // 16: helm.v1alpha1.InstallChartResponse.EntriesEntry.value:type_name -> helm.v1alpha1.K8sObjectList
-	0,  // 17: helm.v1alpha1.HelmManagerService.ListCharts:input_type -> helm.v1alpha1.ListChartsRequest
-	4,  // 18: helm.v1alpha1.HelmManagerService.ConfigureRepo:input_type -> helm.v1alpha1.ConfigureRepoRequest
-	8,  // 19: helm.v1alpha1.HelmManagerService.InstallChart:input_type -> helm.v1alpha1.InstallChartRequest
-	10, // 20: helm.v1alpha1.HelmManagerService.UninstallChart:input_type -> helm.v1alpha1.UninstallChartRequest
-	12, // 21: helm.v1alpha1.HelmManagerService.WatchInstallStatus:input_type -> helm.v1alpha1.WatchInstallStatusRequest
-	14, // 22: helm.v1alpha1.HelmManagerService.ListPodStatus:input_type -> helm.v1alpha1.ListPodStatusRequest
-	18, // 23: helm.v1alpha1.HelmManagerService.CheckApisixRoute:input_type -> helm.v1alpha1.CheckApisixRouteRequest
-	20, // 24: helm.v1alpha1.HelmManagerService.CreateChartApplication:input_type -> helm.v1alpha1.CreateChartApplicationRequest
-	22, // 25: helm.v1alpha1.HelmManagerService.GetPodLogs:input_type -> helm.v1alpha1.GetPodLogsRequest
-	24, // 26: helm.v1alpha1.HelmManagerService.CheckPodTerminal:input_type -> helm.v1alpha1.CheckPodTerminalRequest
-	27, // 27: helm.v1alpha1.HelmManagerService.UpgradeChart:input_type -> helm.v1alpha1.UpgradeChartRequest
-	29, // 28: helm.v1alpha1.HelmManagerService.RollbackChart:input_type -> helm.v1alpha1.RollbackChartRequest
-	31, // 29: helm.v1alpha1.HelmManagerService.ListChartVersions:input_type -> helm.v1alpha1.ListChartVersionsRequest
-	34, // 30: helm.v1alpha1.HelmManagerService.ListInstalledCharts:input_type -> helm.v1alpha1.ListInstalledChartsRequest
-	3,  // 31: helm.v1alpha1.HelmManagerService.ListCharts:output_type -> helm.v1alpha1.ListChartsResponse
-	5,  // 32: helm.v1alpha1.HelmManagerService.ConfigureRepo:output_type -> helm.v1alpha1.ConfigureRepoResponse
-	9,  // 33: helm.v1alpha1.HelmManagerService.InstallChart:output_type -> helm.v1alpha1.InstallChartResponse
-	11, // 34: helm.v1alpha1.HelmManagerService.UninstallChart:output_type -> helm.v1alpha1.UninstallChartResponse
-	13, // 35: helm.v1alpha1.HelmManagerService.WatchInstallStatus:output_type -> helm.v1alpha1.InstallStatus
-	17, // 36: helm.v1alpha1.HelmManagerService.ListPodStatus:output_type -> helm.v1alpha1.ListPodStatusResponse
-	19, // 37: helm.v1alpha1.HelmManagerService.CheckApisixRoute:output_type -> helm.v1alpha1.CheckApisixRouteResponse
-	21, // 38: helm.v1alpha1.HelmManagerService.CreateChartApplication:output_type -> helm.v1alpha1.CreateChartApplicationResponse
-	23, // 39: helm.v1alpha1.HelmManagerService.GetPodLogs:output_type -> helm.v1alpha1.LogChunk
-	25, // 40: helm.v1alpha1.HelmManagerService.CheckPodTerminal:output_type -> helm.v1alpha1.CheckPodTerminalResponse
-	28, // 41: helm.v1alpha1.HelmManagerService.UpgradeChart:output_type -> helm.v1alpha1.UpgradeChartResponse
-	30, // 42: helm.v1alpha1.HelmManagerService.RollbackChart:output_type -> helm.v1alpha1.RollbackChartResponse
-	33, // 43: helm.v1alpha1.HelmManagerService.ListChartVersions:output_type -> helm.v1alpha1.ListChartVersionsResponse
-	35, // 44: helm.v1alpha1.HelmManagerService.ListInstalledCharts:output_type -> helm.v1alpha1.ListInstalledChartsResponse
-	31, // [31:45] is the sub-list for method output_type
-	17, // [17:31] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	39, // 6: helm.v1alpha1.PodStatus.labels:type_name -> helm.v1alpha1.PodStatus.LabelsEntry
+	16, // 7: helm.v1alpha1.PodStatus.containers:type_name -> helm.v1alpha1.ContainerStatus
+	15, // 8: helm.v1alpha1.ListPodStatusResponse.pods:type_name -> helm.v1alpha1.PodStatus
+	40, // 9: helm.v1alpha1.ChartSpec.values:type_name -> helm.v1alpha1.ChartSpec.ValuesEntry
+	26, // 10: helm.v1alpha1.UpgradeChartRequest.chart:type_name -> helm.v1alpha1.ChartSpec
+	32, // 11: helm.v1alpha1.ListChartVersionsResponse.versions:type_name -> helm.v1alpha1.ChartVersionInfo
+	42, // 12: helm.v1alpha1.ListInstalledChartsResponse.data:type_name -> google.protobuf.Any
+	43, // 13: helm.v1alpha1.InstalledChart.updated:type_name -> google.protobuf.Timestamp
+	41, // 14: helm.v1alpha1.InstalledChart.values:type_name -> helm.v1alpha1.InstalledChart.ValuesEntry
+	7,  // 15: helm.v1alpha1.InstallChartResponse.EntriesEntry.value:type_name -> helm.v1alpha1.K8sObjectList
+	0,  // 16: helm.v1alpha1.HelmManagerService.ListCharts:input_type -> helm.v1alpha1.ListChartsRequest
+	4,  // 17: helm.v1alpha1.HelmManagerService.ConfigureRepo:input_type -> helm.v1alpha1.ConfigureRepoRequest
+	8,  // 18: helm.v1alpha1.HelmManagerService.InstallChart:input_type -> helm.v1alpha1.InstallChartRequest
+	10, // 19: helm.v1alpha1.HelmManagerService.UninstallChart:input_type -> helm.v1alpha1.UninstallChartRequest
+	12, // 20: helm.v1alpha1.HelmManagerService.WatchInstallStatus:input_type -> helm.v1alpha1.WatchInstallStatusRequest
+	14, // 21: helm.v1alpha1.HelmManagerService.ListPodStatus:input_type -> helm.v1alpha1.ListPodStatusRequest
+	18, // 22: helm.v1alpha1.HelmManagerService.CheckApisixRoute:input_type -> helm.v1alpha1.CheckApisixRouteRequest
+	20, // 23: helm.v1alpha1.HelmManagerService.CreateChartApplication:input_type -> helm.v1alpha1.CreateChartApplicationRequest
+	22, // 24: helm.v1alpha1.HelmManagerService.GetPodLogs:input_type -> helm.v1alpha1.GetPodLogsRequest
+	24, // 25: helm.v1alpha1.HelmManagerService.CheckPodTerminal:input_type -> helm.v1alpha1.CheckPodTerminalRequest
+	27, // 26: helm.v1alpha1.HelmManagerService.UpgradeChart:input_type -> helm.v1alpha1.UpgradeChartRequest
+	29, // 27: helm.v1alpha1.HelmManagerService.RollbackChart:input_type -> helm.v1alpha1.RollbackChartRequest
+	31, // 28: helm.v1alpha1.HelmManagerService.ListChartVersions:input_type -> helm.v1alpha1.ListChartVersionsRequest
+	34, // 29: helm.v1alpha1.HelmManagerService.ListInstalledCharts:input_type -> helm.v1alpha1.ListInstalledChartsRequest
+	3,  // 30: helm.v1alpha1.HelmManagerService.ListCharts:output_type -> helm.v1alpha1.ListChartsResponse
+	5,  // 31: helm.v1alpha1.HelmManagerService.ConfigureRepo:output_type -> helm.v1alpha1.ConfigureRepoResponse
+	9,  // 32: helm.v1alpha1.HelmManagerService.InstallChart:output_type -> helm.v1alpha1.InstallChartResponse
+	11, // 33: helm.v1alpha1.HelmManagerService.UninstallChart:output_type -> helm.v1alpha1.UninstallChartResponse
+	13, // 34: helm.v1alpha1.HelmManagerService.WatchInstallStatus:output_type -> helm.v1alpha1.InstallStatus
+	17, // 35: helm.v1alpha1.HelmManagerService.ListPodStatus:output_type -> helm.v1alpha1.ListPodStatusResponse
+	19, // 36: helm.v1alpha1.HelmManagerService.CheckApisixRoute:output_type -> helm.v1alpha1.CheckApisixRouteResponse
+	21, // 37: helm.v1alpha1.HelmManagerService.CreateChartApplication:output_type -> helm.v1alpha1.CreateChartApplicationResponse
+	23, // 38: helm.v1alpha1.HelmManagerService.GetPodLogs:output_type -> helm.v1alpha1.LogChunk
+	25, // 39: helm.v1alpha1.HelmManagerService.CheckPodTerminal:output_type -> helm.v1alpha1.CheckPodTerminalResponse
+	28, // 40: helm.v1alpha1.HelmManagerService.UpgradeChart:output_type -> helm.v1alpha1.UpgradeChartResponse
+	30, // 41: helm.v1alpha1.HelmManagerService.RollbackChart:output_type -> helm.v1alpha1.RollbackChartResponse
+	33, // 42: helm.v1alpha1.HelmManagerService.ListChartVersions:output_type -> helm.v1alpha1.ListChartVersionsResponse
+	35, // 43: helm.v1alpha1.HelmManagerService.ListInstalledCharts:output_type -> helm.v1alpha1.ListInstalledChartsResponse
+	30, // [30:44] is the sub-list for method output_type
+	16, // [16:30] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_helm_service_proto_init() }

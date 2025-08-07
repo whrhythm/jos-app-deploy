@@ -21,7 +21,9 @@ import (
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/release"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/client-go/kubernetes"
 
 	pb "jos-deployment/api/v1alpha1/pb"
 
@@ -680,5 +682,71 @@ func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.Lis
 		Message: fmt.Sprintf("Found %d installed charts", len(chartInfos)),
 		Success: true,
 		Data:    anyData,
+	}, nil
+}
+
+func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodStatusRequest) (*pb.ListPodStatusResponse, error) {
+	logger.L().Info("ListPodStatus called", zap.String("request", req.String()))
+
+	namespace := req.GetNamespace()
+	if namespace == "" {
+		namespace = "default"
+	}
+	// 通过标签获取 pod 列表
+	restConfig, err := helmClient.settings.RESTClientGetter().ToRESTConfig()
+	if err != nil {
+		logger.L().Error("Failed to get REST config", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "get REST config failed: %v", err)
+	}
+
+	clientset, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		logger.L().Error("Failed to create Kubernetes clientset", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "create Kubernetes clientset failed: %v", err)
+	}
+
+	podList, err := clientset.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("app.kubernetes.io/instance=%s", req.GetReleaseName()),
+	})
+	if err != nil {
+		logger.L().Error("Failed to list pods", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "list pods failed: %v", err)
+	}
+
+	// 构建 PodStatus 列表
+	var podStatuses []*pb.PodStatus
+	for _, pod := range podList.Items {
+		podStatus := &pb.PodStatus{
+			Name:       pod.Name,
+			Phase:      string(pod.Status.Phase),
+			Ip:         pod.Status.PodIP,
+			Node:       pod.Spec.NodeName,
+			Timestamp:  pod.CreationTimestamp.String(),
+			Labels:     pod.Labels,
+			Containers: make([]*pb.ContainerStatus, 0, len(pod.Status.ContainerStatuses)),
+		}
+
+		readyCount := 0
+		for _, container := range pod.Status.ContainerStatuses {
+			containerStatus := &pb.ContainerStatus{
+				Name:  container.Name,
+				Image: container.Image,
+				State: container.State.String(),
+				Ready: container.Ready,
+			}
+			if container.Ready {
+				readyCount++
+			}
+			podStatus.Containers = append(podStatus.Containers, containerStatus)
+		}
+		readStatus := fmt.Sprintf("%d/%d", readyCount, len(pod.Status.ContainerStatuses))
+		podStatus.Ready = readStatus
+		podStatuses = append(podStatuses, podStatus)
+	}
+
+	return &pb.ListPodStatusResponse{
+		Code:    0,
+		Message: fmt.Sprintf("Found %d pods", len(podStatuses)),
+		Pods:    podStatuses,
 	}, nil
 }
