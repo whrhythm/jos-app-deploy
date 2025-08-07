@@ -391,51 +391,6 @@ func local_request_HelmManagerService_CreateChartApplication_0(ctx context.Conte
 	return msg, metadata, err
 }
 
-var filter_HelmManagerService_GetPodLogs_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0, "pod_name": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
-
-func request_HelmManagerService_GetPodLogs_0(ctx context.Context, marshaler runtime.Marshaler, client HelmManagerServiceClient, req *http.Request, pathParams map[string]string) (HelmManagerService_GetPodLogsClient, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetPodLogsRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["namespace"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
-	}
-	protoReq.Namespace, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
-	}
-	val, ok = pathParams["pod_name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pod_name")
-	}
-	protoReq.PodName, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pod_name", err)
-	}
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_HelmManagerService_GetPodLogs_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	stream, err := client.GetPodLogs(ctx, &protoReq)
-	if err != nil {
-		return nil, metadata, err
-	}
-	header, err := stream.Header()
-	if err != nil {
-		return nil, metadata, err
-	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
-}
-
 var filter_HelmManagerService_CheckPodTerminal_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0, "pod_name": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 
 func request_HelmManagerService_CheckPodTerminal_0(ctx context.Context, marshaler runtime.Marshaler, client HelmManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -902,13 +857,6 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		}
 		forward_HelmManagerService_CreateChartApplication_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-
-	mux.Handle(http.MethodGet, pattern_HelmManagerService_GetPodLogs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
-	})
 	mux.Handle(http.MethodGet, pattern_HelmManagerService_CheckPodTerminal_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1185,23 +1133,6 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		}
 		forward_HelmManagerService_CreateChartApplication_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_HelmManagerService_GetPodLogs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/GetPodLogs", runtime.WithHTTPPathPattern("/v1alpha1/pods/{namespace}/{pod_name}/logs"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_HelmManagerService_GetPodLogs_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_HelmManagerService_GetPodLogs_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-	})
 	mux.Handle(http.MethodGet, pattern_HelmManagerService_CheckPodTerminal_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1299,7 +1230,6 @@ var (
 	pattern_HelmManagerService_ListPodStatus_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "pods"}, ""))
 	pattern_HelmManagerService_CheckApisixRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1alpha1", "charts", "release_name", "apisix"}, ""))
 	pattern_HelmManagerService_CreateChartApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "applications"}, ""))
-	pattern_HelmManagerService_GetPodLogs_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "pods", "namespace", "pod_name", "logs"}, ""))
 	pattern_HelmManagerService_CheckPodTerminal_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "pods", "namespace", "pod_name", "terminal"}, ""))
 	pattern_HelmManagerService_UpgradeChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "upgrade"}, ""))
 	pattern_HelmManagerService_RollbackChart_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "rollback"}, ""))
@@ -1316,7 +1246,6 @@ var (
 	forward_HelmManagerService_ListPodStatus_0          = runtime.ForwardResponseMessage
 	forward_HelmManagerService_CheckApisixRoute_0       = runtime.ForwardResponseMessage
 	forward_HelmManagerService_CreateChartApplication_0 = runtime.ForwardResponseMessage
-	forward_HelmManagerService_GetPodLogs_0             = runtime.ForwardResponseStream
 	forward_HelmManagerService_CheckPodTerminal_0       = runtime.ForwardResponseMessage
 	forward_HelmManagerService_UpgradeChart_0           = runtime.ForwardResponseMessage
 	forward_HelmManagerService_RollbackChart_0          = runtime.ForwardResponseMessage

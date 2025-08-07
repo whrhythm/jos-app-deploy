@@ -166,14 +166,14 @@ service PodManagerService {
   // 删除 Pod
   rpc DeletePod(DeletePodRequest) returns (DeletePodResponse) {
     option (google.api.http) = {
-      delete: "/v1alpha1/namespaces/{namespace}/pods/{pod_name}"
+      delete: "/v1alpha1/{namespace}/pods/{pod_name}"
     };
   }
 
   // 获取 Pod 日志 (流式)
   rpc GetPodLogs(GetPodLogsRequest) returns (stream LogChunk) {
     option (google.api.http) = {
-      get: "/v1alpha1/namespaces/{namespace}/pods/{pod_name}/logs"
+      get: "/v1alpha1/{namespace}/pods/{pod_name}/logs"
     };
   }
 
@@ -191,7 +191,7 @@ service PodManagerService {
   // 配置水平自动伸缩 (HPA)
   rpc ConfigureHorizontalAutoscaling(ConfigureHPARequest) returns (ConfigureHPAResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/namespaces/{namespace}/hpa"
+      post: "/v1alpha1/{namespace}/pod/hpa"
       body: "*"
     };
   }
@@ -199,7 +199,7 @@ service PodManagerService {
   // 配置垂直自动伸缩 (VPA)
   rpc ConfigureVerticalAutoscaling(ConfigureVPARequest) returns (ConfigureVPAResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/namespaces/{namespace}/vpa"
+      post: "/v1alpha1/{namespace}/pod/vpa"
       body: "*"
     };
   }
@@ -207,7 +207,7 @@ service PodManagerService {
   // 金丝雀发布
   rpc CreateCanaryDeployment(CreateCanaryRequest) returns (CreateCanaryResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/canary"
+      post: "/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/canary"
       body: "*"
     };
   }
@@ -215,15 +215,15 @@ service PodManagerService {
   // 蓝绿发布
   rpc CreateBlueGreenDeployment(CreateBlueGreenRequest) returns (CreateBlueGreenResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/bluegreen"
+      post: "/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/bluegreen"
       body: "*"
     };
   }
 
   // 统计应用下所有pod的cpu/mem信息
-    rpc PodsMetrics(PodsMetricsRequest) returns (PodsMetricsResponse) {
+  rpc PodsMetrics(PodsMetricsRequest) returns (PodsMetricsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/namespaces/{namespace}/{release_name}/pod/metrics"
+      get: "/v1alpha1/{namespace}/pod/metrics"
     };
   }
 }

@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	pb "jos-deployment/api/v1alpha1/pb"
+	podpb "jos-deployment/api/v1alpha1/pb_pod"
 	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
 	"jos-deployment/pkg/server"
@@ -169,6 +170,11 @@ func main() {
 	err := pb.RegisterHelmManagerServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
 	if err != nil {
 		log.Fatal("Failed to register gRPC handler:", err)
+	}
+
+	err = podpb.RegisterPodManagerServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
+	if err != nil {
+		log.Fatal("Failed to register PodManagerService handler:", err)
 	}
 
 	// 添加自定义 REST API 路由

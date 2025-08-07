@@ -404,6 +404,8 @@ func local_request_PodManagerService_CreateBlueGreenDeployment_0(ctx context.Con
 	return msg, metadata, err
 }
 
+var filter_PodManagerService_PodsMetrics_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+
 func request_PodManagerService_PodsMetrics_0(ctx context.Context, marshaler runtime.Marshaler, client PodManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq PodsMetricsRequest
@@ -421,13 +423,11 @@ func request_PodManagerService_PodsMetrics_0(ctx context.Context, marshaler runt
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["release_name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	protoReq.ReleaseName, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_PodManagerService_PodsMetrics_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.PodsMetrics(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -447,13 +447,11 @@ func local_request_PodManagerService_PodsMetrics_0(ctx context.Context, marshale
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["release_name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	protoReq.ReleaseName, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_PodManagerService_PodsMetrics_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.PodsMetrics(ctx, &protoReq)
 	return msg, metadata, err
@@ -471,7 +469,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/DeletePod", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/pods/{pod_name}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/DeletePod", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/pods/{pod_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -505,7 +503,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureHorizontalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/hpa"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureHorizontalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/hpa"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -525,7 +523,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureVerticalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/vpa"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureVerticalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/vpa"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -545,7 +543,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateCanaryDeployment", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/canary"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateCanaryDeployment", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/rollouts/{rollout_name}/canary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -565,7 +563,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateBlueGreenDeployment", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/bluegreen"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateBlueGreenDeployment", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/rollouts/{rollout_name}/bluegreen"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -585,7 +583,7 @@ func RegisterPodManagerServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/PodsMetrics", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/{release_name}/pod/metrics"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/PodsMetrics", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/pod/metrics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -643,7 +641,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/DeletePod", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/pods/{pod_name}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/DeletePod", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/pods/{pod_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -660,7 +658,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/GetPodLogs", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/pods/{pod_name}/logs"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/GetPodLogs", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/pods/{pod_name}/logs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -694,7 +692,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureHorizontalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/hpa"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureHorizontalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/hpa"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -711,7 +709,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureVerticalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/vpa"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/ConfigureVerticalAutoscaling", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/vpa"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -728,7 +726,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateCanaryDeployment", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/canary"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateCanaryDeployment", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/rollouts/{rollout_name}/canary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -745,7 +743,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateBlueGreenDeployment", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/rollouts/{rollout_name}/bluegreen"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/CreateBlueGreenDeployment", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/rollouts/{rollout_name}/bluegreen"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -762,7 +760,7 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/PodsMetrics", runtime.WithHTTPPathPattern("/v1alpha1/namespaces/{namespace}/{release_name}/pod/metrics"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pod.v1alpha1.PodManagerService/PodsMetrics", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/pod/metrics"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -779,14 +777,14 @@ func RegisterPodManagerServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_PodManagerService_DeletePod_0                      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1alpha1", "namespaces", "namespace", "pods", "pod_name"}, ""))
-	pattern_PodManagerService_GetPodLogs_0                     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1alpha1", "namespaces", "namespace", "pods", "pod_name", "logs"}, ""))
+	pattern_PodManagerService_DeletePod_0                      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1alpha1", "namespace", "pods", "pod_name"}, ""))
+	pattern_PodManagerService_GetPodLogs_0                     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "pods", "pod_name", "logs"}, ""))
 	pattern_PodManagerService_ExecPodTerminal_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1alpha1", "pod", "exec"}, ""))
-	pattern_PodManagerService_ConfigureHorizontalAutoscaling_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1alpha1", "namespaces", "namespace", "hpa"}, ""))
-	pattern_PodManagerService_ConfigureVerticalAutoscaling_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1alpha1", "namespaces", "namespace", "vpa"}, ""))
-	pattern_PodManagerService_CreateCanaryDeployment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1alpha1", "namespaces", "namespace", "rollouts", "rollout_name", "canary"}, ""))
-	pattern_PodManagerService_CreateBlueGreenDeployment_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1alpha1", "namespaces", "namespace", "rollouts", "rollout_name", "bluegreen"}, ""))
-	pattern_PodManagerService_PodsMetrics_0                    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4, 2, 5}, []string{"v1alpha1", "namespaces", "namespace", "release_name", "pod", "metrics"}, ""))
+	pattern_PodManagerService_ConfigureHorizontalAutoscaling_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"v1alpha1", "namespace", "hpa"}, ""))
+	pattern_PodManagerService_ConfigureVerticalAutoscaling_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"v1alpha1", "namespace", "vpa"}, ""))
+	pattern_PodManagerService_CreateCanaryDeployment_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "rollouts", "rollout_name", "canary"}, ""))
+	pattern_PodManagerService_CreateBlueGreenDeployment_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "rollouts", "rollout_name", "bluegreen"}, ""))
+	pattern_PodManagerService_PodsMetrics_0                    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"v1alpha1", "namespace", "pod", "metrics"}, ""))
 )
 
 var (

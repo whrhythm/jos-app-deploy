@@ -71,11 +71,6 @@ service HelmManagerService {
   }
 
   // 9. 获取 Pod 日志
-  rpc GetPodLogs (GetPodLogsRequest) returns (stream LogChunk) {
-    option (google.api.http) = {
-      get: "/v1alpha1/pods/{namespace}/{pod_name}/logs"
-    };
-  }
 
   // 10. 检查 Pod 是否支持终端交互
   rpc CheckPodTerminal (CheckPodTerminalRequest) returns (CheckPodTerminalResponse) {
@@ -280,16 +275,6 @@ message CreateChartApplicationResponse {
 }
 
 // 9. 获取 Pod 日志
-message GetPodLogsRequest {
-  string namespace = 1;
-  string pod_name = 2;
-  int32 tail_lines = 3;     // 日志行数（可选）
-  bool follow = 4;          // 是否实时流式传输（可选）
-}
-
-message LogChunk {
-  bytes content = 1;        // 日志内容（二进制流）
-}
 
 // 10. 检查 Pod 终端
 message CheckPodTerminalRequest {

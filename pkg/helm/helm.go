@@ -261,6 +261,11 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 
 // 实现按照helm chart方法
 func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallChartRequest) (*pb.InstallChartResponse, error) {
+	logger.L().Info("InstallChart called", zap.String("request", req.String()))
+	namespace := req.GetNamespace()
+	if namespace == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "namespace is required")
+	}
 	// 1. 获取参数
 	dryRun := req.DryRun
 	// 2. 创建 Helm action 配置
@@ -282,11 +287,6 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 	} else {
 		// 4. 安装 chart
 		releaseName := req.GetReleaseName()
-		namespace := req.GetNamespace()
-		if namespace == "" {
-			namespace = "default" // 默认命名空间
-		}
-
 		// 为指定 namespace 创建专用的 action configuration
 		actionConfig := new(action.Configuration)
 		debugLog := func(format string, v ...interface{}) {
@@ -378,7 +378,7 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 	logger.L().Info("UninstallChart called", zap.String("request", req.String()))
 	nameSpace := req.GetNamespace()
 	if nameSpace == "" {
-		nameSpace = "default"
+		return nil, status.Errorf(codes.InvalidArgument, "namespace is required")
 	}
 
 	// 为指定 namespace 创建新的 action configuration
@@ -606,7 +606,6 @@ func (s *HelmManagerServer) RollbackChart(ctx context.Context, req *pb.RollbackC
 
 func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.ListInstalledChartsRequest) (*pb.ListInstalledChartsResponse, error) {
 	logger.L().Info("ListInstalledCharts called", zap.String("request", req.String()))
-
 	namespace := req.GetNamespace()
 	if namespace == "" {
 		return nil, status.Errorf(codes.Internal, "namespace is required")

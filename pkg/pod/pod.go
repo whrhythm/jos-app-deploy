@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "jos-deployment/api/v1alpha1/pb"
+	pb "jos-deployment/api/v1alpha1/pb_pod"
 	"jos-deployment/pkg/logger"
 
 	"jos-deployment/pkg/helm"
@@ -149,7 +149,7 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 
 	// CPU使用量（核）
 	cpuQuery := fmt.Sprintf(
-		`sum(rate(container_cpu_usage_seconds_total{pod="%s"}[5m])) by (pod)`,
+		`sum(rate(container_cpu_usage_seconds_total{namespace="%s", pod="%s"}[5m])) by (pod)`,
 		namespace, podName,
 	)
 	cpuResult, err := queryPrometheus(cpuQuery)
@@ -163,7 +163,7 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 
 	// 内存使用量（MB）
 	memQuery := fmt.Sprintf(
-		`sum(container_memory_working_set_bytes{pod="%s"}) by (pod)`,
+		`sum(container_memory_working_set_bytes{namespace="%s", pod="%s"}) by (pod)`,
 		namespace, podName,
 	)
 	memResult, err := queryPrometheus(memQuery)
