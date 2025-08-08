@@ -1290,20 +1290,87 @@ func (x *PodsMetricsRequest) GetReleaseName() string {
 	return ""
 }
 
+type PodMetricsData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppNum        int32                  `protobuf:"varint,1,opt,name=app_num,json=appNum,proto3" json:"app_num,omitempty"`
+	PodNum        int32                  `protobuf:"varint,2,opt,name=pod_num,json=podNum,proto3" json:"pod_num,omitempty"`
+	CpuUsage      string                 `protobuf:"bytes,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	MemUsage      string                 `protobuf:"bytes,4,opt,name=mem_usage,json=memUsage,proto3" json:"mem_usage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PodMetricsData) Reset() {
+	*x = PodMetricsData{}
+	mi := &file_pod_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PodMetricsData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PodMetricsData) ProtoMessage() {}
+
+func (x *PodMetricsData) ProtoReflect() protoreflect.Message {
+	mi := &file_pod_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PodMetricsData.ProtoReflect.Descriptor instead.
+func (*PodMetricsData) Descriptor() ([]byte, []int) {
+	return file_pod_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PodMetricsData) GetAppNum() int32 {
+	if x != nil {
+		return x.AppNum
+	}
+	return 0
+}
+
+func (x *PodMetricsData) GetPodNum() int32 {
+	if x != nil {
+		return x.PodNum
+	}
+	return 0
+}
+
+func (x *PodMetricsData) GetCpuUsage() string {
+	if x != nil {
+		return x.CpuUsage
+	}
+	return ""
+}
+
+func (x *PodMetricsData) GetMemUsage() string {
+	if x != nil {
+		return x.MemUsage
+	}
+	return ""
+}
+
 type PodsMetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	AppNum        int32                  `protobuf:"varint,2,opt,name=app_num,json=appNum,proto3" json:"app_num,omitempty"`
-	PodNum        int32                  `protobuf:"varint,3,opt,name=pod_num,json=podNum,proto3" json:"pod_num,omitempty"`
-	CpuUsage      string                 `protobuf:"bytes,4,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	MemUsage      string                 `protobuf:"bytes,5,opt,name=mem_usage,json=memUsage,proto3" json:"mem_usage,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Success       bool                   `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
+	Data          *PodMetricsData        `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PodsMetricsResponse) Reset() {
 	*x = PodsMetricsResponse{}
-	mi := &file_pod_service_proto_msgTypes[17]
+	mi := &file_pod_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1315,7 +1382,7 @@ func (x *PodsMetricsResponse) String() string {
 func (*PodsMetricsResponse) ProtoMessage() {}
 
 func (x *PodsMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pod_service_proto_msgTypes[17]
+	mi := &file_pod_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1328,7 +1395,7 @@ func (x *PodsMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PodsMetricsResponse.ProtoReflect.Descriptor instead.
 func (*PodsMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_pod_service_proto_rawDescGZIP(), []int{17}
+	return file_pod_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *PodsMetricsResponse) GetCode() int32 {
@@ -1338,32 +1405,25 @@ func (x *PodsMetricsResponse) GetCode() int32 {
 	return 0
 }
 
-func (x *PodsMetricsResponse) GetAppNum() int32 {
+func (x *PodsMetricsResponse) GetMessage() string {
 	if x != nil {
-		return x.AppNum
-	}
-	return 0
-}
-
-func (x *PodsMetricsResponse) GetPodNum() int32 {
-	if x != nil {
-		return x.PodNum
-	}
-	return 0
-}
-
-func (x *PodsMetricsResponse) GetCpuUsage() string {
-	if x != nil {
-		return x.CpuUsage
+		return x.Message
 	}
 	return ""
 }
 
-func (x *PodsMetricsResponse) GetMemUsage() string {
+func (x *PodsMetricsResponse) GetSuccess() bool {
 	if x != nil {
-		return x.MemUsage
+		return x.Success
 	}
-	return ""
+	return false
+}
+
+func (x *PodsMetricsResponse) GetData() *PodMetricsData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
 }
 
 var File_pod_service_proto protoreflect.FileDescriptor
@@ -1486,13 +1546,17 @@ const file_pod_service_proto_rawDesc = "" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"U\n" +
 	"\x12PodsMetricsRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
-	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\x95\x01\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"|\n" +
+	"\x0ePodMetricsData\x12\x17\n" +
+	"\aapp_num\x18\x01 \x01(\x05R\x06appNum\x12\x17\n" +
+	"\apod_num\x18\x02 \x01(\x05R\x06podNum\x12\x1b\n" +
+	"\tcpu_usage\x18\x03 \x01(\tR\bcpuUsage\x12\x1b\n" +
+	"\tmem_usage\x18\x04 \x01(\tR\bmemUsage\"\x8f\x01\n" +
 	"\x13PodsMetricsResponse\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x17\n" +
-	"\aapp_num\x18\x02 \x01(\x05R\x06appNum\x12\x17\n" +
-	"\apod_num\x18\x03 \x01(\x05R\x06podNum\x12\x1b\n" +
-	"\tcpu_usage\x18\x04 \x01(\tR\bcpuUsage\x12\x1b\n" +
-	"\tmem_usage\x18\x05 \x01(\tR\bmemUsage*L\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\asuccess\x18\x03 \x01(\bR\asuccess\x120\n" +
+	"\x04data\x18\x04 \x01(\v2\x1c.pod.v1alpha1.PodMetricsDataR\x04data*L\n" +
 	"\bPodState\x12\v\n" +
 	"\aPENDING\x10\x00\x12\v\n" +
 	"\aRUNNING\x10\x01\x12\r\n" +
@@ -1524,7 +1588,7 @@ func file_pod_service_proto_rawDescGZIP() []byte {
 }
 
 var file_pod_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_pod_service_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_pod_service_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_pod_service_proto_goTypes = []any{
 	(PodState)(0),                   // 0: pod.v1alpha1.PodState
 	(*Pod)(nil),                     // 1: pod.v1alpha1.Pod
@@ -1544,55 +1608,57 @@ var file_pod_service_proto_goTypes = []any{
 	(*CreateBlueGreenRequest)(nil),  // 15: pod.v1alpha1.CreateBlueGreenRequest
 	(*CreateBlueGreenResponse)(nil), // 16: pod.v1alpha1.CreateBlueGreenResponse
 	(*PodsMetricsRequest)(nil),      // 17: pod.v1alpha1.PodsMetricsRequest
-	(*PodsMetricsResponse)(nil),     // 18: pod.v1alpha1.PodsMetricsResponse
-	nil,                             // 19: pod.v1alpha1.Pod.LabelsEntry
-	nil,                             // 20: pod.v1alpha1.Pod.AnnotationsEntry
-	nil,                             // 21: pod.v1alpha1.ConfigureHPARequest.MetricsEntry
-	nil,                             // 22: pod.v1alpha1.ConfigureVPARequest.ResourcePoliciesEntry
-	nil,                             // 23: pod.v1alpha1.CreateCanaryRequest.SelectorEntry
-	nil,                             // 24: pod.v1alpha1.CreateCanaryRequest.TrafficRoutingEntry
-	nil,                             // 25: pod.v1alpha1.CreateBlueGreenRequest.SelectorEntry
-	(*timestamppb.Timestamp)(nil),   // 26: google.protobuf.Timestamp
+	(*PodMetricsData)(nil),          // 18: pod.v1alpha1.PodMetricsData
+	(*PodsMetricsResponse)(nil),     // 19: pod.v1alpha1.PodsMetricsResponse
+	nil,                             // 20: pod.v1alpha1.Pod.LabelsEntry
+	nil,                             // 21: pod.v1alpha1.Pod.AnnotationsEntry
+	nil,                             // 22: pod.v1alpha1.ConfigureHPARequest.MetricsEntry
+	nil,                             // 23: pod.v1alpha1.ConfigureVPARequest.ResourcePoliciesEntry
+	nil,                             // 24: pod.v1alpha1.CreateCanaryRequest.SelectorEntry
+	nil,                             // 25: pod.v1alpha1.CreateCanaryRequest.TrafficRoutingEntry
+	nil,                             // 26: pod.v1alpha1.CreateBlueGreenRequest.SelectorEntry
+	(*timestamppb.Timestamp)(nil),   // 27: google.protobuf.Timestamp
 }
 var file_pod_service_proto_depIdxs = []int32{
 	0,  // 0: pod.v1alpha1.Pod.state:type_name -> pod.v1alpha1.PodState
-	26, // 1: pod.v1alpha1.Pod.start_time:type_name -> google.protobuf.Timestamp
-	19, // 2: pod.v1alpha1.Pod.labels:type_name -> pod.v1alpha1.Pod.LabelsEntry
-	20, // 3: pod.v1alpha1.Pod.annotations:type_name -> pod.v1alpha1.Pod.AnnotationsEntry
-	26, // 4: pod.v1alpha1.DeletePodResponse.deletion_timestamp:type_name -> google.protobuf.Timestamp
-	26, // 5: pod.v1alpha1.LogChunk.timestamp:type_name -> google.protobuf.Timestamp
+	27, // 1: pod.v1alpha1.Pod.start_time:type_name -> google.protobuf.Timestamp
+	20, // 2: pod.v1alpha1.Pod.labels:type_name -> pod.v1alpha1.Pod.LabelsEntry
+	21, // 3: pod.v1alpha1.Pod.annotations:type_name -> pod.v1alpha1.Pod.AnnotationsEntry
+	27, // 4: pod.v1alpha1.DeletePodResponse.deletion_timestamp:type_name -> google.protobuf.Timestamp
+	27, // 5: pod.v1alpha1.LogChunk.timestamp:type_name -> google.protobuf.Timestamp
 	6,  // 6: pod.v1alpha1.TerminalMessage.session_info:type_name -> pod.v1alpha1.TerminalSessionInfo
 	8,  // 7: pod.v1alpha1.TerminalMessage.resize:type_name -> pod.v1alpha1.Resize
-	21, // 8: pod.v1alpha1.ConfigureHPARequest.metrics:type_name -> pod.v1alpha1.ConfigureHPARequest.MetricsEntry
-	26, // 9: pod.v1alpha1.ConfigureHPAResponse.created_at:type_name -> google.protobuf.Timestamp
-	22, // 10: pod.v1alpha1.ConfigureVPARequest.resource_policies:type_name -> pod.v1alpha1.ConfigureVPARequest.ResourcePoliciesEntry
-	26, // 11: pod.v1alpha1.ConfigureVPAResponse.created_at:type_name -> google.protobuf.Timestamp
-	23, // 12: pod.v1alpha1.CreateCanaryRequest.selector:type_name -> pod.v1alpha1.CreateCanaryRequest.SelectorEntry
-	24, // 13: pod.v1alpha1.CreateCanaryRequest.traffic_routing:type_name -> pod.v1alpha1.CreateCanaryRequest.TrafficRoutingEntry
-	26, // 14: pod.v1alpha1.CreateCanaryResponse.created_at:type_name -> google.protobuf.Timestamp
-	25, // 15: pod.v1alpha1.CreateBlueGreenRequest.selector:type_name -> pod.v1alpha1.CreateBlueGreenRequest.SelectorEntry
-	26, // 16: pod.v1alpha1.CreateBlueGreenResponse.created_at:type_name -> google.protobuf.Timestamp
-	2,  // 17: pod.v1alpha1.PodManagerService.DeletePod:input_type -> pod.v1alpha1.DeletePodRequest
-	4,  // 18: pod.v1alpha1.PodManagerService.GetPodLogs:input_type -> pod.v1alpha1.GetPodLogsRequest
-	7,  // 19: pod.v1alpha1.PodManagerService.ExecPodTerminal:input_type -> pod.v1alpha1.TerminalMessage
-	9,  // 20: pod.v1alpha1.PodManagerService.ConfigureHorizontalAutoscaling:input_type -> pod.v1alpha1.ConfigureHPARequest
-	11, // 21: pod.v1alpha1.PodManagerService.ConfigureVerticalAutoscaling:input_type -> pod.v1alpha1.ConfigureVPARequest
-	13, // 22: pod.v1alpha1.PodManagerService.CreateCanaryDeployment:input_type -> pod.v1alpha1.CreateCanaryRequest
-	15, // 23: pod.v1alpha1.PodManagerService.CreateBlueGreenDeployment:input_type -> pod.v1alpha1.CreateBlueGreenRequest
-	17, // 24: pod.v1alpha1.PodManagerService.PodsMetrics:input_type -> pod.v1alpha1.PodsMetricsRequest
-	3,  // 25: pod.v1alpha1.PodManagerService.DeletePod:output_type -> pod.v1alpha1.DeletePodResponse
-	5,  // 26: pod.v1alpha1.PodManagerService.GetPodLogs:output_type -> pod.v1alpha1.LogChunk
-	7,  // 27: pod.v1alpha1.PodManagerService.ExecPodTerminal:output_type -> pod.v1alpha1.TerminalMessage
-	10, // 28: pod.v1alpha1.PodManagerService.ConfigureHorizontalAutoscaling:output_type -> pod.v1alpha1.ConfigureHPAResponse
-	12, // 29: pod.v1alpha1.PodManagerService.ConfigureVerticalAutoscaling:output_type -> pod.v1alpha1.ConfigureVPAResponse
-	14, // 30: pod.v1alpha1.PodManagerService.CreateCanaryDeployment:output_type -> pod.v1alpha1.CreateCanaryResponse
-	16, // 31: pod.v1alpha1.PodManagerService.CreateBlueGreenDeployment:output_type -> pod.v1alpha1.CreateBlueGreenResponse
-	18, // 32: pod.v1alpha1.PodManagerService.PodsMetrics:output_type -> pod.v1alpha1.PodsMetricsResponse
-	25, // [25:33] is the sub-list for method output_type
-	17, // [17:25] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	22, // 8: pod.v1alpha1.ConfigureHPARequest.metrics:type_name -> pod.v1alpha1.ConfigureHPARequest.MetricsEntry
+	27, // 9: pod.v1alpha1.ConfigureHPAResponse.created_at:type_name -> google.protobuf.Timestamp
+	23, // 10: pod.v1alpha1.ConfigureVPARequest.resource_policies:type_name -> pod.v1alpha1.ConfigureVPARequest.ResourcePoliciesEntry
+	27, // 11: pod.v1alpha1.ConfigureVPAResponse.created_at:type_name -> google.protobuf.Timestamp
+	24, // 12: pod.v1alpha1.CreateCanaryRequest.selector:type_name -> pod.v1alpha1.CreateCanaryRequest.SelectorEntry
+	25, // 13: pod.v1alpha1.CreateCanaryRequest.traffic_routing:type_name -> pod.v1alpha1.CreateCanaryRequest.TrafficRoutingEntry
+	27, // 14: pod.v1alpha1.CreateCanaryResponse.created_at:type_name -> google.protobuf.Timestamp
+	26, // 15: pod.v1alpha1.CreateBlueGreenRequest.selector:type_name -> pod.v1alpha1.CreateBlueGreenRequest.SelectorEntry
+	27, // 16: pod.v1alpha1.CreateBlueGreenResponse.created_at:type_name -> google.protobuf.Timestamp
+	18, // 17: pod.v1alpha1.PodsMetricsResponse.data:type_name -> pod.v1alpha1.PodMetricsData
+	2,  // 18: pod.v1alpha1.PodManagerService.DeletePod:input_type -> pod.v1alpha1.DeletePodRequest
+	4,  // 19: pod.v1alpha1.PodManagerService.GetPodLogs:input_type -> pod.v1alpha1.GetPodLogsRequest
+	7,  // 20: pod.v1alpha1.PodManagerService.ExecPodTerminal:input_type -> pod.v1alpha1.TerminalMessage
+	9,  // 21: pod.v1alpha1.PodManagerService.ConfigureHorizontalAutoscaling:input_type -> pod.v1alpha1.ConfigureHPARequest
+	11, // 22: pod.v1alpha1.PodManagerService.ConfigureVerticalAutoscaling:input_type -> pod.v1alpha1.ConfigureVPARequest
+	13, // 23: pod.v1alpha1.PodManagerService.CreateCanaryDeployment:input_type -> pod.v1alpha1.CreateCanaryRequest
+	15, // 24: pod.v1alpha1.PodManagerService.CreateBlueGreenDeployment:input_type -> pod.v1alpha1.CreateBlueGreenRequest
+	17, // 25: pod.v1alpha1.PodManagerService.PodsMetrics:input_type -> pod.v1alpha1.PodsMetricsRequest
+	3,  // 26: pod.v1alpha1.PodManagerService.DeletePod:output_type -> pod.v1alpha1.DeletePodResponse
+	5,  // 27: pod.v1alpha1.PodManagerService.GetPodLogs:output_type -> pod.v1alpha1.LogChunk
+	7,  // 28: pod.v1alpha1.PodManagerService.ExecPodTerminal:output_type -> pod.v1alpha1.TerminalMessage
+	10, // 29: pod.v1alpha1.PodManagerService.ConfigureHorizontalAutoscaling:output_type -> pod.v1alpha1.ConfigureHPAResponse
+	12, // 30: pod.v1alpha1.PodManagerService.ConfigureVerticalAutoscaling:output_type -> pod.v1alpha1.ConfigureVPAResponse
+	14, // 31: pod.v1alpha1.PodManagerService.CreateCanaryDeployment:output_type -> pod.v1alpha1.CreateCanaryResponse
+	16, // 32: pod.v1alpha1.PodManagerService.CreateBlueGreenDeployment:output_type -> pod.v1alpha1.CreateBlueGreenResponse
+	19, // 33: pod.v1alpha1.PodManagerService.PodsMetrics:output_type -> pod.v1alpha1.PodsMetricsResponse
+	26, // [26:34] is the sub-list for method output_type
+	18, // [18:26] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_pod_service_proto_init() }
@@ -1611,7 +1677,7 @@ func file_pod_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pod_service_proto_rawDesc), len(file_pod_service_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   25,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

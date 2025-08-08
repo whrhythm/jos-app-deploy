@@ -154,12 +154,18 @@ message PodsMetricsRequest {
     string release_name = 2;
 }
 
+message PodMetricsData {
+  int32 app_num = 1;
+  int32 pod_num = 2;
+  string cpu_usage = 3;
+  string mem_usage = 4;
+}
+
 message PodsMetricsResponse {
     int32 code = 1;
-    int32 app_num = 2;
-    int32 pod_num = 3;
-    string cpu_usage = 4;
-    string mem_usage = 5;
+    string message = 2;
+    bool success = 3;
+    PodMetricsData data = 4;
 }
 
 service PodManagerService {

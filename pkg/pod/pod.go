@@ -36,6 +36,16 @@ type PodMetrics struct {
 	MemoryPercent float64
 }
 
+type PrometheusResponse struct {
+	Status string         `json:"status"`
+	Data   PrometheusData `json:"data"`
+}
+
+type PrometheusData struct {
+	ResultType model.ValueType `json:"resultType"`
+	Result     model.Vector    `json:"result"`
+}
+
 // DeletePod 实现删除 Pod 的 RPC 方法
 func (s *PodManagerServer) DeletePod(ctx context.Context, req *pb.DeletePodRequest) (*pb.DeletePodResponse, error) {
 	logger.L().Info("DeletePod called", zap.String("request", req.String()))
@@ -131,12 +141,7 @@ func queryPrometheus(query string) (model.Value, error) {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	var result struct {
-		Data struct {
-			Result model.Value `json:"result"`
-		} `json:"data"`
-	}
-
+	var result PrometheusResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("error decoding response: %v", err)
 	}
@@ -158,7 +163,9 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 	}
 
 	if vector, ok := cpuResult.(model.Vector); ok && len(vector) > 0 {
-		metrics.CPUCores = float64(vector[0].Value)
+		for _, v := range vector {
+			metrics.CPUCores += float64(v.Value)
+		}
 	}
 
 	// 内存使用量（MB）
@@ -172,7 +179,9 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 	}
 
 	if vector, ok := memResult.(model.Vector); ok && len(vector) > 0 {
-		metrics.MemoryMB = float64(vector[0].Value) / 1024 / 1024
+		for _, v := range vector {
+			metrics.MemoryMB += float64(v.Value) / 1024 / 1024 // 转换为 MB
+		}
 	}
 
 	return metrics, nil
@@ -200,10 +209,14 @@ func (s *PodManagerServer) PodsMetrics(ctx context.Context, req *pb.PodsMetricsR
 	}
 
 	return &pb.PodsMetricsResponse{
-		Code:     0,
-		AppNum:   1,
-		PodNum:   int32(len(podList.Items)),
-		CpuUsage: fmt.Sprintf("%.3f", totalCPU),
-		MemUsage: fmt.Sprintf("%.2f", totalMemory),
+		Code:    0,
+		Success: true,
+		Message: "Metrics retrieved successfully",
+		Data: &pb.PodMetricsData{
+			AppNum:   1,
+			PodNum:   int32(len(podList.Items)),
+			CpuUsage: fmt.Sprintf("%.2f cores", totalCPU),
+			MemUsage: fmt.Sprintf("%.2f MB", totalMemory),
+		},
 	}, nil
 }
