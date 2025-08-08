@@ -223,7 +223,7 @@ service PodManagerService {
   // 统计应用下所有pod的cpu/mem信息
   rpc PodsMetrics(PodsMetricsRequest) returns (PodsMetricsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/pod/metrics"
+      get: "/v1alpha1/{namespace}/pod/{release_name}/metrics"
     };
   }
 }

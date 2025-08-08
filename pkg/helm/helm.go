@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -217,6 +218,11 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 			chartInfos = append(chartInfos, chartInfo)
 		}
 	}
+
+	// 按照 chartInfos.Name 首写字母排序
+	sort.Slice(chartInfos, func(i, j int) bool {
+		return strings.ToLower(chartInfos[i].Name)[0] < strings.ToLower(chartInfos[j].Name)[0]
+	})
 
 	totalCharts := len(chartInfos)
 	pageCount := int32(totalCharts) / req.Size
