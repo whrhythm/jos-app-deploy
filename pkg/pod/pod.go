@@ -215,8 +215,8 @@ func (s *PodManagerServer) PodsMetrics(ctx context.Context, req *pb.PodsMetricsR
 		Data: &pb.PodMetricsData{
 			AppNum:   1,
 			PodNum:   int32(len(podList.Items)),
-			CpuUsage: fmt.Sprintf("%.2f cores", totalCPU),
-			MemUsage: fmt.Sprintf("%.2f MB", totalMemory),
+			CpuUsage: fmt.Sprintf("%.2f", totalCPU),
+			MemUsage: fmt.Sprintf("%.2f", totalMemory),
 		},
 	}, nil
 }
