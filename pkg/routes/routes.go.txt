@@ -1,0 +1,175 @@
+package routes
+
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	pb "api/v1alpha1/pb_routes"
+
+type APISIXGatewayService struct {
+	// 可以在这里添加需要的依赖，如数据库连接、缓存等
+}
+
+// ListRoutes 实现列出路由的接口
+func (s *APISIXGatewayService) ListRoutes(ctx context.Context, req *apisix.ListRoutesRequest) (*apisix.ListRoutesResponse, error) {
+	// 1. 验证请求参数
+	if req.Namespace == "" {
+		return &apisix.ListRoutesResponse{
+			Success: false,
+			Message: "namespace is required",
+		}, nil
+	}
+
+	// 2. 构建查询条件
+	filter := map[string]interface{}{
+		"namespace": req.Namespace,
+	}
+	
+	// 添加标签筛选条件
+	if len(req.Labels) > 0 {
+		labelFilters := make([]string, 0, len(req.Labels))
+		for k, v := range req.Labels {
+			labelFilters = append(labelFilters, fmt.Sprintf("%s=%s", k, v))
+		}
+		filter["labels"] = strings.Join(labelFilters, ",")
+	}
+
+	// 3. 模拟从APISIX Admin API获取路由列表
+	// 实际项目中这里应该调用APISIX的Admin API
+	routes, err := s.fetchRoutesFromAPISIX(filter, req.PageSize, req.PageToken)
+	if err != nil {
+		return &apisix.ListRoutesResponse{
+			Success: false,
+			Message: fmt.Sprintf("failed to fetch routes: %v", err),
+		}, nil
+	}
+
+	// 4. 转换为protobuf格式的路由列表
+	var routeConfigs []*apisix.RouteConfig
+	for _, r := range routes {
+		routeConfigs = append(routeConfigs, &apisix.RouteConfig{
+			Id:              r.ID,
+			Name:            r.Name,
+			Hosts:           r.Hosts,
+			Uris:            r.URIs,
+			Labels:          r.Labels,
+			UpstreamId:      r.UpstreamID,
+			PluginConfig:    r.PluginConfig,
+			EnableWebsocket: r.EnableWebsocket,
+		})
+	}
+
+	// 5. 返回响应
+	return &apisix.ListRoutesResponse{
+		Success:      true,
+		Message:      "success",
+		Routes:       routeConfigs,
+		NextPageToken: "", // 实际项目中应该根据分页情况设置
+	}, nil
+}
+
+// fetchRoutesFromAPISIX 模拟从APISIX获取路由列表
+func (s *APISIXGatewayService) fetchRoutesFromAPISIX(filter map[string]interface{}, pageSize int32, pageToken string) ([]Route, error) {
+	// 这里应该是实际调用APISIX Admin API的代码
+	// 以下是模拟数据
+	return []Route{
+		{
+			ID:       "route-1",
+			Name:     "user-service-route",
+			Hosts:    []string{"api.example.com"},
+			URIs:     []string{"/user/*"},
+			Labels:   map[string]string{"env": "prod", "team": "backend"},
+			UpstreamID: "user-service-upstream",
+			PluginConfig: `{"limit-count":{"count":100,"time_window":60}}`,
+			EnableWebsocket: false,
+		},
+		{
+			ID:       "route-2",
+			Name:     "order-service-route",
+			Hosts:    []string{"api.example.com"},
+			URIs:     []string{"/order/*"},
+			Labels:   map[string]string{"env": "prod", "team": "backend"},
+			UpstreamID: "order-service-upstream",
+			PluginConfig: `{"limit-count":{"count":200,"time_window":60}}`,
+			EnableWebsocket: true,
+		},
+	}, nil
+}
+
+// Route 表示APISIX路由的内部结构
+type Route struct {
+	ID              string
+	Name            string
+	Hosts           []string
+	URIs            []string
+	Labels          map[string]string
+	UpstreamID      string
+	PluginConfig    string
+	EnableWebsocket bool
+}
+
+// RegisterHTTPHandlers 注册HTTP路由
+func (s *APISIXGatewayService) RegisterHTTPHandlers(router *gin.Engine) {
+	router.GET("/v1alpha1/:namespace/routes", s.listRoutesHTTP)
+}
+
+// listRoutesHTTP HTTP处理函数
+func (s *APISIXGatewayService) listRoutesHTTP(c *gin.Context) {
+	// 1. 解析请求参数
+	req := &apisix.ListRoutesRequest{
+		Namespace: c.Param("namespace"),
+	}
+
+	// 解析标签参数
+	labels := c.QueryMap("labels")
+	if len(labels) > 0 {
+		req.Labels = labels
+	}
+
+	// 解析分页参数
+	if pageSize := c.Query("page_size"); pageSize != "" {
+		if size, err := parseInt32(pageSize); err == nil {
+			req.PageSize = size
+		}
+	}
+	req.PageToken = c.Query("page_token")
+
+	// 2. 调用gRPC方法
+	resp, err := s.ListRoutes(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// 3. 返回响应
+	if resp.Success {
+		c.JSON(http.StatusOK, resp)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": resp.Message,
+		})
+	}
+}
+
+// parseInt32 辅助函数，将字符串转换为int32
+func parseInt32(s string) (int32, error) {
+	var i int32
+	_, err := fmt.Sscanf(s, "%d", &i)
+	return i, err
+}
+
+// RegisterGRPCServer 注册gRPC服务
+func (s *APISIXGatewayService) RegisterGRPCServer(server *grpc.Server) {
+	apisix.RegisterAPISIXGatewayServiceServer(server, s)
+}

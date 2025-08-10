@@ -1,0 +1,159 @@
+syntax = "proto3";
+
+package apisix.v1alpha1;
+
+import "google/api/annotations.proto";
+
+option go_package = "./pkg/pb/;pb";
+
+// 路由配置数据结构
+message RouteConfig {
+  string id = 1;                  // 路由ID
+  string name = 2;               // 路由名称
+  repeated string hosts = 3;     // 匹配的host列表
+  repeated string uris = 4;      // 匹配的URI列表
+  map<string, string> labels = 5; // 标签
+  string upstream_id = 6;        // 关联的上游ID
+  string plugin_config = 7;      // 插件配置(JSON格式)
+  bool enable_websocket = 8;      // 是否启用WebSocket
+}
+
+// 上游服务配置
+message UpstreamConfig {
+  string id = 1;                  // 上游ID
+  string name = 2;               // 上游名称
+  string type = 3;               // 类型(roundrobin/chash)
+  repeated Node nodes = 4;       // 节点列表
+  map<string, string> labels = 5; // 标签
+  string scheme = 6;             // 协议(http/https)
+  
+  message Node {
+    string host = 1;             // 节点主机
+    int32 port = 2;             // 节点端口
+    int32 weight = 3;           // 权重
+  }
+}
+
+// 创建路由请求
+message CreateRouteRequest {
+  string namespace = 1;          // 命名空间
+  RouteConfig route = 2;         // 路由配置
+}
+
+// 创建路由响应
+message CreateRouteResponse {
+  bool success = 1;              // 是否成功
+  string message = 2;            // 返回消息
+  string route_id = 3;           // 创建的路由ID
+}
+
+// 更新路由请求
+message UpdateRouteRequest {
+  string namespace = 1;          // 命名空间
+  string route_id = 2;           // 要更新的路由ID
+  RouteConfig route = 3;         // 新的路由配置
+}
+
+// 更新路由响应
+message UpdateRouteResponse {
+  bool success = 1;              // 是否成功
+  string message = 2;            // 返回消息
+}
+
+// 删除路由请求
+message DeleteRouteRequest {
+  string namespace = 1;          // 命名空间
+  string route_id = 2;           // 要删除的路由ID
+}
+
+// 删除路由响应
+message DeleteRouteResponse {
+  bool success = 1;              // 是否成功
+  string message = 2;            // 返回消息
+}
+
+// 查询路由请求
+message GetRouteRequest {
+  string namespace = 1;          // 命名空间
+  string route_id = 2;           // 要查询的路由ID
+}
+
+// 查询路由响应
+message GetRouteResponse {
+  bool success = 1;              // 是否成功
+  string message = 2;            // 返回消息
+  RouteConfig route = 3;         // 路由配置
+}
+
+// 列出路由请求
+message ListRoutesRequest {
+  string namespace = 1;          // 命名空间
+  string release_name = 2;
+  map<string, string> labels = 3; // 标签选择器
+  int32 page_size = 4;           // 每页数量
+  string page_token = 5;         // 分页令牌
+}
+
+// 列出路由响应
+message ListRoutesResponse {
+  bool success = 1;              // 是否成功
+  string message = 2;            // 返回消息
+  repeated RouteConfig routes = 3; // 路由列表
+  string next_page_token = 4;    // 下一页令牌
+}
+
+// 上游服务相关接口
+message CreateUpstreamRequest {
+  string namespace = 1;
+  UpstreamConfig upstream = 2;
+}
+
+message CreateUpstreamResponse {
+  bool success = 1;
+  string message = 2;
+  string upstream_id = 3;
+}
+
+// 网关配置服务
+service APISIXGatewayService {
+  // 路由管理
+  rpc CreateRoute (CreateRouteRequest) returns (CreateRouteResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{namespace}/routes"
+      body: "route"
+    };
+  }
+  
+  rpc UpdateRoute (UpdateRouteRequest) returns (UpdateRouteResponse) {
+    option (google.api.http) = {
+      put: "/v1alpha1/{namespace}/routes/{route_id}"
+      body: "route"
+    };
+  }
+  
+  rpc DeleteRoute (DeleteRouteRequest) returns (DeleteRouteResponse) {
+    option (google.api.http) = {
+      delete: "/v1alpha1/{namespace}/routes/{route_id}"
+    };
+  }
+  
+  rpc GetRoute (GetRouteRequest) returns (GetRouteResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/{namespace}/routes/{route_id}"
+    };
+  }
+  
+  rpc ListRoutes (ListRoutesRequest) returns (ListRoutesResponse) {
+    option (google.api.http) = {
+      get: "/v1alpha1/{namespace}/routes/{release_name}/list"
+    };
+  }
+  
+  // 上游服务管理
+  rpc CreateUpstream (CreateUpstreamRequest) returns (CreateUpstreamResponse) {
+    option (google.api.http) = {
+      post: "/v1alpha1/{namespace}/upstreams"
+      body: "upstream"
+    };
+  }
+}

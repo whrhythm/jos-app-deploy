@@ -277,7 +277,7 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 	// 2. 创建 Helm action 配置
 
 	// 3. 解析 values
-	var values map[string]interface{}
+	var values map[string]any
 	if dryRun {
 		var message string
 		if req.Values != "" {
@@ -349,7 +349,15 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 			release, err = install.Run(chart, values)
 			if err != nil {
 				logger.L().Error("Failed to install chart", zap.Error(err))
-				return nil, err
+				// 安装失败，调用uninstall方法清理已安装的资源
+				uninstall := action.NewUninstall(actionConfig)
+				uninstall.Wait = true
+				uninstall.Run(releaseName)
+				return &pb.InstallChartResponse{
+					Code:        1,
+					Message:     fmt.Sprintf("Failed to install chart: %v", err),
+					ReleaseName: releaseName,
+				}, err
 			}
 
 			logger.L().Info("Chart installed successfully", zap.String("release", release.Name))
