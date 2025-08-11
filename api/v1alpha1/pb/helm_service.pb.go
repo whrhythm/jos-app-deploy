@@ -2573,22 +2573,22 @@ const file_helm_service_proto_rawDesc = "" +
 	"\x06values\x18\t \x03(\v2).helm.v1alpha1.InstalledChart.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xaa\x0f\n" +
-	"\x12HelmManagerService\x12k\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xeb\x0f\n" +
+	"\x12HelmManagerService\x12p\n" +
 	"\n" +
-	"ListCharts\x12 .helm.v1alpha1.ListChartsRequest\x1a!.helm.v1alpha1.ListChartsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1alpha1/charts\x12v\n" +
-	"\rConfigureRepo\x12#.helm.v1alpha1.ConfigureRepoRequest\x1a$.helm.v1alpha1.ConfigureRepoResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1alpha1/repos\x12\x97\x01\n" +
-	"\fInstallChart\x12\".helm.v1alpha1.InstallChartRequest\x1a#.helm.v1alpha1.InstallChartResponse\">\x82\xd3\xe4\x93\x028:\x01*\"3/v1alpha1/{namespace}/charts/{release_name}/install\x12\x9f\x01\n" +
-	"\x0eUninstallChart\x12$.helm.v1alpha1.UninstallChartRequest\x1a%.helm.v1alpha1.UninstallChartResponse\"@\x82\xd3\xe4\x93\x02::\x01*\"5/v1alpha1/{namespace}/charts/{release_name}/uninstall\x12\x9a\x01\n" +
-	"\x12WatchInstallStatus\x12(.helm.v1alpha1.WatchInstallStatusRequest\x1a\x1c.helm.v1alpha1.InstallStatus\":\x82\xd3\xe4\x93\x024\x122/v1alpha1/{namespace}/charts/{release_name}/status0\x01\x12\x94\x01\n" +
-	"\rListPodStatus\x12#.helm.v1alpha1.ListPodStatusRequest\x1a$.helm.v1alpha1.ListPodStatusResponse\"8\x82\xd3\xe4\x93\x022\x120/v1alpha1/{namespace}/charts/{release_name}/pods\x12\x93\x01\n" +
-	"\x10CheckApisixRoute\x12&.helm.v1alpha1.CheckApisixRouteRequest\x1a'.helm.v1alpha1.CheckApisixRouteResponse\".\x82\xd3\xe4\x93\x02(\x12&/v1alpha1/charts/{release_name}/apisix\x12\x98\x01\n" +
-	"\x16CreateChartApplication\x12,.helm.v1alpha1.CreateChartApplicationRequest\x1a-.helm.v1alpha1.CreateChartApplicationResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/v1alpha1/applications\x12\x9b\x01\n" +
-	"\x10CheckPodTerminal\x12&.helm.v1alpha1.CheckPodTerminalRequest\x1a'.helm.v1alpha1.CheckPodTerminalResponse\"6\x82\xd3\xe4\x93\x020\x12./v1alpha1/pods/{namespace}/{pod_name}/terminal\x12\x97\x01\n" +
-	"\fUpgradeChart\x12\".helm.v1alpha1.UpgradeChartRequest\x1a#.helm.v1alpha1.UpgradeChartResponse\">\x82\xd3\xe4\x93\x028:\x01*\"3/v1alpha1/{namespace}/charts/{release_name}/upgrade\x12\x9b\x01\n" +
-	"\rRollbackChart\x12#.helm.v1alpha1.RollbackChartRequest\x1a$.helm.v1alpha1.RollbackChartResponse\"?\x82\xd3\xe4\x93\x029:\x01*\"4/v1alpha1/{namespace}/charts/{release_name}/rollback\x12\xa2\x01\n" +
-	"\x11ListChartVersions\x12'.helm.v1alpha1.ListChartVersionsRequest\x1a(.helm.v1alpha1.ListChartVersionsResponse\":\x82\xd3\xe4\x93\x024\x122/v1alpha1/charts/{repo_name}/{chart_name}/versions\x12\x92\x01\n" +
-	"\x13ListInstalledCharts\x12).helm.v1alpha1.ListInstalledChartsRequest\x1a*.helm.v1alpha1.ListInstalledChartsResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/v1alpha1/{namespace}/chartsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"ListCharts\x12 .helm.v1alpha1.ListChartsRequest\x1a!.helm.v1alpha1.ListChartsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/prod/v1alpha1/charts\x12{\n" +
+	"\rConfigureRepo\x12#.helm.v1alpha1.ConfigureRepoRequest\x1a$.helm.v1alpha1.ConfigureRepoResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/prod/v1alpha1/repos\x12\x9c\x01\n" +
+	"\fInstallChart\x12\".helm.v1alpha1.InstallChartRequest\x1a#.helm.v1alpha1.InstallChartResponse\"C\x82\xd3\xe4\x93\x02=:\x01*\"8/prod/v1alpha1/{namespace}/charts/{release_name}/install\x12\xa4\x01\n" +
+	"\x0eUninstallChart\x12$.helm.v1alpha1.UninstallChartRequest\x1a%.helm.v1alpha1.UninstallChartResponse\"E\x82\xd3\xe4\x93\x02?:\x01*\":/prod/v1alpha1/{namespace}/charts/{release_name}/uninstall\x12\x9f\x01\n" +
+	"\x12WatchInstallStatus\x12(.helm.v1alpha1.WatchInstallStatusRequest\x1a\x1c.helm.v1alpha1.InstallStatus\"?\x82\xd3\xe4\x93\x029\x127/prod/v1alpha1/{namespace}/charts/{release_name}/status0\x01\x12\x99\x01\n" +
+	"\rListPodStatus\x12#.helm.v1alpha1.ListPodStatusRequest\x1a$.helm.v1alpha1.ListPodStatusResponse\"=\x82\xd3\xe4\x93\x027\x125/prod/v1alpha1/{namespace}/charts/{release_name}/pods\x12\x98\x01\n" +
+	"\x10CheckApisixRoute\x12&.helm.v1alpha1.CheckApisixRouteRequest\x1a'.helm.v1alpha1.CheckApisixRouteResponse\"3\x82\xd3\xe4\x93\x02-\x12+/prod/v1alpha1/charts/{release_name}/apisix\x12\x9d\x01\n" +
+	"\x16CreateChartApplication\x12,.helm.v1alpha1.CreateChartApplicationRequest\x1a-.helm.v1alpha1.CreateChartApplicationResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/prod/v1alpha1/applications\x12\xa0\x01\n" +
+	"\x10CheckPodTerminal\x12&.helm.v1alpha1.CheckPodTerminalRequest\x1a'.helm.v1alpha1.CheckPodTerminalResponse\";\x82\xd3\xe4\x93\x025\x123/prod/v1alpha1/pods/{namespace}/{pod_name}/terminal\x12\x9c\x01\n" +
+	"\fUpgradeChart\x12\".helm.v1alpha1.UpgradeChartRequest\x1a#.helm.v1alpha1.UpgradeChartResponse\"C\x82\xd3\xe4\x93\x02=:\x01*\"8/prod/v1alpha1/{namespace}/charts/{release_name}/upgrade\x12\xa0\x01\n" +
+	"\rRollbackChart\x12#.helm.v1alpha1.RollbackChartRequest\x1a$.helm.v1alpha1.RollbackChartResponse\"D\x82\xd3\xe4\x93\x02>:\x01*\"9/prod/v1alpha1/{namespace}/charts/{release_name}/rollback\x12\xa7\x01\n" +
+	"\x11ListChartVersions\x12'.helm.v1alpha1.ListChartVersionsRequest\x1a(.helm.v1alpha1.ListChartVersionsResponse\"?\x82\xd3\xe4\x93\x029\x127/prod/v1alpha1/charts/{repo_name}/{chart_name}/versions\x12\x97\x01\n" +
+	"\x13ListInstalledCharts\x12).helm.v1alpha1.ListInstalledChartsRequest\x1a*.helm.v1alpha1.ListInstalledChartsResponse\")\x82\xd3\xe4\x93\x02#\x12!/prod/v1alpha1/{namespace}/chartsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_helm_service_proto_rawDescOnce sync.Once

@@ -377,7 +377,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -397,7 +397,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -417,7 +417,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -437,7 +437,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -457,7 +457,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{release_name}/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{release_name}/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -477,7 +477,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/upstreams"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/upstreams"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -535,7 +535,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -552,7 +552,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -569,7 +569,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -586,7 +586,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetRoute", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -603,7 +603,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/routes/{release_name}/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{release_name}/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -620,7 +620,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/upstreams"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/upstreams"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -637,12 +637,12 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_APISIXGatewayService_CreateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"v1alpha1", "namespace", "routes"}, ""))
-	pattern_APISIXGatewayService_UpdateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_DeleteRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_GetRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_ListRoutes_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "routes", "release_name", "list"}, ""))
-	pattern_APISIXGatewayService_CreateUpstream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"v1alpha1", "namespace", "upstreams"}, ""))
+	pattern_APISIXGatewayService_CreateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "routes"}, ""))
+	pattern_APISIXGatewayService_UpdateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_DeleteRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_GetRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_ListRoutes_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "routes", "release_name", "list"}, ""))
+	pattern_APISIXGatewayService_CreateUpstream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "upstreams"}, ""))
 )
 
 var (

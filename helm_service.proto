@@ -13,14 +13,14 @@ service HelmManagerService {
   // 1. 获取私有仓库中所有 Helm Chart 信息
   rpc ListCharts (ListChartsRequest) returns (ListChartsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/charts"
+      get: "/prod/v1alpha1/charts"
     };
   }
 
   // 2. 设置私有仓库地址和权限
   rpc ConfigureRepo (ConfigureRepoRequest) returns (ConfigureRepoResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/repos"
+      post: "/prod/v1alpha1/repos"
       body: "*"
     };
   }
@@ -28,7 +28,7 @@ service HelmManagerService {
   // 3. 安装 Helm Chart
   rpc InstallChart (InstallChartRequest) returns (InstallChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{release_name}/install"
+      post: "/prod/v1alpha1/{namespace}/charts/{release_name}/install"
       body: "*"
     };
   }
@@ -36,7 +36,7 @@ service HelmManagerService {
   // 4. 卸载 Helm Chart
   rpc UninstallChart (UninstallChartRequest) returns (UninstallChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{release_name}/uninstall"
+      post: "/prod/v1alpha1/{namespace}/charts/{release_name}/uninstall"
       body: "*"
     };
   }
@@ -44,28 +44,28 @@ service HelmManagerService {
   // 5. 监控 Chart 安装状态
   rpc WatchInstallStatus (WatchInstallStatusRequest) returns (stream InstallStatus) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/charts/{release_name}/status"
+      get: "/prod/v1alpha1/{namespace}/charts/{release_name}/status"
     };
   }
 
   // 6. 监控 Chart 下 Pod 状态
   rpc ListPodStatus (ListPodStatusRequest) returns (ListPodStatusResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/charts/{release_name}/pods"
+      get: "/prod/v1alpha1/{namespace}/charts/{release_name}/pods"
     };
   }
 
   // 7. 检查已安装 Chart 是否包含 ApisixRoute 资源
   rpc CheckApisixRoute (CheckApisixRouteRequest) returns (CheckApisixRouteResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/charts/{release_name}/apisix"
+      get: "/prod/v1alpha1/charts/{release_name}/apisix"
     };
   }
 
   // 8. 创建 Helm Chart 应用
   rpc CreateChartApplication (CreateChartApplicationRequest) returns (CreateChartApplicationResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/applications"
+      post: "/prod/v1alpha1/applications"
       body: "*"
     };
   }
@@ -75,7 +75,7 @@ service HelmManagerService {
   // 10. 检查 Pod 是否支持终端交互
   rpc CheckPodTerminal (CheckPodTerminalRequest) returns (CheckPodTerminalResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/pods/{namespace}/{pod_name}/terminal"
+      get: "/prod/v1alpha1/pods/{namespace}/{pod_name}/terminal"
     };
   }
 
@@ -84,7 +84,7 @@ service HelmManagerService {
   // 12. 升级 Helm Chart
   rpc UpgradeChart (UpgradeChartRequest) returns (UpgradeChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{release_name}/upgrade"
+      post: "/prod/v1alpha1/{namespace}/charts/{release_name}/upgrade"
       body: "*"
     };
   }
@@ -92,7 +92,7 @@ service HelmManagerService {
   // 13. 回滚 Helm Chart
   rpc RollbackChart (RollbackChartRequest) returns (RollbackChartResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/charts/{release_name}/rollback"
+      post: "/prod/v1alpha1/{namespace}/charts/{release_name}/rollback"
       body: "*"
     };
   }
@@ -100,14 +100,14 @@ service HelmManagerService {
   // 14. 查询 Chart 所有版本信息
   rpc ListChartVersions (ListChartVersionsRequest) returns (ListChartVersionsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/charts/{repo_name}/{chart_name}/versions"
+      get: "/prod/v1alpha1/charts/{repo_name}/{chart_name}/versions"
     };
   }
 
   // 15. 获取应用列表
   rpc ListInstalledCharts (ListInstalledChartsRequest) returns (ListInstalledChartsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/charts"
+      get: "/prod/v1alpha1/{namespace}/charts"
     };
   }
 }

@@ -1056,15 +1056,15 @@ const file_routes_service_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1f\n" +
 	"\vupstream_id\x18\x03 \x01(\tR\n" +
-	"upstreamId2\xe9\x06\n" +
-	"\x14APISIXGatewayService\x12\x85\x01\n" +
-	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\"+\x82\xd3\xe4\x93\x02%:\x05route\"\x1c/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
-	"\vUpdateRoute\x12#.apisix.v1alpha1.UpdateRouteRequest\x1a$.apisix.v1alpha1.UpdateRouteResponse\"6\x82\xd3\xe4\x93\x020:\x05route\x1a'/v1alpha1/{namespace}/routes/{route_id}\x12\x89\x01\n" +
-	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"/\x82\xd3\xe4\x93\x02)*'/v1alpha1/{namespace}/routes/{route_id}\x12\x80\x01\n" +
-	"\bGetRoute\x12 .apisix.v1alpha1.GetRouteRequest\x1a!.apisix.v1alpha1.GetRouteResponse\"/\x82\xd3\xe4\x93\x02)\x12'/v1alpha1/{namespace}/routes/{route_id}\x12\x8f\x01\n" +
+	"upstreamId2\x87\a\n" +
+	"\x14APISIXGatewayService\x12\x8a\x01\n" +
+	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\"0\x82\xd3\xe4\x93\x02*:\x05route\"!/prod/v1alpha1/{namespace}/routes\x12\x95\x01\n" +
+	"\vUpdateRoute\x12#.apisix.v1alpha1.UpdateRouteRequest\x1a$.apisix.v1alpha1.UpdateRouteResponse\";\x82\xd3\xe4\x93\x025:\x05route\x1a,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x8e\x01\n" +
+	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"4\x82\xd3\xe4\x93\x02.*,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x85\x01\n" +
+	"\bGetRoute\x12 .apisix.v1alpha1.GetRouteRequest\x1a!.apisix.v1alpha1.GetRouteResponse\"4\x82\xd3\xe4\x93\x02.\x12,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x94\x01\n" +
 	"\n" +
-	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\"8\x82\xd3\xe4\x93\x022\x120/v1alpha1/{namespace}/routes/{release_name}/list\x12\x94\x01\n" +
-	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"1\x82\xd3\xe4\x93\x02+:\bupstream\"\x1f/v1alpha1/{namespace}/upstreamsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\"=\x82\xd3\xe4\x93\x027\x125/prod/v1alpha1/{namespace}/routes/{release_name}/list\x12\x99\x01\n" +
+	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"6\x82\xd3\xe4\x93\x020:\bupstream\"$/prod/v1alpha1/{namespace}/upstreamsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_routes_service_proto_rawDescOnce sync.Once

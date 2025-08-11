@@ -172,14 +172,14 @@ service PodManagerService {
   // 删除 Pod
   rpc DeletePod(DeletePodRequest) returns (DeletePodResponse) {
     option (google.api.http) = {
-      delete: "/v1alpha1/{namespace}/pods/{pod_name}"
+      delete: "/prod/v1alpha1/{namespace}/pods/{pod_name}"
     };
   }
 
   // 获取 Pod 日志 (流式)
   rpc GetPodLogs(GetPodLogsRequest) returns (stream LogChunk) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/pods/{pod_name}/logs"
+      get: "/prod/v1alpha1/{namespace}/pods/{pod_name}/logs"
     };
   }
 
@@ -189,7 +189,7 @@ service PodManagerService {
       // 此流式接口不适合直接映射为标准的 RESTful GET/POST
       // 通常通过 WebSocket 代理实现
       // 这里移除 http option，或保留一个非标准的 POST 用于特定客户端
-      post: "/v1alpha1/pod/exec"
+      post: "/prod/v1alpha1/pod/exec"
       body: "*"
     };
   }
@@ -197,7 +197,7 @@ service PodManagerService {
   // 配置水平自动伸缩 (HPA)
   rpc ConfigureHorizontalAutoscaling(ConfigureHPARequest) returns (ConfigureHPAResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/pod/hpa"
+      post: "/prod/v1alpha1/{namespace}/pod/hpa"
       body: "*"
     };
   }
@@ -205,7 +205,7 @@ service PodManagerService {
   // 配置垂直自动伸缩 (VPA)
   rpc ConfigureVerticalAutoscaling(ConfigureVPARequest) returns (ConfigureVPAResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/pod/vpa"
+      post: "/prod/v1alpha1/{namespace}/pod/vpa"
       body: "*"
     };
   }
@@ -213,7 +213,7 @@ service PodManagerService {
   // 金丝雀发布
   rpc CreateCanaryDeployment(CreateCanaryRequest) returns (CreateCanaryResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/canary"
+      post: "/prod/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/canary"
       body: "*"
     };
   }
@@ -221,7 +221,7 @@ service PodManagerService {
   // 蓝绿发布
   rpc CreateBlueGreenDeployment(CreateBlueGreenRequest) returns (CreateBlueGreenResponse) {
     option (google.api.http) = {
-      post: "/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/bluegreen"
+      post: "/prod/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/bluegreen"
       body: "*"
     };
   }
@@ -229,7 +229,7 @@ service PodManagerService {
   // 统计应用下所有pod的cpu/mem信息
   rpc PodsMetrics(PodsMetricsRequest) returns (PodsMetricsResponse) {
     option (google.api.http) = {
-      get: "/v1alpha1/{namespace}/pod/{release_name}/metrics"
+      get: "/prod/v1alpha1/{namespace}/pod/{release_name}/metrics"
     };
   }
 }

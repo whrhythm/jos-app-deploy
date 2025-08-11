@@ -1563,17 +1563,17 @@ const file_pod_service_proto_rawDesc = "" +
 	"\tSUCCEEDED\x10\x02\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x03\x12\v\n" +
-	"\aUNKNOWN\x10\x042\x90\t\n" +
-	"\x11PodManagerService\x12{\n" +
-	"\tDeletePod\x12\x1e.pod.v1alpha1.DeletePodRequest\x1a\x1f.pod.v1alpha1.DeletePodResponse\"-\x82\xd3\xe4\x93\x02'*%/v1alpha1/{namespace}/pods/{pod_name}\x12{\n" +
+	"\aUNKNOWN\x10\x042\xba\t\n" +
+	"\x11PodManagerService\x12\x80\x01\n" +
+	"\tDeletePod\x12\x1e.pod.v1alpha1.DeletePodRequest\x1a\x1f.pod.v1alpha1.DeletePodResponse\"2\x82\xd3\xe4\x93\x02,**/prod/v1alpha1/{namespace}/pods/{pod_name}\x12\x80\x01\n" +
 	"\n" +
-	"GetPodLogs\x12\x1f.pod.v1alpha1.GetPodLogsRequest\x1a\x16.pod.v1alpha1.LogChunk\"2\x82\xd3\xe4\x93\x02,\x12*/v1alpha1/{namespace}/pods/{pod_name}/logs0\x01\x12r\n" +
-	"\x0fExecPodTerminal\x12\x1d.pod.v1alpha1.TerminalMessage\x1a\x1d.pod.v1alpha1.TerminalMessage\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/v1alpha1/pod/exec(\x010\x01\x12\x91\x01\n" +
-	"\x1eConfigureHorizontalAutoscaling\x12!.pod.v1alpha1.ConfigureHPARequest\x1a\".pod.v1alpha1.ConfigureHPAResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1alpha1/{namespace}/pod/hpa\x12\x8f\x01\n" +
-	"\x1cConfigureVerticalAutoscaling\x12!.pod.v1alpha1.ConfigureVPARequest\x1a\".pod.v1alpha1.ConfigureVPAResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1alpha1/{namespace}/pod/vpa\x12\xa4\x01\n" +
-	"\x16CreateCanaryDeployment\x12!.pod.v1alpha1.CreateCanaryRequest\x1a\".pod.v1alpha1.CreateCanaryResponse\"C\x82\xd3\xe4\x93\x02=:\x01*\"8/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/canary\x12\xb0\x01\n" +
-	"\x19CreateBlueGreenDeployment\x12$.pod.v1alpha1.CreateBlueGreenRequest\x1a%.pod.v1alpha1.CreateBlueGreenResponse\"F\x82\xd3\xe4\x93\x02@:\x01*\";/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/bluegreen\x12\x8c\x01\n" +
-	"\vPodsMetrics\x12 .pod.v1alpha1.PodsMetricsRequest\x1a!.pod.v1alpha1.PodsMetricsResponse\"8\x82\xd3\xe4\x93\x022\x120/v1alpha1/{namespace}/pod/{release_name}/metricsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"GetPodLogs\x12\x1f.pod.v1alpha1.GetPodLogsRequest\x1a\x16.pod.v1alpha1.LogChunk\"7\x82\xd3\xe4\x93\x021\x12//prod/v1alpha1/{namespace}/pods/{pod_name}/logs0\x01\x12w\n" +
+	"\x0fExecPodTerminal\x12\x1d.pod.v1alpha1.TerminalMessage\x1a\x1d.pod.v1alpha1.TerminalMessage\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/prod/v1alpha1/pod/exec(\x010\x01\x12\x96\x01\n" +
+	"\x1eConfigureHorizontalAutoscaling\x12!.pod.v1alpha1.ConfigureHPARequest\x1a\".pod.v1alpha1.ConfigureHPAResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/prod/v1alpha1/{namespace}/pod/hpa\x12\x94\x01\n" +
+	"\x1cConfigureVerticalAutoscaling\x12!.pod.v1alpha1.ConfigureVPARequest\x1a\".pod.v1alpha1.ConfigureVPAResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/prod/v1alpha1/{namespace}/pod/vpa\x12\xa9\x01\n" +
+	"\x16CreateCanaryDeployment\x12!.pod.v1alpha1.CreateCanaryRequest\x1a\".pod.v1alpha1.CreateCanaryResponse\"H\x82\xd3\xe4\x93\x02B:\x01*\"=/prod/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/canary\x12\xb5\x01\n" +
+	"\x19CreateBlueGreenDeployment\x12$.pod.v1alpha1.CreateBlueGreenRequest\x1a%.pod.v1alpha1.CreateBlueGreenResponse\"K\x82\xd3\xe4\x93\x02E:\x01*\"@/prod/v1alpha1/{namespace}/pod/rollouts/{rollout_name}/bluegreen\x12\x91\x01\n" +
+	"\vPodsMetrics\x12 .pod.v1alpha1.PodsMetricsRequest\x1a!.pod.v1alpha1.PodsMetricsResponse\"=\x82\xd3\xe4\x93\x027\x125/prod/v1alpha1/{namespace}/pod/{release_name}/metricsB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_pod_service_proto_rawDescOnce sync.Once

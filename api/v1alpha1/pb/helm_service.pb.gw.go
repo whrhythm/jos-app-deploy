@@ -716,7 +716,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListCharts", runtime.WithHTTPPathPattern("/v1alpha1/charts"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListCharts", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -736,7 +736,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ConfigureRepo", runtime.WithHTTPPathPattern("/v1alpha1/repos"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ConfigureRepo", runtime.WithHTTPPathPattern("/prod/v1alpha1/repos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -756,7 +756,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/install"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/install"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -776,7 +776,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -803,7 +803,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListPodStatus", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/pods"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListPodStatus", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/pods"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -823,7 +823,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckApisixRoute", runtime.WithHTTPPathPattern("/v1alpha1/charts/{release_name}/apisix"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckApisixRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts/{release_name}/apisix"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -843,7 +843,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CreateChartApplication", runtime.WithHTTPPathPattern("/v1alpha1/applications"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CreateChartApplication", runtime.WithHTTPPathPattern("/prod/v1alpha1/applications"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -863,7 +863,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckPodTerminal", runtime.WithHTTPPathPattern("/v1alpha1/pods/{namespace}/{pod_name}/terminal"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckPodTerminal", runtime.WithHTTPPathPattern("/prod/v1alpha1/pods/{namespace}/{pod_name}/terminal"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -883,7 +883,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UpgradeChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/upgrade"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UpgradeChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/upgrade"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -903,7 +903,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/RollbackChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/rollback"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/RollbackChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/rollback"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -923,7 +923,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListChartVersions", runtime.WithHTTPPathPattern("/v1alpha1/charts/{repo_name}/{chart_name}/versions"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListChartVersions", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts/{repo_name}/{chart_name}/versions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -943,7 +943,7 @@ func RegisterHelmManagerServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListInstalledCharts", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListInstalledCharts", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1001,7 +1001,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListCharts", runtime.WithHTTPPathPattern("/v1alpha1/charts"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListCharts", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1018,7 +1018,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ConfigureRepo", runtime.WithHTTPPathPattern("/v1alpha1/repos"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ConfigureRepo", runtime.WithHTTPPathPattern("/prod/v1alpha1/repos"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1035,7 +1035,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/install"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/InstallChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/install"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1052,7 +1052,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UninstallChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/uninstall"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1069,7 +1069,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/WatchInstallStatus", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/status"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/WatchInstallStatus", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/status"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1086,7 +1086,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListPodStatus", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/pods"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListPodStatus", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/pods"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1103,7 +1103,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckApisixRoute", runtime.WithHTTPPathPattern("/v1alpha1/charts/{release_name}/apisix"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckApisixRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts/{release_name}/apisix"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1120,7 +1120,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CreateChartApplication", runtime.WithHTTPPathPattern("/v1alpha1/applications"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CreateChartApplication", runtime.WithHTTPPathPattern("/prod/v1alpha1/applications"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1137,7 +1137,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckPodTerminal", runtime.WithHTTPPathPattern("/v1alpha1/pods/{namespace}/{pod_name}/terminal"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/CheckPodTerminal", runtime.WithHTTPPathPattern("/prod/v1alpha1/pods/{namespace}/{pod_name}/terminal"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1154,7 +1154,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UpgradeChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/upgrade"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/UpgradeChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/upgrade"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1171,7 +1171,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/RollbackChart", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts/{release_name}/rollback"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/RollbackChart", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts/{release_name}/rollback"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1188,7 +1188,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListChartVersions", runtime.WithHTTPPathPattern("/v1alpha1/charts/{repo_name}/{chart_name}/versions"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListChartVersions", runtime.WithHTTPPathPattern("/prod/v1alpha1/charts/{repo_name}/{chart_name}/versions"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1205,7 +1205,7 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListInstalledCharts", runtime.WithHTTPPathPattern("/v1alpha1/{namespace}/charts"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/helm.v1alpha1.HelmManagerService/ListInstalledCharts", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/charts"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1222,19 +1222,19 @@ func RegisterHelmManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_HelmManagerService_ListCharts_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "charts"}, ""))
-	pattern_HelmManagerService_ConfigureRepo_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "repos"}, ""))
-	pattern_HelmManagerService_InstallChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "install"}, ""))
-	pattern_HelmManagerService_UninstallChart_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "uninstall"}, ""))
-	pattern_HelmManagerService_WatchInstallStatus_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "status"}, ""))
-	pattern_HelmManagerService_ListPodStatus_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "pods"}, ""))
-	pattern_HelmManagerService_CheckApisixRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1alpha1", "charts", "release_name", "apisix"}, ""))
-	pattern_HelmManagerService_CreateChartApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1alpha1", "applications"}, ""))
-	pattern_HelmManagerService_CheckPodTerminal_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "pods", "namespace", "pod_name", "terminal"}, ""))
-	pattern_HelmManagerService_UpgradeChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "upgrade"}, ""))
-	pattern_HelmManagerService_RollbackChart_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "namespace", "charts", "release_name", "rollback"}, ""))
-	pattern_HelmManagerService_ListChartVersions_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"v1alpha1", "charts", "repo_name", "chart_name", "versions"}, ""))
-	pattern_HelmManagerService_ListInstalledCharts_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"v1alpha1", "namespace", "charts"}, ""))
+	pattern_HelmManagerService_ListCharts_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"prod", "v1alpha1", "charts"}, ""))
+	pattern_HelmManagerService_ConfigureRepo_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"prod", "v1alpha1", "repos"}, ""))
+	pattern_HelmManagerService_InstallChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "install"}, ""))
+	pattern_HelmManagerService_UninstallChart_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "uninstall"}, ""))
+	pattern_HelmManagerService_WatchInstallStatus_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "status"}, ""))
+	pattern_HelmManagerService_ListPodStatus_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "pods"}, ""))
+	pattern_HelmManagerService_CheckApisixRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"prod", "v1alpha1", "charts", "release_name", "apisix"}, ""))
+	pattern_HelmManagerService_CreateChartApplication_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"prod", "v1alpha1", "applications"}, ""))
+	pattern_HelmManagerService_CheckPodTerminal_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "pods", "namespace", "pod_name", "terminal"}, ""))
+	pattern_HelmManagerService_UpgradeChart_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "upgrade"}, ""))
+	pattern_HelmManagerService_RollbackChart_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "charts", "release_name", "rollback"}, ""))
+	pattern_HelmManagerService_ListChartVersions_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "charts", "repo_name", "chart_name", "versions"}, ""))
+	pattern_HelmManagerService_ListInstalledCharts_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "charts"}, ""))
 )
 
 var (
