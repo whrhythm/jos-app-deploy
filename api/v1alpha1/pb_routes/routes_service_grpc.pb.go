@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	APISIXGatewayService_CreateRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/CreateRoute"
-	APISIXGatewayService_UpdateRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute"
 	APISIXGatewayService_DeleteRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
 	APISIXGatewayService_GetRoute_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
 	APISIXGatewayService_ListRoutes_FullMethodName      = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
@@ -38,7 +37,6 @@ const (
 type APISIXGatewayServiceClient interface {
 	// 路由管理
 	CreateRoute(ctx context.Context, in *CreateRouteRequest, opts ...grpc.CallOption) (*CreateRouteResponse, error)
-	UpdateRoute(ctx context.Context, in *UpdateRouteRequest, opts ...grpc.CallOption) (*UpdateRouteResponse, error)
 	DeleteRoute(ctx context.Context, in *DeleteRouteRequest, opts ...grpc.CallOption) (*DeleteRouteResponse, error)
 	GetRoute(ctx context.Context, in *GetRouteRequest, opts ...grpc.CallOption) (*GetRouteResponse, error)
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (*ListRoutesResponse, error)
@@ -63,16 +61,6 @@ func (c *aPISIXGatewayServiceClient) CreateRoute(ctx context.Context, in *Create
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateRouteResponse)
 	err := c.cc.Invoke(ctx, APISIXGatewayService_CreateRoute_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *aPISIXGatewayServiceClient) UpdateRoute(ctx context.Context, in *UpdateRouteRequest, opts ...grpc.CallOption) (*UpdateRouteResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateRouteResponse)
-	err := c.cc.Invoke(ctx, APISIXGatewayService_UpdateRoute_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +145,6 @@ func (c *aPISIXGatewayServiceClient) GetServiceList(ctx context.Context, in *Get
 type APISIXGatewayServiceServer interface {
 	// 路由管理
 	CreateRoute(context.Context, *CreateRouteRequest) (*CreateRouteResponse, error)
-	UpdateRoute(context.Context, *UpdateRouteRequest) (*UpdateRouteResponse, error)
 	DeleteRoute(context.Context, *DeleteRouteRequest) (*DeleteRouteResponse, error)
 	GetRoute(context.Context, *GetRouteRequest) (*GetRouteResponse, error)
 	ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error)
@@ -180,9 +167,6 @@ type UnimplementedAPISIXGatewayServiceServer struct{}
 
 func (UnimplementedAPISIXGatewayServiceServer) CreateRoute(context.Context, *CreateRouteRequest) (*CreateRouteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRoute not implemented")
-}
-func (UnimplementedAPISIXGatewayServiceServer) UpdateRoute(context.Context, *UpdateRouteRequest) (*UpdateRouteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRoute not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) DeleteRoute(context.Context, *DeleteRouteRequest) (*DeleteRouteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoute not implemented")
@@ -240,24 +224,6 @@ func _APISIXGatewayService_CreateRoute_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(APISIXGatewayServiceServer).CreateRoute(ctx, req.(*CreateRouteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _APISIXGatewayService_UpdateRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRouteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(APISIXGatewayServiceServer).UpdateRoute(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: APISIXGatewayService_UpdateRoute_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(APISIXGatewayServiceServer).UpdateRoute(ctx, req.(*UpdateRouteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -398,10 +364,6 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRoute",
 			Handler:    _APISIXGatewayService_CreateRoute_Handler,
-		},
-		{
-			MethodName: "UpdateRoute",
-			Handler:    _APISIXGatewayService_UpdateRoute_Handler,
 		},
 		{
 			MethodName: "DeleteRoute",

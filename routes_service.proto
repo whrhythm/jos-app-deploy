@@ -73,7 +73,7 @@ message UpdateRouteResponse {
 // 删除路由请求
 message DeleteRouteRequest {
   string namespace = 1;          // 命名空间
-  string route_id = 2;           // 要删除的路由ID
+  string route_name = 2;           // 要删除的路由ID
 }
 
 // 删除路由响应
@@ -180,7 +180,10 @@ message GetServiceData {
 }
 
 message GetServiceListResponse {
-  repeated GetServiceData data = 1;
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  repeated GetServiceData data = 4;
 }
 
 // 网关配置服务
@@ -192,17 +195,10 @@ service APISIXGatewayService {
       body: "*"
     };
   }
-  
-  rpc UpdateRoute (UpdateRouteRequest) returns (UpdateRouteResponse) {
-    option (google.api.http) = {
-      put: "/prod/v1alpha1/{namespace}/routes/{route_id}"
-      body: "route"
-    };
-  }
-  
+    
   rpc DeleteRoute (DeleteRouteRequest) returns (DeleteRouteResponse) {
     option (google.api.http) = {
-      delete: "/prod/v1alpha1/{namespace}/routes/{route_id}"
+      delete: "/prod/v1alpha1/{namespace}/routes/{route_name}"
     };
   }
   

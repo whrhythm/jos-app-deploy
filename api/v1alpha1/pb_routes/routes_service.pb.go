@@ -531,8 +531,8 @@ func (x *UpdateRouteResponse) GetMessage() string {
 // 删除路由请求
 type DeleteRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`            // 命名空间
-	RouteId       string                 `protobuf:"bytes,2,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"` // 要删除的路由ID
+	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`                  // 命名空间
+	RouteName     string                 `protobuf:"bytes,2,opt,name=route_name,json=routeName,proto3" json:"route_name,omitempty"` // 要删除的路由ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -574,9 +574,9 @@ func (x *DeleteRouteRequest) GetNamespace() string {
 	return ""
 }
 
-func (x *DeleteRouteRequest) GetRouteId() string {
+func (x *DeleteRouteRequest) GetRouteName() string {
 	if x != nil {
-		return x.RouteId
+		return x.RouteName
 	}
 	return ""
 }
@@ -1562,7 +1562,10 @@ func (x *GetServiceData) GetPorts() []int32 {
 
 type GetServiceListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*GetServiceData      `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*GetServiceData      `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1595,6 +1598,27 @@ func (x *GetServiceListResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetServiceListResponse.ProtoReflect.Descriptor instead.
 func (*GetServiceListResponse) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetServiceListResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetServiceListResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetServiceListResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *GetServiceListResponse) GetData() []*GetServiceData {
@@ -1719,10 +1743,11 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x05route\x18\x03 \x01(\v2\x1c.apisix.v1alpha1.RouteConfigR\x05route\"I\n" +
 	"\x13UpdateRouteResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"M\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"Q\n" +
 	"\x12DeleteRouteRequest\x12\x1c\n" +
-	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n" +
-	"\broute_id\x18\x02 \x01(\tR\arouteId\"I\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x1d\n" +
+	"\n" +
+	"route_name\x18\x02 \x01(\tR\trouteName\"I\n" +
 	"\x13DeleteRouteResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"J\n" +
@@ -1785,14 +1810,15 @@ const file_routes_service_proto_rawDesc = "" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\":\n" +
 	"\x0eGetServiceData\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05ports\x18\x02 \x03(\x05R\x05ports\"M\n" +
-	"\x16GetServiceListResponse\x123\n" +
-	"\x04data\x18\x01 \x03(\v2\x1f.apisix.v1alpha1.GetServiceDataR\x04data2\x9e\n" +
-	"\n" +
+	"\x05ports\x18\x02 \x03(\x05R\x05ports\"\x95\x01\n" +
+	"\x16GetServiceListResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
+	"\x04data\x18\x04 \x03(\v2\x1f.apisix.v1alpha1.GetServiceDataR\x04data2\x88\t\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
-	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x95\x01\n" +
-	"\vUpdateRoute\x12#.apisix.v1alpha1.UpdateRouteRequest\x1a$.apisix.v1alpha1.UpdateRouteResponse\";\x82\xd3\xe4\x93\x025:\x05route\x1a,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x8e\x01\n" +
-	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"4\x82\xd3\xe4\x93\x02.*,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x85\x01\n" +
+	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
+	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"6\x82\xd3\xe4\x93\x020*./prod/v1alpha1/{namespace}/routes/{route_name}\x12\x85\x01\n" +
 	"\bGetRoute\x12 .apisix.v1alpha1.GetRouteRequest\x1a!.apisix.v1alpha1.GetRouteResponse\"4\x82\xd3\xe4\x93\x02.\x12,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x85\x01\n" +
 	"\n" +
 	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\".\x82\xd3\xe4\x93\x02(\x12&/prod/v1alpha1/{namespace}/routes/list\x12\x99\x01\n" +
@@ -1861,25 +1887,23 @@ var file_routes_service_proto_depIdxs = []int32{
 	19, // 12: apisix.v1alpha1.ListTLSResponse.data:type_name -> apisix.v1alpha1.TLSData
 	24, // 13: apisix.v1alpha1.GetServiceListResponse.data:type_name -> apisix.v1alpha1.GetServiceData
 	3,  // 14: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
-	5,  // 15: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:input_type -> apisix.v1alpha1.UpdateRouteRequest
-	7,  // 16: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
-	9,  // 17: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
-	13, // 18: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
-	16, // 19: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
-	18, // 20: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
-	21, // 21: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
-	23, // 22: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
-	4,  // 23: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
-	6,  // 24: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:output_type -> apisix.v1alpha1.UpdateRouteResponse
-	8,  // 25: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
-	10, // 26: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
-	15, // 27: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
-	17, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
-	20, // 29: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
-	22, // 30: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
-	25, // 31: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
-	23, // [23:32] is the sub-list for method output_type
-	14, // [14:23] is the sub-list for method input_type
+	7,  // 15: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
+	9,  // 16: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
+	13, // 17: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
+	16, // 18: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
+	18, // 19: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
+	21, // 20: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
+	23, // 21: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
+	4,  // 22: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
+	8,  // 23: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
+	10, // 24: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
+	15, // 25: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
+	17, // 26: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
+	20, // 27: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
+	22, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
+	25, // 29: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
+	22, // [22:30] is the sub-list for method output_type
+	14, // [14:22] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
 	14, // [14:14] is the sub-list for extension extendee
 	0,  // [0:14] is the sub-list for field type_name

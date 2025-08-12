@@ -80,67 +80,6 @@ func local_request_APISIXGatewayService_CreateRoute_0(ctx context.Context, marsh
 	return msg, metadata, err
 }
 
-func request_APISIXGatewayService_UpdateRoute_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateRouteRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Route); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["namespace"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
-	}
-	protoReq.Namespace, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
-	}
-	val, ok = pathParams["route_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_id")
-	}
-	protoReq.RouteId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_id", err)
-	}
-	msg, err := client.UpdateRoute(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_APISIXGatewayService_UpdateRoute_0(ctx context.Context, marshaler runtime.Marshaler, server APISIXGatewayServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateRouteRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Route); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["namespace"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
-	}
-	protoReq.Namespace, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
-	}
-	val, ok = pathParams["route_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_id")
-	}
-	protoReq.RouteId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_id", err)
-	}
-	msg, err := server.UpdateRoute(ctx, &protoReq)
-	return msg, metadata, err
-}
-
 func request_APISIXGatewayService_DeleteRoute_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq DeleteRouteRequest
@@ -158,13 +97,13 @@ func request_APISIXGatewayService_DeleteRoute_0(ctx context.Context, marshaler r
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["route_id"]
+	val, ok = pathParams["route_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_name")
 	}
-	protoReq.RouteId, err = runtime.String(val)
+	protoReq.RouteName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_name", err)
 	}
 	msg, err := client.DeleteRoute(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -184,13 +123,13 @@ func local_request_APISIXGatewayService_DeleteRoute_0(ctx context.Context, marsh
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
-	val, ok = pathParams["route_id"]
+	val, ok = pathParams["route_name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "route_name")
 	}
-	protoReq.RouteId, err = runtime.String(val)
+	protoReq.RouteName, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "route_name", err)
 	}
 	msg, err := server.DeleteRoute(ctx, &protoReq)
 	return msg, metadata, err
@@ -512,33 +451,13 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		}
 		forward_APISIXGatewayService_CreateRoute_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPut, pattern_APISIXGatewayService_UpdateRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_APISIXGatewayService_UpdateRoute_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_APISIXGatewayService_UpdateRoute_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
 	mux.Handle(http.MethodDelete, pattern_APISIXGatewayService_DeleteRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -729,28 +648,11 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		}
 		forward_APISIXGatewayService_CreateRoute_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPut, pattern_APISIXGatewayService_UpdateRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_APISIXGatewayService_UpdateRoute_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_APISIXGatewayService_UpdateRoute_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
 	mux.Handle(http.MethodDelete, pattern_APISIXGatewayService_DeleteRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{route_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -870,8 +772,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 
 var (
 	pattern_APISIXGatewayService_CreateRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "routes"}, ""))
-	pattern_APISIXGatewayService_UpdateRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_DeleteRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_DeleteRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_name"}, ""))
 	pattern_APISIXGatewayService_GetRoute_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
 	pattern_APISIXGatewayService_ListRoutes_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "list"}, ""))
 	pattern_APISIXGatewayService_CreateUpstream_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "upstreams"}, ""))
@@ -882,7 +783,6 @@ var (
 
 var (
 	forward_APISIXGatewayService_CreateRoute_0     = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_UpdateRoute_0     = runtime.ForwardResponseMessage
 	forward_APISIXGatewayService_DeleteRoute_0     = runtime.ForwardResponseMessage
 	forward_APISIXGatewayService_GetRoute_0        = runtime.ForwardResponseMessage
 	forward_APISIXGatewayService_ListRoutes_0      = runtime.ForwardResponseMessage

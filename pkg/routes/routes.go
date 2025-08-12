@@ -11,6 +11,7 @@ import (
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -149,7 +150,8 @@ func (s *RoutesManageService) ListCerts(ctx context.Context, req *pb.ListTLSRequ
 func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRouteRequest) (*pb.CreateRouteResponse, error) {
 	logger.L().Info("CreateRoute called", zap.String("namespace", req.GetNamespace()), zap.String("ingressName", req.GetIngName()))
 	namespace := req.GetNamespace()
-
+	// 默认更新是false
+	update := false
 	errRsp := &pb.CreateRouteResponse{
 		Code:    2,
 		Success: false,
@@ -176,13 +178,13 @@ func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRou
 	for _, rule := range req.GetRules() {
 		var paths []networkingv1.HTTPIngressPath
 		if routeName == "" {
-			routeName = "route-" + rule.GetHost()
+			return errRsp, status.Errorf(400, "ingress name cannot be empty")
 		}
 		// 检查 Ingress 是否已存在
 		_, err = clientset.NetworkingV1().Ingresses(namespace).Get(ctx, routeName, metav1.GetOptions{})
 		if err == nil {
-			// 已经存在
-			return errRsp, status.Errorf(409, "ingress %s already exists in namespace %s", routeName, namespace)
+			// 已经存在，更新Ingress
+			update = true
 		}
 		for _, path := range rule.GetPaths() {
 			paths = append(paths, networkingv1.HTTPIngressPath{
@@ -223,12 +225,19 @@ func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRou
 	}
 
 	// 创建 Ingress
-	_, err = clientset.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
-	if err != nil {
-		logger.L().Error("Failed to create ingress", zap.Error(err))
-		return errRsp, status.Errorf(status.Code(err), "failed to create ingress: %v", err)
+	if update {
+		_, err = clientset.NetworkingV1().Ingresses(namespace).Update(ctx, ingress, metav1.UpdateOptions{})
+		if err != nil {
+			logger.L().Error("Failed to update ingress", zap.Error(err))
+			return errRsp, status.Errorf(status.Code(err), "failed to update ingress: %v", err)
+		}
+	} else {
+		_, err = clientset.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
+		if err != nil {
+			logger.L().Error("Failed to create ingress", zap.Error(err))
+			return errRsp, status.Errorf(status.Code(err), "failed to create ingress: %v", err)
+		}
 	}
-
 	return &pb.CreateRouteResponse{
 		Code:    0,
 		Success: true,
@@ -274,6 +283,90 @@ func (s *RoutesManageService) GetServiceList(ctx context.Context, req *pb.GetSer
 	}
 
 	return &pb.GetServiceListResponse{
-		Data: serviceList,
+		Code:    0,
+		Success: true,
+		Message: "Successfully retrieved service list",
+		Data:    serviceList,
+	}, nil
+}
+
+func (s *RoutesManageService) DeleteRoute(ctx context.Context, req *pb.DeleteRouteRequest) (*pb.DeleteRouteResponse, error) {
+	logger.L().Info("DeleteRoute called", zap.String("namespace", req.GetNamespace()), zap.String("routeName", req.GetRouteName()))
+	namespace := req.GetNamespace()
+	routeName := req.GetRouteName()
+
+	// Initialize Kubernetes clientset
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		// 尝试使用本地 kubeconfig
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create Kubernetes clientset: %v", err)
+	}
+
+	err = clientset.NetworkingV1().Ingresses(namespace).Delete(ctx, routeName, metav1.DeleteOptions{})
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to delete ingress: %v", err)
+	}
+
+	return &pb.DeleteRouteResponse{
+		Success: true,
+		Message: "Route deleted successfully",
+	}, nil
+}
+
+func (s *RoutesManageService) CreateUpdateTLS(ctx context.Context, req *pb.CreateUPdateTLSRequest) (*pb.CreateUPdateTLSResponse, error) {
+	logger.L().Info("CreateUpdateTLS called", zap.String("namespace", req.GetNamespace()))
+
+	namespace := req.GetNamespace()
+	certName := req.GetName()
+	certData := req.GetCrt()
+	keyData := req.GetKey()
+
+	// Initialize Kubernetes clientset
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		// 尝试使用本地 kubeconfig
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create Kubernetes clientset: %v", err)
+	}
+	// 检查 Secret 是否已存在
+	_, err = clientset.CoreV1().Secrets(namespace).Get(ctx, certName, metav1.GetOptions{})
+	if err == nil {
+		return nil, status.Errorf(409, "TLS secret with name %s already exists", certName)
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      certName,
+			Namespace: namespace,
+		},
+		Data: map[string][]byte{
+			"tls.crt": []byte(certData),
+			"tls.key": []byte(keyData),
+		},
+		Type: "kubernetes.io/tls",
+	}
+	_, err = clientset.CoreV1().Secrets(namespace).Create(ctx, secret, metav1.CreateOptions{})
+	if err != nil {
+		logger.L().Error("Failed to create TLS secret", zap.Error(err))
+		return nil, status.Errorf(status.Code(err), "failed to create TLS secret: %v", err)
+	}
+
+	return &pb.CreateUPdateTLSResponse{
+		Code:    0,
+		Message: "TLS secret created successfully",
 	}, nil
 }
