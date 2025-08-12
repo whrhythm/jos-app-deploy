@@ -51,9 +51,10 @@ message CreateRouteRequest {
 
 // 创建路由响应
 message CreateRouteResponse {
-  bool success = 1;              // 是否成功
-  string message = 2;            // 返回消息
-  string route_id = 3;           // 创建的路由ID
+  int32 code = 1;
+  bool success = 2;              // 是否成功
+  string message = 3;            // 返回消息
+  string route_id = 4;           // 创建的路由ID
 }
 
 // 更新路由请求
@@ -113,12 +114,16 @@ message ListRoutesRequest {
   repeated RouteRule rules = 3;
 }
 
+message ListRoutesData {
+  repeated RouteRule rules = 1;
+}
+
 // 列出路由响应
 message ListRoutesResponse {
   int32 code = 1;
   bool success = 2;              // 是否成功
   string message = 3;            // 返回消息
-  repeated RouteRule rules = 4;
+  ListRoutesData data = 4;
 }
 
 // 上游服务相关接口
@@ -146,7 +151,10 @@ message TLSData {
 }
 
 message ListTLSResponse {
-  repeated TLSData data = 1;
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  repeated TLSData data = 4;
 }
 
 message CreateUPdateTLSRequest {
@@ -160,6 +168,19 @@ message CreateUPdateTLSRequest {
 message CreateUPdateTLSResponse {
   int32 code = 1;
   string message = 2;
+}
+
+message GetServiceListRequest {
+  string namespace = 1;
+}
+
+message GetServiceData {
+  string name = 1;
+  repeated int32 ports = 2;
+}
+
+message GetServiceListResponse {
+  repeated GetServiceData data = 1;
 }
 
 // 网关配置服务
@@ -208,8 +229,7 @@ service APISIXGatewayService {
   // 证书管理
   rpc ListCerts (ListTLSRequest) returns (ListTLSResponse) {
     option (google.api.http) = {
-      post: "/prod/v1alpha1/{namespace}/certs/list"
-      body: "*"
+      get: "/prod/v1alpha1/{namespace}/certs/list"
     };
   }
 
@@ -217,6 +237,13 @@ service APISIXGatewayService {
     option (google.api.http) = {
       post: "/prod/v1alpha1/{namespace}/certs/update"
       body: "*"
+    };
+  }
+
+  // 获取service list
+  rpc GetServiceList (GetServiceListRequest) returns (GetServiceListResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/{namespace}/service"
     };
   }
 }

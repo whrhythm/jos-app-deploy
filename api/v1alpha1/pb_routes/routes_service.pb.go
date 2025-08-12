@@ -348,9 +348,10 @@ func (x *CreateRouteRequest) GetRules() []*RouteRule {
 // 创建路由响应
 type CreateRouteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`               // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`                // 返回消息
-	RouteId       string                 `protobuf:"bytes,3,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"` // 创建的路由ID
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`               // 是否成功
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`                // 返回消息
+	RouteId       string                 `protobuf:"bytes,4,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"` // 创建的路由ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -383,6 +384,13 @@ func (x *CreateRouteResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateRouteResponse.ProtoReflect.Descriptor instead.
 func (*CreateRouteResponse) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreateRouteResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
 }
 
 func (x *CreateRouteResponse) GetSuccess() bool {
@@ -914,20 +922,64 @@ func (x *ListRoutesRequest) GetRules() []*RouteRule {
 	return nil
 }
 
+type ListRoutesData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rules         []*RouteRule           `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRoutesData) Reset() {
+	*x = ListRoutesData{}
+	mi := &file_routes_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRoutesData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRoutesData) ProtoMessage() {}
+
+func (x *ListRoutesData) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRoutesData.ProtoReflect.Descriptor instead.
+func (*ListRoutesData) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ListRoutesData) GetRules() []*RouteRule {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
 // 列出路由响应
 type ListRoutesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"` // 是否成功
 	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`  // 返回消息
-	Rules         []*RouteRule           `protobuf:"bytes,4,rep,name=rules,proto3" json:"rules,omitempty"`
+	Data          *ListRoutesData        `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListRoutesResponse) Reset() {
 	*x = ListRoutesResponse{}
-	mi := &file_routes_service_proto_msgTypes[14]
+	mi := &file_routes_service_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -939,7 +991,7 @@ func (x *ListRoutesResponse) String() string {
 func (*ListRoutesResponse) ProtoMessage() {}
 
 func (x *ListRoutesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[14]
+	mi := &file_routes_service_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -952,7 +1004,7 @@ func (x *ListRoutesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRoutesResponse.ProtoReflect.Descriptor instead.
 func (*ListRoutesResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{14}
+	return file_routes_service_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListRoutesResponse) GetCode() int32 {
@@ -976,9 +1028,9 @@ func (x *ListRoutesResponse) GetMessage() string {
 	return ""
 }
 
-func (x *ListRoutesResponse) GetRules() []*RouteRule {
+func (x *ListRoutesResponse) GetData() *ListRoutesData {
 	if x != nil {
-		return x.Rules
+		return x.Data
 	}
 	return nil
 }
@@ -994,7 +1046,7 @@ type CreateUpstreamRequest struct {
 
 func (x *CreateUpstreamRequest) Reset() {
 	*x = CreateUpstreamRequest{}
-	mi := &file_routes_service_proto_msgTypes[15]
+	mi := &file_routes_service_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1006,7 +1058,7 @@ func (x *CreateUpstreamRequest) String() string {
 func (*CreateUpstreamRequest) ProtoMessage() {}
 
 func (x *CreateUpstreamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[15]
+	mi := &file_routes_service_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1019,7 +1071,7 @@ func (x *CreateUpstreamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUpstreamRequest.ProtoReflect.Descriptor instead.
 func (*CreateUpstreamRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{15}
+	return file_routes_service_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreateUpstreamRequest) GetNamespace() string {
@@ -1047,7 +1099,7 @@ type CreateUpstreamResponse struct {
 
 func (x *CreateUpstreamResponse) Reset() {
 	*x = CreateUpstreamResponse{}
-	mi := &file_routes_service_proto_msgTypes[16]
+	mi := &file_routes_service_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1059,7 +1111,7 @@ func (x *CreateUpstreamResponse) String() string {
 func (*CreateUpstreamResponse) ProtoMessage() {}
 
 func (x *CreateUpstreamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[16]
+	mi := &file_routes_service_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1072,7 +1124,7 @@ func (x *CreateUpstreamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUpstreamResponse.ProtoReflect.Descriptor instead.
 func (*CreateUpstreamResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{16}
+	return file_routes_service_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CreateUpstreamResponse) GetSuccess() bool {
@@ -1106,7 +1158,7 @@ type ListTLSRequest struct {
 
 func (x *ListTLSRequest) Reset() {
 	*x = ListTLSRequest{}
-	mi := &file_routes_service_proto_msgTypes[17]
+	mi := &file_routes_service_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1118,7 +1170,7 @@ func (x *ListTLSRequest) String() string {
 func (*ListTLSRequest) ProtoMessage() {}
 
 func (x *ListTLSRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[17]
+	mi := &file_routes_service_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1131,7 +1183,7 @@ func (x *ListTLSRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTLSRequest.ProtoReflect.Descriptor instead.
 func (*ListTLSRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{17}
+	return file_routes_service_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListTLSRequest) GetReleaseName() string {
@@ -1160,7 +1212,7 @@ type TLSData struct {
 
 func (x *TLSData) Reset() {
 	*x = TLSData{}
-	mi := &file_routes_service_proto_msgTypes[18]
+	mi := &file_routes_service_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1172,7 +1224,7 @@ func (x *TLSData) String() string {
 func (*TLSData) ProtoMessage() {}
 
 func (x *TLSData) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[18]
+	mi := &file_routes_service_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1185,7 +1237,7 @@ func (x *TLSData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TLSData.ProtoReflect.Descriptor instead.
 func (*TLSData) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{18}
+	return file_routes_service_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *TLSData) GetName() string {
@@ -1218,14 +1270,17 @@ func (x *TLSData) GetSource() string {
 
 type ListTLSResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*TLSData             `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*TLSData             `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListTLSResponse) Reset() {
 	*x = ListTLSResponse{}
-	mi := &file_routes_service_proto_msgTypes[19]
+	mi := &file_routes_service_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1237,7 +1292,7 @@ func (x *ListTLSResponse) String() string {
 func (*ListTLSResponse) ProtoMessage() {}
 
 func (x *ListTLSResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[19]
+	mi := &file_routes_service_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1250,7 +1305,28 @@ func (x *ListTLSResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTLSResponse.ProtoReflect.Descriptor instead.
 func (*ListTLSResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{19}
+	return file_routes_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ListTLSResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListTLSResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ListTLSResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *ListTLSResponse) GetData() []*TLSData {
@@ -1273,7 +1349,7 @@ type CreateUPdateTLSRequest struct {
 
 func (x *CreateUPdateTLSRequest) Reset() {
 	*x = CreateUPdateTLSRequest{}
-	mi := &file_routes_service_proto_msgTypes[20]
+	mi := &file_routes_service_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1285,7 +1361,7 @@ func (x *CreateUPdateTLSRequest) String() string {
 func (*CreateUPdateTLSRequest) ProtoMessage() {}
 
 func (x *CreateUPdateTLSRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[20]
+	mi := &file_routes_service_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1298,7 +1374,7 @@ func (x *CreateUPdateTLSRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUPdateTLSRequest.ProtoReflect.Descriptor instead.
 func (*CreateUPdateTLSRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{20}
+	return file_routes_service_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CreateUPdateTLSRequest) GetName() string {
@@ -1346,7 +1422,7 @@ type CreateUPdateTLSResponse struct {
 
 func (x *CreateUPdateTLSResponse) Reset() {
 	*x = CreateUPdateTLSResponse{}
-	mi := &file_routes_service_proto_msgTypes[21]
+	mi := &file_routes_service_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1358,7 +1434,7 @@ func (x *CreateUPdateTLSResponse) String() string {
 func (*CreateUPdateTLSResponse) ProtoMessage() {}
 
 func (x *CreateUPdateTLSResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[21]
+	mi := &file_routes_service_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1371,7 +1447,7 @@ func (x *CreateUPdateTLSResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUPdateTLSResponse.ProtoReflect.Descriptor instead.
 func (*CreateUPdateTLSResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{21}
+	return file_routes_service_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateUPdateTLSResponse) GetCode() int32 {
@@ -1388,6 +1464,146 @@ func (x *CreateUPdateTLSResponse) GetMessage() string {
 	return ""
 }
 
+type GetServiceListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServiceListRequest) Reset() {
+	*x = GetServiceListRequest{}
+	mi := &file_routes_service_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServiceListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServiceListRequest) ProtoMessage() {}
+
+func (x *GetServiceListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServiceListRequest.ProtoReflect.Descriptor instead.
+func (*GetServiceListRequest) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetServiceListRequest) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+type GetServiceData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Ports         []int32                `protobuf:"varint,2,rep,packed,name=ports,proto3" json:"ports,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServiceData) Reset() {
+	*x = GetServiceData{}
+	mi := &file_routes_service_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServiceData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServiceData) ProtoMessage() {}
+
+func (x *GetServiceData) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServiceData.ProtoReflect.Descriptor instead.
+func (*GetServiceData) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetServiceData) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetServiceData) GetPorts() []int32 {
+	if x != nil {
+		return x.Ports
+	}
+	return nil
+}
+
+type GetServiceListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []*GetServiceData      `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetServiceListResponse) Reset() {
+	*x = GetServiceListResponse{}
+	mi := &file_routes_service_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetServiceListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetServiceListResponse) ProtoMessage() {}
+
+func (x *GetServiceListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetServiceListResponse.ProtoReflect.Descriptor instead.
+func (*GetServiceListResponse) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GetServiceListResponse) GetData() []*GetServiceData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 type UpstreamConfig_Node struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Host          string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`      // 节点主机
@@ -1399,7 +1615,7 @@ type UpstreamConfig_Node struct {
 
 func (x *UpstreamConfig_Node) Reset() {
 	*x = UpstreamConfig_Node{}
-	mi := &file_routes_service_proto_msgTypes[24]
+	mi := &file_routes_service_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1411,7 +1627,7 @@ func (x *UpstreamConfig_Node) String() string {
 func (*UpstreamConfig_Node) ProtoMessage() {}
 
 func (x *UpstreamConfig_Node) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[24]
+	mi := &file_routes_service_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1491,11 +1707,12 @@ const file_routes_service_proto_rawDesc = "" +
 	"\n" +
 	"enable_tls\x18\x04 \x01(\bR\tenableTls\x126\n" +
 	"\troute_tls\x18\x05 \x03(\v2\x19.apisix.v1alpha1.RouteTLSR\brouteTls\x120\n" +
-	"\x05rules\x18\x06 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"d\n" +
-	"\x13CreateRouteResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
-	"\broute_id\x18\x03 \x01(\tR\arouteId\"\x81\x01\n" +
+	"\x05rules\x18\x06 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"x\n" +
+	"\x13CreateRouteResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x19\n" +
+	"\broute_id\x18\x04 \x01(\tR\arouteId\"\x81\x01\n" +
 	"\x12UpdateRouteRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n" +
 	"\broute_id\x18\x02 \x01(\tR\arouteId\x122\n" +
@@ -1526,12 +1743,14 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x11ListRoutesRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x120\n" +
-	"\x05rules\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"\x8e\x01\n" +
+	"\x05rules\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"B\n" +
+	"\x0eListRoutesData\x120\n" +
+	"\x05rules\x18\x01 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"\x91\x01\n" +
 	"\x12ListRoutesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\x120\n" +
-	"\x05rules\x18\x04 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"r\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
+	"\x04data\x18\x04 \x01(\v2\x1f.apisix.v1alpha1.ListRoutesDataR\x04data\"r\n" +
 	"\x15CreateUpstreamRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12;\n" +
 	"\bupstream\x18\x02 \x01(\v2\x1f.apisix.v1alpha1.UpstreamConfigR\bupstream\"m\n" +
@@ -1547,9 +1766,12 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x19\n" +
 	"\bdns_name\x18\x02 \x01(\tR\adnsName\x12\x18\n" +
 	"\aexpired\x18\x03 \x01(\tR\aexpired\x12\x16\n" +
-	"\x06source\x18\x04 \x01(\tR\x06source\"?\n" +
-	"\x0fListTLSResponse\x12,\n" +
-	"\x04data\x18\x01 \x03(\v2\x18.apisix.v1alpha1.TLSDataR\x04data\"\x91\x01\n" +
+	"\x06source\x18\x04 \x01(\tR\x06source\"\x87\x01\n" +
+	"\x0fListTLSResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12,\n" +
+	"\x04data\x18\x04 \x03(\v2\x18.apisix.v1alpha1.TLSDataR\x04data\"\x91\x01\n" +
 	"\x16CreateUPdateTLSRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12\x1c\n" +
@@ -1558,7 +1780,15 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x03key\x18\x05 \x01(\tR\x03key\"G\n" +
 	"\x17CreateUPdateTLSResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x92\t\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"5\n" +
+	"\x15GetServiceListRequest\x12\x1c\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\":\n" +
+	"\x0eGetServiceData\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05ports\x18\x02 \x03(\x05R\x05ports\"M\n" +
+	"\x16GetServiceListResponse\x123\n" +
+	"\x04data\x18\x01 \x03(\v2\x1f.apisix.v1alpha1.GetServiceDataR\x04data2\x9e\n" +
+	"\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
 	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x95\x01\n" +
 	"\vUpdateRoute\x12#.apisix.v1alpha1.UpdateRouteRequest\x1a$.apisix.v1alpha1.UpdateRouteResponse\";\x82\xd3\xe4\x93\x025:\x05route\x1a,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x8e\x01\n" +
@@ -1566,9 +1796,10 @@ const file_routes_service_proto_rawDesc = "" +
 	"\bGetRoute\x12 .apisix.v1alpha1.GetRouteRequest\x1a!.apisix.v1alpha1.GetRouteResponse\"4\x82\xd3\xe4\x93\x02.\x12,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x85\x01\n" +
 	"\n" +
 	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\".\x82\xd3\xe4\x93\x02(\x12&/prod/v1alpha1/{namespace}/routes/list\x12\x99\x01\n" +
-	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"6\x82\xd3\xe4\x93\x020:\bupstream\"$/prod/v1alpha1/{namespace}/upstreams\x12\x80\x01\n" +
-	"\tListCerts\x12\x1f.apisix.v1alpha1.ListTLSRequest\x1a .apisix.v1alpha1.ListTLSResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/prod/v1alpha1/{namespace}/certs/list\x12\x98\x01\n" +
-	"\x0fCreateUpdateTLS\x12'.apisix.v1alpha1.CreateUPdateTLSRequest\x1a(.apisix.v1alpha1.CreateUPdateTLSResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/prod/v1alpha1/{namespace}/certs/updateB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"6\x82\xd3\xe4\x93\x020:\bupstream\"$/prod/v1alpha1/{namespace}/upstreams\x12}\n" +
+	"\tListCerts\x12\x1f.apisix.v1alpha1.ListTLSRequest\x1a .apisix.v1alpha1.ListTLSResponse\"-\x82\xd3\xe4\x93\x02'\x12%/prod/v1alpha1/{namespace}/certs/list\x12\x98\x01\n" +
+	"\x0fCreateUpdateTLS\x12'.apisix.v1alpha1.CreateUPdateTLSRequest\x1a(.apisix.v1alpha1.CreateUPdateTLSResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/prod/v1alpha1/{namespace}/certs/update\x12\x8d\x01\n" +
+	"\x0eGetServiceList\x12&.apisix.v1alpha1.GetServiceListRequest\x1a'.apisix.v1alpha1.GetServiceListResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/prod/v1alpha1/{namespace}/serviceB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_routes_service_proto_rawDescOnce sync.Once
@@ -1582,7 +1813,7 @@ func file_routes_service_proto_rawDescGZIP() []byte {
 	return file_routes_service_proto_rawDescData
 }
 
-var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_routes_service_proto_goTypes = []any{
 	(*RouteConfig)(nil),             // 0: apisix.v1alpha1.RouteConfig
 	(*UpstreamConfig)(nil),          // 1: apisix.v1alpha1.UpstreamConfig
@@ -1598,52 +1829,60 @@ var file_routes_service_proto_goTypes = []any{
 	(*RouteBackend)(nil),            // 11: apisix.v1alpha1.RouteBackend
 	(*RouteRule)(nil),               // 12: apisix.v1alpha1.RouteRule
 	(*ListRoutesRequest)(nil),       // 13: apisix.v1alpha1.ListRoutesRequest
-	(*ListRoutesResponse)(nil),      // 14: apisix.v1alpha1.ListRoutesResponse
-	(*CreateUpstreamRequest)(nil),   // 15: apisix.v1alpha1.CreateUpstreamRequest
-	(*CreateUpstreamResponse)(nil),  // 16: apisix.v1alpha1.CreateUpstreamResponse
-	(*ListTLSRequest)(nil),          // 17: apisix.v1alpha1.ListTLSRequest
-	(*TLSData)(nil),                 // 18: apisix.v1alpha1.TLSData
-	(*ListTLSResponse)(nil),         // 19: apisix.v1alpha1.ListTLSResponse
-	(*CreateUPdateTLSRequest)(nil),  // 20: apisix.v1alpha1.CreateUPdateTLSRequest
-	(*CreateUPdateTLSResponse)(nil), // 21: apisix.v1alpha1.CreateUPdateTLSResponse
-	nil,                             // 22: apisix.v1alpha1.RouteConfig.LabelsEntry
-	nil,                             // 23: apisix.v1alpha1.UpstreamConfig.LabelsEntry
-	(*UpstreamConfig_Node)(nil),     // 24: apisix.v1alpha1.UpstreamConfig.Node
+	(*ListRoutesData)(nil),          // 14: apisix.v1alpha1.ListRoutesData
+	(*ListRoutesResponse)(nil),      // 15: apisix.v1alpha1.ListRoutesResponse
+	(*CreateUpstreamRequest)(nil),   // 16: apisix.v1alpha1.CreateUpstreamRequest
+	(*CreateUpstreamResponse)(nil),  // 17: apisix.v1alpha1.CreateUpstreamResponse
+	(*ListTLSRequest)(nil),          // 18: apisix.v1alpha1.ListTLSRequest
+	(*TLSData)(nil),                 // 19: apisix.v1alpha1.TLSData
+	(*ListTLSResponse)(nil),         // 20: apisix.v1alpha1.ListTLSResponse
+	(*CreateUPdateTLSRequest)(nil),  // 21: apisix.v1alpha1.CreateUPdateTLSRequest
+	(*CreateUPdateTLSResponse)(nil), // 22: apisix.v1alpha1.CreateUPdateTLSResponse
+	(*GetServiceListRequest)(nil),   // 23: apisix.v1alpha1.GetServiceListRequest
+	(*GetServiceData)(nil),          // 24: apisix.v1alpha1.GetServiceData
+	(*GetServiceListResponse)(nil),  // 25: apisix.v1alpha1.GetServiceListResponse
+	nil,                             // 26: apisix.v1alpha1.RouteConfig.LabelsEntry
+	nil,                             // 27: apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	(*UpstreamConfig_Node)(nil),     // 28: apisix.v1alpha1.UpstreamConfig.Node
 }
 var file_routes_service_proto_depIdxs = []int32{
-	22, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
-	24, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
-	23, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	26, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
+	28, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
+	27, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
 	2,  // 3: apisix.v1alpha1.CreateRouteRequest.route_tls:type_name -> apisix.v1alpha1.RouteTLS
 	12, // 4: apisix.v1alpha1.CreateRouteRequest.rules:type_name -> apisix.v1alpha1.RouteRule
 	0,  // 5: apisix.v1alpha1.UpdateRouteRequest.route:type_name -> apisix.v1alpha1.RouteConfig
 	0,  // 6: apisix.v1alpha1.GetRouteResponse.route:type_name -> apisix.v1alpha1.RouteConfig
 	11, // 7: apisix.v1alpha1.RouteRule.paths:type_name -> apisix.v1alpha1.RouteBackend
 	12, // 8: apisix.v1alpha1.ListRoutesRequest.rules:type_name -> apisix.v1alpha1.RouteRule
-	12, // 9: apisix.v1alpha1.ListRoutesResponse.rules:type_name -> apisix.v1alpha1.RouteRule
-	1,  // 10: apisix.v1alpha1.CreateUpstreamRequest.upstream:type_name -> apisix.v1alpha1.UpstreamConfig
-	18, // 11: apisix.v1alpha1.ListTLSResponse.data:type_name -> apisix.v1alpha1.TLSData
-	3,  // 12: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
-	5,  // 13: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:input_type -> apisix.v1alpha1.UpdateRouteRequest
-	7,  // 14: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
-	9,  // 15: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
-	13, // 16: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
-	15, // 17: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
-	17, // 18: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
-	20, // 19: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
-	4,  // 20: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
-	6,  // 21: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:output_type -> apisix.v1alpha1.UpdateRouteResponse
-	8,  // 22: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
-	10, // 23: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
-	14, // 24: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
-	16, // 25: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
-	19, // 26: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
-	21, // 27: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
-	20, // [20:28] is the sub-list for method output_type
-	12, // [12:20] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	12, // 9: apisix.v1alpha1.ListRoutesData.rules:type_name -> apisix.v1alpha1.RouteRule
+	14, // 10: apisix.v1alpha1.ListRoutesResponse.data:type_name -> apisix.v1alpha1.ListRoutesData
+	1,  // 11: apisix.v1alpha1.CreateUpstreamRequest.upstream:type_name -> apisix.v1alpha1.UpstreamConfig
+	19, // 12: apisix.v1alpha1.ListTLSResponse.data:type_name -> apisix.v1alpha1.TLSData
+	24, // 13: apisix.v1alpha1.GetServiceListResponse.data:type_name -> apisix.v1alpha1.GetServiceData
+	3,  // 14: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
+	5,  // 15: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:input_type -> apisix.v1alpha1.UpdateRouteRequest
+	7,  // 16: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
+	9,  // 17: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
+	13, // 18: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
+	16, // 19: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
+	18, // 20: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
+	21, // 21: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
+	23, // 22: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
+	4,  // 23: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
+	6,  // 24: apisix.v1alpha1.APISIXGatewayService.UpdateRoute:output_type -> apisix.v1alpha1.UpdateRouteResponse
+	8,  // 25: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
+	10, // 26: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
+	15, // 27: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
+	17, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
+	20, // 29: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
+	22, // 30: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
+	25, // 31: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
+	23, // [23:32] is the sub-list for method output_type
+	14, // [14:23] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_routes_service_proto_init() }
@@ -1657,7 +1896,7 @@ func file_routes_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_routes_service_proto_rawDesc), len(file_routes_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
