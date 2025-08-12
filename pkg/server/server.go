@@ -3,8 +3,10 @@ package server
 import (
 	pb "jos-deployment/api/v1alpha1/pb"
 	podpb "jos-deployment/api/v1alpha1/pb_pod"
+	routepb "jos-deployment/api/v1alpha1/pb_routes"
 	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/pod"
+	"jos-deployment/pkg/routes"
 	"log"
 	"net"
 
@@ -15,6 +17,7 @@ func Server() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterHelmManagerServiceServer(grpcServer, &helm.HelmManagerServer{})
 	podpb.RegisterPodManagerServiceServer(grpcServer, &pod.PodManagerServer{})
+	routepb.RegisterAPISIXGatewayServiceServer(grpcServer, &routes.RoutesManageService{})
 	// 启动 gRPC 服务
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {

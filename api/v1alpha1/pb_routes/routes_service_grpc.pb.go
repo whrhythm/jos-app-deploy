@@ -19,12 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	APISIXGatewayService_CreateRoute_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/CreateRoute"
-	APISIXGatewayService_UpdateRoute_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute"
-	APISIXGatewayService_DeleteRoute_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
-	APISIXGatewayService_GetRoute_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
-	APISIXGatewayService_ListRoutes_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
-	APISIXGatewayService_CreateUpstream_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
+	APISIXGatewayService_CreateRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/CreateRoute"
+	APISIXGatewayService_UpdateRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/UpdateRoute"
+	APISIXGatewayService_DeleteRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
+	APISIXGatewayService_GetRoute_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
+	APISIXGatewayService_ListRoutes_FullMethodName      = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
+	APISIXGatewayService_CreateUpstream_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
+	APISIXGatewayService_ListCerts_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/ListCerts"
+	APISIXGatewayService_CreateUpdateTLS_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
 )
 
 // APISIXGatewayServiceClient is the client API for APISIXGatewayService service.
@@ -41,6 +43,9 @@ type APISIXGatewayServiceClient interface {
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (*ListRoutesResponse, error)
 	// 上游服务管理
 	CreateUpstream(ctx context.Context, in *CreateUpstreamRequest, opts ...grpc.CallOption) (*CreateUpstreamResponse, error)
+	// 证书管理
+	ListCerts(ctx context.Context, in *ListTLSRequest, opts ...grpc.CallOption) (*ListTLSResponse, error)
+	CreateUpdateTLS(ctx context.Context, in *CreateUPdateTLSRequest, opts ...grpc.CallOption) (*CreateUPdateTLSResponse, error)
 }
 
 type aPISIXGatewayServiceClient struct {
@@ -111,6 +116,26 @@ func (c *aPISIXGatewayServiceClient) CreateUpstream(ctx context.Context, in *Cre
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) ListCerts(ctx context.Context, in *ListTLSRequest, opts ...grpc.CallOption) (*ListTLSResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTLSResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_ListCerts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) CreateUpdateTLS(ctx context.Context, in *CreateUPdateTLSRequest, opts ...grpc.CallOption) (*CreateUPdateTLSResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateUPdateTLSResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_CreateUpdateTLS_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APISIXGatewayServiceServer is the server API for APISIXGatewayService service.
 // All implementations must embed UnimplementedAPISIXGatewayServiceServer
 // for forward compatibility.
@@ -125,6 +150,9 @@ type APISIXGatewayServiceServer interface {
 	ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error)
 	// 上游服务管理
 	CreateUpstream(context.Context, *CreateUpstreamRequest) (*CreateUpstreamResponse, error)
+	// 证书管理
+	ListCerts(context.Context, *ListTLSRequest) (*ListTLSResponse, error)
+	CreateUpdateTLS(context.Context, *CreateUPdateTLSRequest) (*CreateUPdateTLSResponse, error)
 	mustEmbedUnimplementedAPISIXGatewayServiceServer()
 }
 
@@ -152,6 +180,12 @@ func (UnimplementedAPISIXGatewayServiceServer) ListRoutes(context.Context, *List
 }
 func (UnimplementedAPISIXGatewayServiceServer) CreateUpstream(context.Context, *CreateUpstreamRequest) (*CreateUpstreamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUpstream not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) ListCerts(context.Context, *ListTLSRequest) (*ListTLSResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCerts not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) CreateUpdateTLS(context.Context, *CreateUPdateTLSRequest) (*CreateUPdateTLSResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUpdateTLS not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) mustEmbedUnimplementedAPISIXGatewayServiceServer() {}
 func (UnimplementedAPISIXGatewayServiceServer) testEmbeddedByValue()                              {}
@@ -282,6 +316,42 @@ func _APISIXGatewayService_CreateUpstream_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_ListCerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTLSRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).ListCerts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_ListCerts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).ListCerts(ctx, req.(*ListTLSRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_CreateUpdateTLS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUPdateTLSRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).CreateUpdateTLS(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_CreateUpdateTLS_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).CreateUpdateTLS(ctx, req.(*CreateUPdateTLSRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // APISIXGatewayService_ServiceDesc is the grpc.ServiceDesc for APISIXGatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -312,6 +382,14 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUpstream",
 			Handler:    _APISIXGatewayService_CreateUpstream_Handler,
+		},
+		{
+			MethodName: "ListCerts",
+			Handler:    _APISIXGatewayService_ListCerts_Handler,
+		},
+		{
+			MethodName: "CreateUpdateTLS",
+			Handler:    _APISIXGatewayService_CreateUpdateTLS_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

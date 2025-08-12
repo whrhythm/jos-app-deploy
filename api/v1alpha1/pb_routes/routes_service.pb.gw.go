@@ -41,7 +41,7 @@ func request_APISIXGatewayService_CreateRoute_0(ctx context.Context, marshaler r
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Route); err != nil && !errors.Is(err, io.EOF) {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
@@ -65,7 +65,7 @@ func local_request_APISIXGatewayService_CreateRoute_0(ctx context.Context, marsh
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Route); err != nil && !errors.Is(err, io.EOF) {
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	val, ok := pathParams["namespace"]
@@ -251,7 +251,7 @@ func local_request_APISIXGatewayService_GetRoute_0(ctx context.Context, marshale
 	return msg, metadata, err
 }
 
-var filter_APISIXGatewayService_ListRoutes_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0, "release_name": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+var filter_APISIXGatewayService_ListRoutes_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 
 func request_APISIXGatewayService_ListRoutes_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
@@ -269,14 +269,6 @@ func request_APISIXGatewayService_ListRoutes_0(ctx context.Context, marshaler ru
 	protoReq.Namespace, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
-	}
-	val, ok = pathParams["release_name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
-	}
-	protoReq.ReleaseName, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -301,14 +293,6 @@ func local_request_APISIXGatewayService_ListRoutes_0(ctx context.Context, marsha
 	protoReq.Namespace, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
-	}
-	val, ok = pathParams["release_name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "release_name")
-	}
-	protoReq.ReleaseName, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "release_name", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -362,6 +346,96 @@ func local_request_APISIXGatewayService_CreateUpstream_0(ctx context.Context, ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
 	}
 	msg, err := server.CreateUpstream(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_APISIXGatewayService_ListCerts_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ListTLSRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	msg, err := client.ListCerts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_APISIXGatewayService_ListCerts_0(ctx context.Context, marshaler runtime.Marshaler, server APISIXGatewayServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq ListTLSRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	msg, err := server.ListCerts(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_APISIXGatewayService_CreateUpdateTLS_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateUPdateTLSRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	msg, err := client.CreateUpdateTLS(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_APISIXGatewayService_CreateUpdateTLS_0(ctx context.Context, marshaler runtime.Marshaler, server APISIXGatewayServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateUPdateTLSRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	msg, err := server.CreateUpdateTLS(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -457,7 +531,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{release_name}/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -490,6 +564,46 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 			return
 		}
 		forward_APISIXGatewayService_CreateUpstream_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_APISIXGatewayService_ListCerts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListCerts", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/certs/list"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_APISIXGatewayService_ListCerts_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_ListCerts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_APISIXGatewayService_CreateUpdateTLS_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/certs/update"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_APISIXGatewayService_CreateUpdateTLS_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_CreateUpdateTLS_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -603,7 +717,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/{release_name}/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListRoutes", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/routes/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -633,23 +747,61 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		}
 		forward_APISIXGatewayService_CreateUpstream_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_APISIXGatewayService_ListCerts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/ListCerts", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/certs/list"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_APISIXGatewayService_ListCerts_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_ListCerts_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_APISIXGatewayService_CreateUpdateTLS_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/certs/update"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_APISIXGatewayService_CreateUpdateTLS_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_CreateUpdateTLS_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_APISIXGatewayService_CreateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "routes"}, ""))
-	pattern_APISIXGatewayService_UpdateRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_DeleteRoute_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_GetRoute_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
-	pattern_APISIXGatewayService_ListRoutes_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"prod", "v1alpha1", "namespace", "routes", "release_name", "list"}, ""))
-	pattern_APISIXGatewayService_CreateUpstream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "upstreams"}, ""))
+	pattern_APISIXGatewayService_CreateRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "routes"}, ""))
+	pattern_APISIXGatewayService_UpdateRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_DeleteRoute_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_GetRoute_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "route_id"}, ""))
+	pattern_APISIXGatewayService_ListRoutes_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"prod", "v1alpha1", "namespace", "routes", "list"}, ""))
+	pattern_APISIXGatewayService_CreateUpstream_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "upstreams"}, ""))
+	pattern_APISIXGatewayService_ListCerts_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"prod", "v1alpha1", "namespace", "certs", "list"}, ""))
+	pattern_APISIXGatewayService_CreateUpdateTLS_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"prod", "v1alpha1", "namespace", "certs", "update"}, ""))
 )
 
 var (
-	forward_APISIXGatewayService_CreateRoute_0    = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_UpdateRoute_0    = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_DeleteRoute_0    = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_GetRoute_0       = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_ListRoutes_0     = runtime.ForwardResponseMessage
-	forward_APISIXGatewayService_CreateUpstream_0 = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_CreateRoute_0     = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_UpdateRoute_0     = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_DeleteRoute_0     = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_GetRoute_0        = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_ListRoutes_0      = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_CreateUpstream_0  = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_ListCerts_0       = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_CreateUpdateTLS_0 = runtime.ForwardResponseMessage
 )

@@ -223,13 +223,14 @@ message ListPodStatusRequest {
 message PodStatus {
   string name = 1;          // Pod 名称
   string phase = 2;         // 当前阶段（Pending/Running/Succeeded/Failed）
-  string ready = 3;         // 就绪状态（如 "1/2"）
-  int32 restarts = 4;       // 容器重启次数
-  string ip = 5;            // Pod IP 地址
-  string node = 6;          // 所在节点名称
-  string age = 7;
-  map<string, string> labels = 8;         // Pod 标签
-  repeated ContainerStatus containers = 9; // 容器状态详情
+  string status = 3;
+  string ready = 4;         // 就绪状态（如 "1/2"）
+  int32 restarts = 5;       // 容器重启次数
+  string ip = 6;            // Pod IP 地址
+  string node = 7;          // 所在节点名称
+  string age = 8;
+  map<string, string> labels = 9;         // Pod 标签
+  repeated ContainerStatus containers = 10; // 容器状态详情
 }
 
 message ContainerStatus {

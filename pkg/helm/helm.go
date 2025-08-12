@@ -246,6 +246,20 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 		CurrentPage: req.Limit,
 		Charts:      pagedCharts,
 	}
+
+	if req.Keyword != "" {
+		// 过滤包含关键词的 charts
+		filteredCharts := make([]*pb.ChartInfo, 0)
+		for _, chart := range pagedCharts {
+			if strings.Contains(strings.ToLower(chart.Name), strings.ToLower(req.Keyword)) ||
+				strings.Contains(strings.ToLower(chart.Description), strings.ToLower(req.Keyword)) {
+				filteredCharts = append(filteredCharts, chart)
+			}
+		}
+		listChartsData.Charts = filteredCharts
+		listChartsData.Total = int32(len(filteredCharts))
+	}
+
 	anyData, err := anypb.New(listChartsData)
 	if err != nil {
 		logger.L().Error("Failed to marshal ListChartsData to Any", zap.Error(err))
@@ -724,6 +738,27 @@ func GetPodList(ctx context.Context, namespace, releaseName string) (*v1.PodList
 	return podList, nil
 }
 
+func calculatePodStatus(pod *v1.Pod) string {
+	// 规则 1：检查容器状态（优先于 Phase）
+	for _, containerStatus := range pod.Status.ContainerStatuses {
+		// 1.1 容器处于 Waiting 且原因非空（如 ImagePullBackOff）
+		if containerStatus.State.Waiting != nil && containerStatus.State.Waiting.Reason != "" {
+			return containerStatus.State.Waiting.Reason
+		}
+		// 1.2 容器异常退出（如 CrashLoopBackOff）
+		if containerStatus.State.Terminated != nil && containerStatus.State.Terminated.ExitCode != 0 {
+			if containerStatus.State.Terminated.Reason != "" {
+				return containerStatus.State.Terminated.Reason
+			}
+			return "Error"
+		}
+	}
+
+	// 规则 2：所有容器 Running → 返回 Phase（通常是 Running）
+	// 规则 3：Pod 未被调度 → 返回 Pending
+	return string(pod.Status.Phase)
+}
+
 func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodStatusRequest) (*pb.ListPodStatusResponse, error) {
 	logger.L().Info("ListPodStatus called", zap.String("request", req.String()))
 
@@ -742,8 +777,8 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 	for _, pod := range podList.Items {
 		podStatus := &pb.PodStatus{
 			Name:       pod.Name,
-			Phase:      string(pod.Status.Phase),
 			Ip:         pod.Status.PodIP,
+			Phase:      string(pod.Status.Phase),
 			Node:       pod.Spec.NodeName,
 			Labels:     pod.Labels,
 			Containers: make([]*pb.ContainerStatus, 0, len(pod.Status.ContainerStatuses)),
@@ -774,6 +809,7 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 		default:
 			podStatus.Age = fmt.Sprintf("%d小时", int(age.Hours()))
 		}
+		podStatus.Status = calculatePodStatus(&pod)
 		podStatuses = append(podStatuses, podStatus)
 	}
 

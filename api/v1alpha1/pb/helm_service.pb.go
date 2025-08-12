@@ -1005,15 +1005,16 @@ func (x *ListPodStatusRequest) GetReleaseName() string {
 
 type PodStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`          // Pod 名称
-	Phase         string                 `protobuf:"bytes,2,opt,name=phase,proto3" json:"phase,omitempty"`        // 当前阶段（Pending/Running/Succeeded/Failed）
-	Ready         string                 `protobuf:"bytes,3,opt,name=ready,proto3" json:"ready,omitempty"`        // 就绪状态（如 "1/2"）
-	Restarts      int32                  `protobuf:"varint,4,opt,name=restarts,proto3" json:"restarts,omitempty"` // 容器重启次数
-	Ip            string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`              // Pod IP 地址
-	Node          string                 `protobuf:"bytes,6,opt,name=node,proto3" json:"node,omitempty"`          // 所在节点名称
-	Age           string                 `protobuf:"bytes,7,opt,name=age,proto3" json:"age,omitempty"`
-	Labels        map[string]string      `protobuf:"bytes,8,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Pod 标签
-	Containers    []*ContainerStatus     `protobuf:"bytes,9,rep,name=containers,proto3" json:"containers,omitempty"`                                                                   // 容器状态详情
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`   // Pod 名称
+	Phase         string                 `protobuf:"bytes,2,opt,name=phase,proto3" json:"phase,omitempty"` // 当前阶段（Pending/Running/Succeeded/Failed）
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Ready         string                 `protobuf:"bytes,4,opt,name=ready,proto3" json:"ready,omitempty"`        // 就绪状态（如 "1/2"）
+	Restarts      int32                  `protobuf:"varint,5,opt,name=restarts,proto3" json:"restarts,omitempty"` // 容器重启次数
+	Ip            string                 `protobuf:"bytes,6,opt,name=ip,proto3" json:"ip,omitempty"`              // Pod IP 地址
+	Node          string                 `protobuf:"bytes,7,opt,name=node,proto3" json:"node,omitempty"`          // 所在节点名称
+	Age           string                 `protobuf:"bytes,8,opt,name=age,proto3" json:"age,omitempty"`
+	Labels        map[string]string      `protobuf:"bytes,9,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Pod 标签
+	Containers    []*ContainerStatus     `protobuf:"bytes,10,rep,name=containers,proto3" json:"containers,omitempty"`                                                                  // 容器状态详情
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1058,6 +1059,13 @@ func (x *PodStatus) GetName() string {
 func (x *PodStatus) GetPhase() string {
 	if x != nil {
 		return x.Phase
+	}
+	return ""
+}
+
+func (x *PodStatus) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -2459,18 +2467,20 @@ const file_helm_service_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"W\n" +
 	"\x14ListPodStatusRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
-	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xd6\x02\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\"\xee\x02\n" +
 	"\tPodStatus\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05phase\x18\x02 \x01(\tR\x05phase\x12\x14\n" +
-	"\x05ready\x18\x03 \x01(\tR\x05ready\x12\x1a\n" +
-	"\brestarts\x18\x04 \x01(\x05R\brestarts\x12\x0e\n" +
-	"\x02ip\x18\x05 \x01(\tR\x02ip\x12\x12\n" +
-	"\x04node\x18\x06 \x01(\tR\x04node\x12\x10\n" +
-	"\x03age\x18\a \x01(\tR\x03age\x12<\n" +
-	"\x06labels\x18\b \x03(\v2$.helm.v1alpha1.PodStatus.LabelsEntryR\x06labels\x12>\n" +
+	"\x05phase\x18\x02 \x01(\tR\x05phase\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12\x14\n" +
+	"\x05ready\x18\x04 \x01(\tR\x05ready\x12\x1a\n" +
+	"\brestarts\x18\x05 \x01(\x05R\brestarts\x12\x0e\n" +
+	"\x02ip\x18\x06 \x01(\tR\x02ip\x12\x12\n" +
+	"\x04node\x18\a \x01(\tR\x04node\x12\x10\n" +
+	"\x03age\x18\b \x01(\tR\x03age\x12<\n" +
+	"\x06labels\x18\t \x03(\v2$.helm.v1alpha1.PodStatus.LabelsEntryR\x06labels\x12>\n" +
 	"\n" +
-	"containers\x18\t \x03(\v2\x1e.helm.v1alpha1.ContainerStatusR\n" +
+	"containers\x18\n" +
+	" \x03(\v2\x1e.helm.v1alpha1.ContainerStatusR\n" +
 	"containers\x1a9\n" +
 	"\vLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

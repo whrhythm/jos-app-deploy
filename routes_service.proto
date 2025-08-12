@@ -34,10 +34,19 @@ message UpstreamConfig {
   }
 }
 
+message RouteTLS {
+  string host = 1;
+  string secret_name = 2;
+}
+
 // 创建路由请求
 message CreateRouteRequest {
-  string namespace = 1;          // 命名空间
-  RouteConfig route = 2;         // 路由配置
+  string ing_name = 1;
+  string namespace = 2;          // 命名空间
+  string release_name = 3;
+  bool enable_tls = 4;
+  repeated RouteTLS route_tls = 5;
+  repeated RouteRule rules = 6;
 }
 
 // 创建路由响应
@@ -85,21 +94,31 @@ message GetRouteResponse {
   RouteConfig route = 3;         // 路由配置
 }
 
+message RouteBackend {
+  string name = 1;
+  int32 port = 2;
+  string path = 3;
+}
+
+// 规则
+message RouteRule {
+  string host = 1;
+  repeated RouteBackend paths = 2;
+}
+
 // 列出路由请求
 message ListRoutesRequest {
   string namespace = 1;          // 命名空间
   string release_name = 2;
-  map<string, string> labels = 3; // 标签选择器
-  int32 page_size = 4;           // 每页数量
-  string page_token = 5;         // 分页令牌
+  repeated RouteRule rules = 3;
 }
 
 // 列出路由响应
 message ListRoutesResponse {
-  bool success = 1;              // 是否成功
-  string message = 2;            // 返回消息
-  repeated RouteConfig routes = 3; // 路由列表
-  string next_page_token = 4;    // 下一页令牌
+  int32 code = 1;
+  bool success = 2;              // 是否成功
+  string message = 3;            // 返回消息
+  repeated RouteRule rules = 4;
 }
 
 // 上游服务相关接口
@@ -114,13 +133,42 @@ message CreateUpstreamResponse {
   string upstream_id = 3;
 }
 
+message ListTLSRequest {
+  string release_name = 1;
+  string namespace = 2;
+}
+
+message TLSData {
+  string name = 1;
+  string dns_name = 2;
+  string expired = 3;
+  string source = 4;
+}
+
+message ListTLSResponse {
+  repeated TLSData data = 1;
+}
+
+message CreateUPdateTLSRequest {
+  string name = 1;
+  string release_name = 2;
+  string namespace = 3;
+  string crt = 4;
+  string key = 5;
+}
+
+message CreateUPdateTLSResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
 // 网关配置服务
 service APISIXGatewayService {
   // 路由管理
   rpc CreateRoute (CreateRouteRequest) returns (CreateRouteResponse) {
     option (google.api.http) = {
       post: "/prod/v1alpha1/{namespace}/routes"
-      body: "route"
+      body: "*"
     };
   }
   
@@ -145,7 +193,7 @@ service APISIXGatewayService {
   
   rpc ListRoutes (ListRoutesRequest) returns (ListRoutesResponse) {
     option (google.api.http) = {
-      get: "/prod/v1alpha1/{namespace}/routes/{release_name}/list"
+      get: "/prod/v1alpha1/{namespace}/routes/list"
     };
   }
   
@@ -154,6 +202,21 @@ service APISIXGatewayService {
     option (google.api.http) = {
       post: "/prod/v1alpha1/{namespace}/upstreams"
       body: "upstream"
+    };
+  }
+
+  // 证书管理
+  rpc ListCerts (ListTLSRequest) returns (ListTLSResponse) {
+    option (google.api.http) = {
+      post: "/prod/v1alpha1/{namespace}/certs/list"
+      body: "*"
+    };
+  }
+
+  rpc CreateUpdateTLS (CreateUPdateTLSRequest) returns (CreateUPdateTLSResponse) {
+    option (google.api.http) = {
+      post: "/prod/v1alpha1/{namespace}/certs/update"
+      body: "*"
     };
   }
 }

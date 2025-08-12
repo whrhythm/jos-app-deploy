@@ -19,6 +19,7 @@ import (
 
 	pb "jos-deployment/api/v1alpha1/pb"
 	podpb "jos-deployment/api/v1alpha1/pb_pod"
+	routepb "jos-deployment/api/v1alpha1/pb_routes"
 	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
 	"jos-deployment/pkg/server"
@@ -177,6 +178,10 @@ func main() {
 		log.Fatal("Failed to register PodManagerService handler:", err)
 	}
 
+	err = routepb.RegisterAPISIXGatewayServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
+	if err != nil {
+		log.Fatal("Failed to register RoutesManageService handler:", err)
+	}
 	// 添加自定义 REST API 路由
 	httpMux := http.NewServeMux()
 
@@ -184,7 +189,7 @@ func main() {
 	httpMux.Handle("/", mux)
 
 	// 添加文件上传 REST API
-	httpMux.HandleFunc("/v1alpha1/chart/upload", handleChartUpload)
+	httpMux.HandleFunc("/prod/v1alpha1/chart/upload", handleChartUpload)
 
 	log.Println("gRPC server on :50051, HTTP gateway on :8080")
 	http.ListenAndServe(":8080", httpMux)

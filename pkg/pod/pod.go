@@ -159,7 +159,7 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 	)
 	cpuResult, err := queryPrometheus(cpuQuery)
 	if err != nil {
-		return nil, fmt.Errorf("error querying CPU usage: %v", err)
+		return nil, status.Errorf(status.Code(err), "error querying CPU usage: %v", err)
 	}
 
 	if vector, ok := cpuResult.(model.Vector); ok && len(vector) > 0 {
@@ -175,7 +175,7 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 	)
 	memResult, err := queryPrometheus(memQuery)
 	if err != nil {
-		return nil, fmt.Errorf("error querying memory usage: %v", err)
+		return nil, status.Errorf(status.Code(err), "error querying memory usage: %v", err)
 	}
 
 	if vector, ok := memResult.(model.Vector); ok && len(vector) > 0 {
