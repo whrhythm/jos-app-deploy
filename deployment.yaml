@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jos-deploy-backend-sa
+  namespace: joiningos
+---
+# clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jos-deploy-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: jos-deploy-backend-sa
+  namespace: joiningos
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jos-deploy-backend
+  labels:
+    app: jos-deploy-backend
+  namespace: joiningos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jos-deploy-backend
+  template:
+    metadata:
+      labels:
+        app: jos-deploy-backend
+    spec:
+      serviceAccountName: jos-deploy-backend-sa
+      containers:
+        - name: jos-deploy-backend
+          image: harbor.joiningos.com/library/jos-deploy:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080 # REST API 网关端口
+            - containerPort: 50051 # gRPC 端口
+          env:
+            - name: KUBERNETES_SERVICE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: KUBERNETES_SERVICE_PORT
+              value: "6443"
+          volumeMounts:
+            - mountPath: /opt/helm/repositories.yaml
+              name: deploy-config-map
+              subPath: repositories.yaml
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: internal-harbor-config
+        name: deploy-config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jos-deploy-backend
+  namespace: joiningos
+spec:
+  selector:
+    app: jos-deploy-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+---
+apiVersion: v1
+data:
+  repositories.yaml: |
+    apiVersion: ""
+    generated: "0001-01-01T00:00:00Z"
+    repositories:
+    - caFile: ""
+      certFile: ""
+      insecure_skip_tls_verify: true
+      keyFile: ""
+      name: harbor
+      pass_credentials_all: true
+      password: P@88w0rd
+      url: http://harbor-core.harbor/chartrepo/library
+      username: admin
+kind: ConfigMap
+metadata:
+  name: internal-harbor-config
+  namespace: joiningos

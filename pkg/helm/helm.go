@@ -27,6 +27,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	pb "jos-deployment/api/v1alpha1/pb"
 
@@ -81,6 +82,15 @@ func init() {
 	settings := cli.New()
 	if fileExists(defaultRepositoryConfigPath) {
 		settings.RepositoryConfig = defaultRepositoryConfigPath
+		// 修改默认 的harborEntry，从新赋值
+		repoEntry, err := repo.LoadFile(settings.RepositoryConfig)
+		if err != nil {
+			log.Fatal("Failed to load repository config:", err)
+		}
+		if e := repoEntry.Get("harbor"); e != nil {
+			harborEntry = *e
+		}
+
 	} else {
 		err := createRespositoryConfig(settings)
 		if err != nil {
@@ -715,7 +725,9 @@ func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.Lis
 }
 
 func GetPodList(ctx context.Context, namespace, releaseName string) (*v1.PodList, error) {
-	restConfig, err := helmClient.settings.RESTClientGetter().ToRESTConfig()
+	logger.L().Info("GetPodList called", zap.String("namespace", namespace), zap.String("releaseName", releaseName))
+
+	restConfig, err := rest.InClusterConfig()
 	if err != nil {
 		logger.L().Error("Failed to get REST config", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "get REST config failed: %v", err)
