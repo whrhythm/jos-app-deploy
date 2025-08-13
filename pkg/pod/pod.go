@@ -179,7 +179,7 @@ func getPodMetrics(namespace, podName string) (*PodMetrics, error) {
 
 	// CPU使用量（核）
 	cpuQuery := fmt.Sprintf(
-		`sum(rate(container_cpu_usage_seconds_total{namespace="%s", pod="%s"}[5m])) by (pod)`,
+		`1000 * sum(rate(container_cpu_usage_seconds_total{namespace="%s", pod="%s"}[5m])) by (pod)`,
 		namespace, podName,
 	)
 	cpuResult, err := queryPrometheus(cpuQuery)
