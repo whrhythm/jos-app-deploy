@@ -25,6 +25,7 @@ const (
 	APISIXGatewayService_ListRoutes_FullMethodName      = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
 	APISIXGatewayService_CreateUpstream_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
 	APISIXGatewayService_ListCerts_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/ListCerts"
+	APISIXGatewayService_DeleteCerts_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteCerts"
 	APISIXGatewayService_CreateUpdateTLS_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
 	APISIXGatewayService_GetServiceList_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetServiceList"
 )
@@ -44,6 +45,8 @@ type APISIXGatewayServiceClient interface {
 	CreateUpstream(ctx context.Context, in *CreateUpstreamRequest, opts ...grpc.CallOption) (*CreateUpstreamResponse, error)
 	// 证书管理
 	ListCerts(ctx context.Context, in *ListTLSRequest, opts ...grpc.CallOption) (*ListTLSResponse, error)
+	// 证书删除
+	DeleteCerts(ctx context.Context, in *DeleteCertsRequest, opts ...grpc.CallOption) (*DeleteCertsResponse, error)
 	CreateUpdateTLS(ctx context.Context, in *CreateUPdateTLSRequest, opts ...grpc.CallOption) (*CreateUPdateTLSResponse, error)
 	// 获取service list
 	GetServiceList(ctx context.Context, in *GetServiceListRequest, opts ...grpc.CallOption) (*GetServiceListResponse, error)
@@ -117,6 +120,16 @@ func (c *aPISIXGatewayServiceClient) ListCerts(ctx context.Context, in *ListTLSR
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) DeleteCerts(ctx context.Context, in *DeleteCertsRequest, opts ...grpc.CallOption) (*DeleteCertsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCertsResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_DeleteCerts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *aPISIXGatewayServiceClient) CreateUpdateTLS(ctx context.Context, in *CreateUPdateTLSRequest, opts ...grpc.CallOption) (*CreateUPdateTLSResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateUPdateTLSResponse)
@@ -152,6 +165,8 @@ type APISIXGatewayServiceServer interface {
 	CreateUpstream(context.Context, *CreateUpstreamRequest) (*CreateUpstreamResponse, error)
 	// 证书管理
 	ListCerts(context.Context, *ListTLSRequest) (*ListTLSResponse, error)
+	// 证书删除
+	DeleteCerts(context.Context, *DeleteCertsRequest) (*DeleteCertsResponse, error)
 	CreateUpdateTLS(context.Context, *CreateUPdateTLSRequest) (*CreateUPdateTLSResponse, error)
 	// 获取service list
 	GetServiceList(context.Context, *GetServiceListRequest) (*GetServiceListResponse, error)
@@ -182,6 +197,9 @@ func (UnimplementedAPISIXGatewayServiceServer) CreateUpstream(context.Context, *
 }
 func (UnimplementedAPISIXGatewayServiceServer) ListCerts(context.Context, *ListTLSRequest) (*ListTLSResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCerts not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) DeleteCerts(context.Context, *DeleteCertsRequest) (*DeleteCertsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCerts not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) CreateUpdateTLS(context.Context, *CreateUPdateTLSRequest) (*CreateUPdateTLSResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUpdateTLS not implemented")
@@ -318,6 +336,24 @@ func _APISIXGatewayService_ListCerts_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_DeleteCerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCertsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).DeleteCerts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_DeleteCerts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).DeleteCerts(ctx, req.(*DeleteCertsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _APISIXGatewayService_CreateUpdateTLS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUPdateTLSRequest)
 	if err := dec(in); err != nil {
@@ -384,6 +420,10 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCerts",
 			Handler:    _APISIXGatewayService_ListCerts_Handler,
+		},
+		{
+			MethodName: "DeleteCerts",
+			Handler:    _APISIXGatewayService_DeleteCerts_Handler,
 		},
 		{
 			MethodName: "CreateUpdateTLS",

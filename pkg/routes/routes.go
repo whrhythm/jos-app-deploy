@@ -56,7 +56,13 @@ func (s *RoutesManageService) ListRoutes(ctx context.Context, req *pb.ListRoutes
 	}
 
 	var routeRules []*pb.RouteRule
+	var routeTLS []*pb.RouteTLS
+	var listData []*pb.ListRoutesData
+	enableTLS := false
 	for _, ingress := range ingresses.Items {
+		// 重置routeRules
+		routeRules = make([]*pb.RouteRule, 0)
+		routeTLS = make([]*pb.RouteTLS, 0)
 		for _, rule := range ingress.Spec.Rules {
 			routeRule := &pb.RouteRule{
 				Host: rule.Host,
@@ -71,13 +77,28 @@ func (s *RoutesManageService) ListRoutes(ctx context.Context, req *pb.ListRoutes
 			}
 			routeRules = append(routeRules, routeRule)
 		}
+		if len(ingress.Spec.TLS) > 0 {
+			enableTLS = true
+			for _, tls := range ingress.Spec.TLS {
+				routeTLS = append(routeTLS, &pb.RouteTLS{
+					Host:       tls.Hosts[0],
+					SecretName: tls.SecretName,
+				})
+			}
+		}
+		listData = append(listData, &pb.ListRoutesData{
+			IngName:   ingress.Name,
+			EnableTls: enableTLS,
+			RouteTls:  routeTLS,
+			Rules:     routeRules,
+		})
 	}
+
 	return &pb.ListRoutesResponse{
 		Code:    0,
 		Success: true,
-		Data: &pb.ListRoutesData{
-			Rules: routeRules,
-		},
+		Message: "Successfully retrieved routes",
+		Data:    listData,
 	}, nil
 }
 
@@ -135,6 +156,8 @@ func (s *RoutesManageService) ListCerts(ctx context.Context, req *pb.ListTLSRequ
 			if len(dnsName) > 0 {
 				tlsData.DnsName = dnsName[0]
 			}
+			tlsData.Crt = string(cert.Data["tls.crt"])
+			tlsData.Key = string(cert.Data["tls.key"])
 			tlsDataList = append(tlsDataList, tlsData)
 		}
 	}
@@ -148,7 +171,7 @@ func (s *RoutesManageService) ListCerts(ctx context.Context, req *pb.ListTLSRequ
 }
 
 func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRouteRequest) (*pb.CreateRouteResponse, error) {
-	logger.L().Info("CreateRoute called", zap.String("namespace", req.GetNamespace()), zap.String("ingressName", req.GetIngName()))
+	logger.L().Info("CreateRoute called", zap.String("namespace", req.GetNamespace()), zap.Bool("enableTls", req.EnableTls))
 	namespace := req.GetNamespace()
 	// 默认更新是false
 	update := false
@@ -221,7 +244,18 @@ func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRou
 		},
 		Spec: networkingv1.IngressSpec{
 			Rules: ingressRules,
+			// Add TLS configuration here if needed, e.g.:
+			// TLS: []networkingv1.IngressTLS{ ... },
 		},
+	}
+
+	if req.EnableTls {
+		for _, tls := range req.GetRouteTls() {
+			ingress.Spec.TLS = append(ingress.Spec.TLS, networkingv1.IngressTLS{
+				Hosts:      []string{tls.GetHost()},
+				SecretName: tls.GetSecretName(),
+			})
+		}
 	}
 
 	// 创建 Ingress
@@ -316,6 +350,7 @@ func (s *RoutesManageService) DeleteRoute(ctx context.Context, req *pb.DeleteRou
 	}
 
 	return &pb.DeleteRouteResponse{
+		Code:    0,
 		Success: true,
 		Message: "Route deleted successfully",
 	}, nil
@@ -328,6 +363,7 @@ func (s *RoutesManageService) CreateUpdateTLS(ctx context.Context, req *pb.Creat
 	certName := req.GetName()
 	certData := req.GetCrt()
 	keyData := req.GetKey()
+	update := false
 
 	// Initialize Kubernetes clientset
 	config, err := rest.InClusterConfig()
@@ -346,7 +382,8 @@ func (s *RoutesManageService) CreateUpdateTLS(ctx context.Context, req *pb.Creat
 	// 检查 Secret 是否已存在
 	_, err = clientset.CoreV1().Secrets(namespace).Get(ctx, certName, metav1.GetOptions{})
 	if err == nil {
-		return nil, status.Errorf(409, "TLS secret with name %s already exists", certName)
+		logger.L().Info("TLS secret already exists, updating", zap.String("secret_name", certName))
+		update = true
 	}
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -359,14 +396,58 @@ func (s *RoutesManageService) CreateUpdateTLS(ctx context.Context, req *pb.Creat
 		},
 		Type: "kubernetes.io/tls",
 	}
-	_, err = clientset.CoreV1().Secrets(namespace).Create(ctx, secret, metav1.CreateOptions{})
-	if err != nil {
-		logger.L().Error("Failed to create TLS secret", zap.Error(err))
-		return nil, status.Errorf(status.Code(err), "failed to create TLS secret: %v", err)
+
+	if update {
+		// 更新现有 Secret
+		_, err = clientset.CoreV1().Secrets(namespace).Update(ctx, secret, metav1.UpdateOptions{})
+		if err != nil {
+			logger.L().Error("Failed to update TLS secret", zap.Error(err))
+			return nil, status.Errorf(status.Code(err), "failed to update TLS secret: %v", err)
+		}
+	} else {
+		// 创建新的 Secret
+		logger.L().Info("Creating new TLS secret", zap.String("secret_name", certName))
+		_, err = clientset.CoreV1().Secrets(namespace).Create(ctx, secret, metav1.CreateOptions{})
+		if err != nil {
+			logger.L().Error("Failed to create TLS secret", zap.Error(err))
+			return nil, status.Errorf(status.Code(err), "failed to create TLS secret: %v", err)
+		}
 	}
 
 	return &pb.CreateUPdateTLSResponse{
 		Code:    0,
 		Message: "TLS secret created successfully",
+	}, nil
+}
+
+func (s *RoutesManageService) DeleteCerts(ctx context.Context, req *pb.DeleteCertsRequest) (*pb.DeleteCertsResponse, error) {
+	logger.L().Info("DeleteCerts called", zap.String("namespace", req.GetNamespace()), zap.String("name", req.GetName()))
+	namespace := req.GetNamespace()
+	name := req.GetName()
+
+	// Initialize Kubernetes clientset
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		// 尝试使用本地 kubeconfig
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create Kubernetes clientset: %v", err)
+	}
+
+	err = clientset.CoreV1().Secrets(namespace).Delete(ctx, name, metav1.DeleteOptions{})
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to delete certificate: %v", err)
+	}
+
+	return &pb.DeleteCertsResponse{
+		Code:    0,
+		Success: true,
+		Message: "Certificate deleted successfully",
 	}, nil
 }

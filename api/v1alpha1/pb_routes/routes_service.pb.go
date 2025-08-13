@@ -584,8 +584,9 @@ func (x *DeleteRouteRequest) GetRouteName() string {
 // 删除路由响应
 type DeleteRouteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"` // 是否成功
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`  // 返回消息
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"` // 是否成功
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`  // 返回消息
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -618,6 +619,13 @@ func (x *DeleteRouteResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteRouteResponse.ProtoReflect.Descriptor instead.
 func (*DeleteRouteResponse) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DeleteRouteResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
 }
 
 func (x *DeleteRouteResponse) GetSuccess() bool {
@@ -924,7 +932,10 @@ func (x *ListRoutesRequest) GetRules() []*RouteRule {
 
 type ListRoutesData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Rules         []*RouteRule           `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
+	IngName       string                 `protobuf:"bytes,1,opt,name=ing_name,json=ingName,proto3" json:"ing_name,omitempty"`
+	EnableTls     bool                   `protobuf:"varint,2,opt,name=enable_tls,json=enableTls,proto3" json:"enable_tls,omitempty"`
+	RouteTls      []*RouteTLS            `protobuf:"bytes,3,rep,name=route_tls,json=routeTls,proto3" json:"route_tls,omitempty"`
+	Rules         []*RouteRule           `protobuf:"bytes,4,rep,name=rules,proto3" json:"rules,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -959,6 +970,27 @@ func (*ListRoutesData) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{14}
 }
 
+func (x *ListRoutesData) GetIngName() string {
+	if x != nil {
+		return x.IngName
+	}
+	return ""
+}
+
+func (x *ListRoutesData) GetEnableTls() bool {
+	if x != nil {
+		return x.EnableTls
+	}
+	return false
+}
+
+func (x *ListRoutesData) GetRouteTls() []*RouteTLS {
+	if x != nil {
+		return x.RouteTls
+	}
+	return nil
+}
+
 func (x *ListRoutesData) GetRules() []*RouteRule {
 	if x != nil {
 		return x.Rules
@@ -972,7 +1004,7 @@ type ListRoutesResponse struct {
 	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"` // 是否成功
 	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`  // 返回消息
-	Data          *ListRoutesData        `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	Data          []*ListRoutesData      `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1028,7 +1060,7 @@ func (x *ListRoutesResponse) GetMessage() string {
 	return ""
 }
 
-func (x *ListRoutesResponse) GetData() *ListRoutesData {
+func (x *ListRoutesResponse) GetData() []*ListRoutesData {
 	if x != nil {
 		return x.Data
 	}
@@ -1206,6 +1238,8 @@ type TLSData struct {
 	DnsName       string                 `protobuf:"bytes,2,opt,name=dns_name,json=dnsName,proto3" json:"dns_name,omitempty"`
 	Expired       string                 `protobuf:"bytes,3,opt,name=expired,proto3" json:"expired,omitempty"`
 	Source        string                 `protobuf:"bytes,4,opt,name=source,proto3" json:"source,omitempty"`
+	Crt           string                 `protobuf:"bytes,5,opt,name=crt,proto3" json:"crt,omitempty"`
+	Key           string                 `protobuf:"bytes,6,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1264,6 +1298,20 @@ func (x *TLSData) GetExpired() string {
 func (x *TLSData) GetSource() string {
 	if x != nil {
 		return x.Source
+	}
+	return ""
+}
+
+func (x *TLSData) GetCrt() string {
+	if x != nil {
+		return x.Crt
+	}
+	return ""
+}
+
+func (x *TLSData) GetKey() string {
+	if x != nil {
+		return x.Key
 	}
 	return ""
 }
@@ -1628,6 +1676,119 @@ func (x *GetServiceListResponse) GetData() []*GetServiceData {
 	return nil
 }
 
+// 删除证书
+type DeleteCertsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCertsRequest) Reset() {
+	*x = DeleteCertsRequest{}
+	mi := &file_routes_service_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCertsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCertsRequest) ProtoMessage() {}
+
+func (x *DeleteCertsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCertsRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCertsRequest) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DeleteCertsRequest) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *DeleteCertsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type DeleteCertsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCertsResponse) Reset() {
+	*x = DeleteCertsResponse{}
+	mi := &file_routes_service_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCertsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCertsResponse) ProtoMessage() {}
+
+func (x *DeleteCertsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCertsResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCertsResponse) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *DeleteCertsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeleteCertsResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteCertsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type UpstreamConfig_Node struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Host          string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`      // 节点主机
@@ -1639,7 +1800,7 @@ type UpstreamConfig_Node struct {
 
 func (x *UpstreamConfig_Node) Reset() {
 	*x = UpstreamConfig_Node{}
-	mi := &file_routes_service_proto_msgTypes[28]
+	mi := &file_routes_service_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1651,7 +1812,7 @@ func (x *UpstreamConfig_Node) String() string {
 func (*UpstreamConfig_Node) ProtoMessage() {}
 
 func (x *UpstreamConfig_Node) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[28]
+	mi := &file_routes_service_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1747,10 +1908,11 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x12DeleteRouteRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x1d\n" +
 	"\n" +
-	"route_name\x18\x02 \x01(\tR\trouteName\"I\n" +
-	"\x13DeleteRouteResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"J\n" +
+	"route_name\x18\x02 \x01(\tR\trouteName\"]\n" +
+	"\x13DeleteRouteResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"J\n" +
 	"\x0fGetRouteRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n" +
 	"\broute_id\x18\x02 \x01(\tR\arouteId\"z\n" +
@@ -1768,14 +1930,18 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x11ListRoutesRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x120\n" +
-	"\x05rules\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"B\n" +
-	"\x0eListRoutesData\x120\n" +
-	"\x05rules\x18\x01 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"\x91\x01\n" +
+	"\x05rules\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"\xb4\x01\n" +
+	"\x0eListRoutesData\x12\x19\n" +
+	"\bing_name\x18\x01 \x01(\tR\aingName\x12\x1d\n" +
+	"\n" +
+	"enable_tls\x18\x02 \x01(\bR\tenableTls\x126\n" +
+	"\troute_tls\x18\x03 \x03(\v2\x19.apisix.v1alpha1.RouteTLSR\brouteTls\x120\n" +
+	"\x05rules\x18\x04 \x03(\v2\x1a.apisix.v1alpha1.RouteRuleR\x05rules\"\x91\x01\n" +
 	"\x12ListRoutesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
-	"\x04data\x18\x04 \x01(\v2\x1f.apisix.v1alpha1.ListRoutesDataR\x04data\"r\n" +
+	"\x04data\x18\x04 \x03(\v2\x1f.apisix.v1alpha1.ListRoutesDataR\x04data\"r\n" +
 	"\x15CreateUpstreamRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12;\n" +
 	"\bupstream\x18\x02 \x01(\v2\x1f.apisix.v1alpha1.UpstreamConfigR\bupstream\"m\n" +
@@ -1786,12 +1952,14 @@ const file_routes_service_proto_rawDesc = "" +
 	"upstreamId\"Q\n" +
 	"\x0eListTLSRequest\x12!\n" +
 	"\frelease_name\x18\x01 \x01(\tR\vreleaseName\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"j\n" +
+	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"\x8e\x01\n" +
 	"\aTLSData\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x19\n" +
 	"\bdns_name\x18\x02 \x01(\tR\adnsName\x12\x18\n" +
 	"\aexpired\x18\x03 \x01(\tR\aexpired\x12\x16\n" +
-	"\x06source\x18\x04 \x01(\tR\x06source\"\x87\x01\n" +
+	"\x06source\x18\x04 \x01(\tR\x06source\x12\x10\n" +
+	"\x03crt\x18\x05 \x01(\tR\x03crt\x12\x10\n" +
+	"\x03key\x18\x06 \x01(\tR\x03key\"\x87\x01\n" +
 	"\x0fListTLSResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
@@ -1815,7 +1983,15 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
-	"\x04data\x18\x04 \x03(\v2\x1f.apisix.v1alpha1.GetServiceDataR\x04data2\x88\t\n" +
+	"\x04data\x18\x04 \x03(\v2\x1f.apisix.v1alpha1.GetServiceDataR\x04data\"F\n" +
+	"\x12DeleteCertsRequest\x12\x1c\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"]\n" +
+	"\x13DeleteCertsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage2\x94\n" +
+	"\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
 	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
 	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"6\x82\xd3\xe4\x93\x020*./prod/v1alpha1/{namespace}/routes/{route_name}\x12\x85\x01\n" +
@@ -1823,7 +1999,8 @@ const file_routes_service_proto_rawDesc = "" +
 	"\n" +
 	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\".\x82\xd3\xe4\x93\x02(\x12&/prod/v1alpha1/{namespace}/routes/list\x12\x99\x01\n" +
 	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"6\x82\xd3\xe4\x93\x020:\bupstream\"$/prod/v1alpha1/{namespace}/upstreams\x12}\n" +
-	"\tListCerts\x12\x1f.apisix.v1alpha1.ListTLSRequest\x1a .apisix.v1alpha1.ListTLSResponse\"-\x82\xd3\xe4\x93\x02'\x12%/prod/v1alpha1/{namespace}/certs/list\x12\x98\x01\n" +
+	"\tListCerts\x12\x1f.apisix.v1alpha1.ListTLSRequest\x1a .apisix.v1alpha1.ListTLSResponse\"-\x82\xd3\xe4\x93\x02'\x12%/prod/v1alpha1/{namespace}/certs/list\x12\x89\x01\n" +
+	"\vDeleteCerts\x12#.apisix.v1alpha1.DeleteCertsRequest\x1a$.apisix.v1alpha1.DeleteCertsResponse\"/\x82\xd3\xe4\x93\x02)*'/prod/v1alpha1/{namespace}/certs/{name}\x12\x98\x01\n" +
 	"\x0fCreateUpdateTLS\x12'.apisix.v1alpha1.CreateUPdateTLSRequest\x1a(.apisix.v1alpha1.CreateUPdateTLSResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/prod/v1alpha1/{namespace}/certs/update\x12\x8d\x01\n" +
 	"\x0eGetServiceList\x12&.apisix.v1alpha1.GetServiceListRequest\x1a'.apisix.v1alpha1.GetServiceListResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/prod/v1alpha1/{namespace}/serviceB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
@@ -1839,7 +2016,7 @@ func file_routes_service_proto_rawDescGZIP() []byte {
 	return file_routes_service_proto_rawDescData
 }
 
-var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_routes_service_proto_goTypes = []any{
 	(*RouteConfig)(nil),             // 0: apisix.v1alpha1.RouteConfig
 	(*UpstreamConfig)(nil),          // 1: apisix.v1alpha1.UpstreamConfig
@@ -1867,46 +2044,51 @@ var file_routes_service_proto_goTypes = []any{
 	(*GetServiceListRequest)(nil),   // 23: apisix.v1alpha1.GetServiceListRequest
 	(*GetServiceData)(nil),          // 24: apisix.v1alpha1.GetServiceData
 	(*GetServiceListResponse)(nil),  // 25: apisix.v1alpha1.GetServiceListResponse
-	nil,                             // 26: apisix.v1alpha1.RouteConfig.LabelsEntry
-	nil,                             // 27: apisix.v1alpha1.UpstreamConfig.LabelsEntry
-	(*UpstreamConfig_Node)(nil),     // 28: apisix.v1alpha1.UpstreamConfig.Node
+	(*DeleteCertsRequest)(nil),      // 26: apisix.v1alpha1.DeleteCertsRequest
+	(*DeleteCertsResponse)(nil),     // 27: apisix.v1alpha1.DeleteCertsResponse
+	nil,                             // 28: apisix.v1alpha1.RouteConfig.LabelsEntry
+	nil,                             // 29: apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	(*UpstreamConfig_Node)(nil),     // 30: apisix.v1alpha1.UpstreamConfig.Node
 }
 var file_routes_service_proto_depIdxs = []int32{
-	26, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
-	28, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
-	27, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	28, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
+	30, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
+	29, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
 	2,  // 3: apisix.v1alpha1.CreateRouteRequest.route_tls:type_name -> apisix.v1alpha1.RouteTLS
 	12, // 4: apisix.v1alpha1.CreateRouteRequest.rules:type_name -> apisix.v1alpha1.RouteRule
 	0,  // 5: apisix.v1alpha1.UpdateRouteRequest.route:type_name -> apisix.v1alpha1.RouteConfig
 	0,  // 6: apisix.v1alpha1.GetRouteResponse.route:type_name -> apisix.v1alpha1.RouteConfig
 	11, // 7: apisix.v1alpha1.RouteRule.paths:type_name -> apisix.v1alpha1.RouteBackend
 	12, // 8: apisix.v1alpha1.ListRoutesRequest.rules:type_name -> apisix.v1alpha1.RouteRule
-	12, // 9: apisix.v1alpha1.ListRoutesData.rules:type_name -> apisix.v1alpha1.RouteRule
-	14, // 10: apisix.v1alpha1.ListRoutesResponse.data:type_name -> apisix.v1alpha1.ListRoutesData
-	1,  // 11: apisix.v1alpha1.CreateUpstreamRequest.upstream:type_name -> apisix.v1alpha1.UpstreamConfig
-	19, // 12: apisix.v1alpha1.ListTLSResponse.data:type_name -> apisix.v1alpha1.TLSData
-	24, // 13: apisix.v1alpha1.GetServiceListResponse.data:type_name -> apisix.v1alpha1.GetServiceData
-	3,  // 14: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
-	7,  // 15: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
-	9,  // 16: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
-	13, // 17: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
-	16, // 18: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
-	18, // 19: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
-	21, // 20: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
-	23, // 21: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
-	4,  // 22: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
-	8,  // 23: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
-	10, // 24: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
-	15, // 25: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
-	17, // 26: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
-	20, // 27: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
-	22, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
-	25, // 29: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
-	22, // [22:30] is the sub-list for method output_type
-	14, // [14:22] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	2,  // 9: apisix.v1alpha1.ListRoutesData.route_tls:type_name -> apisix.v1alpha1.RouteTLS
+	12, // 10: apisix.v1alpha1.ListRoutesData.rules:type_name -> apisix.v1alpha1.RouteRule
+	14, // 11: apisix.v1alpha1.ListRoutesResponse.data:type_name -> apisix.v1alpha1.ListRoutesData
+	1,  // 12: apisix.v1alpha1.CreateUpstreamRequest.upstream:type_name -> apisix.v1alpha1.UpstreamConfig
+	19, // 13: apisix.v1alpha1.ListTLSResponse.data:type_name -> apisix.v1alpha1.TLSData
+	24, // 14: apisix.v1alpha1.GetServiceListResponse.data:type_name -> apisix.v1alpha1.GetServiceData
+	3,  // 15: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
+	7,  // 16: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
+	9,  // 17: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
+	13, // 18: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
+	16, // 19: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
+	18, // 20: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
+	26, // 21: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:input_type -> apisix.v1alpha1.DeleteCertsRequest
+	21, // 22: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
+	23, // 23: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
+	4,  // 24: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
+	8,  // 25: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
+	10, // 26: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
+	15, // 27: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
+	17, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
+	20, // 29: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
+	27, // 30: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:output_type -> apisix.v1alpha1.DeleteCertsResponse
+	22, // 31: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
+	25, // 32: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
+	24, // [24:33] is the sub-list for method output_type
+	15, // [15:24] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_routes_service_proto_init() }
@@ -1920,7 +2102,7 @@ func file_routes_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_routes_service_proto_rawDesc), len(file_routes_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   29,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

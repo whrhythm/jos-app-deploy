@@ -78,8 +78,9 @@ message DeleteRouteRequest {
 
 // 删除路由响应
 message DeleteRouteResponse {
-  bool success = 1;              // 是否成功
-  string message = 2;            // 返回消息
+  int32 code = 1;
+  bool success = 2;              // 是否成功
+  string message = 3;            // 返回消息
 }
 
 // 查询路由请求
@@ -115,7 +116,10 @@ message ListRoutesRequest {
 }
 
 message ListRoutesData {
-  repeated RouteRule rules = 1;
+  string ing_name = 1;
+  bool enable_tls = 2;
+  repeated RouteTLS route_tls = 3;
+  repeated RouteRule rules = 4;
 }
 
 // 列出路由响应
@@ -123,7 +127,7 @@ message ListRoutesResponse {
   int32 code = 1;
   bool success = 2;              // 是否成功
   string message = 3;            // 返回消息
-  ListRoutesData data = 4;
+  repeated ListRoutesData data = 4;
 }
 
 // 上游服务相关接口
@@ -148,6 +152,8 @@ message TLSData {
   string dns_name = 2;
   string expired = 3;
   string source = 4;
+  string crt = 5;
+  string key = 6;
 }
 
 message ListTLSResponse {
@@ -184,6 +190,18 @@ message GetServiceListResponse {
   bool success = 2;
   string message = 3;
   repeated GetServiceData data = 4;
+}
+
+// 删除证书
+message DeleteCertsRequest {
+  string namespace = 1;
+  string name = 2;
+}
+
+message DeleteCertsResponse {
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
 }
 
 // 网关配置服务
@@ -226,6 +244,13 @@ service APISIXGatewayService {
   rpc ListCerts (ListTLSRequest) returns (ListTLSResponse) {
     option (google.api.http) = {
       get: "/prod/v1alpha1/{namespace}/certs/list"
+    };
+  }
+
+  // 证书删除
+  rpc DeleteCerts (DeleteCertsRequest) returns (DeleteCertsResponse) {
+    option (google.api.http) = {
+      delete: "/prod/v1alpha1/{namespace}/certs/{name}"
     };
   }
 
