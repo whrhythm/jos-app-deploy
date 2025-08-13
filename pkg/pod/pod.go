@@ -7,10 +7,17 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"time"
 
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 
 	pb "jos-deployment/api/v1alpha1/pb_pod"
 	"jos-deployment/pkg/logger"
@@ -50,11 +57,29 @@ type PrometheusData struct {
 func (s *PodManagerServer) DeletePod(ctx context.Context, req *pb.DeletePodRequest) (*pb.DeletePodResponse, error) {
 	logger.L().Info("DeletePod called", zap.String("request", req.String()))
 
-	// 在这里实现实际的 Pod 删除逻辑
-	// 示例模拟操作
+	// 删除 Pod 的逻辑
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Failed to build kubeconfig: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to create Kubernetes client: %v", err)
+	}
+	err = clientset.CoreV1().Pods(req.Namespace).Delete(ctx, req.PodName, metav1.DeleteOptions{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to delete pod %s/%s: %v", req.Namespace, req.PodName, err)
+	}
+
 	deletionTime := timestamppb.Now()
 
 	return &pb.DeletePodResponse{
+		Code:              0,
+		Success:           true,
 		Message:           "Pod deleted successfully",
 		DeletionTimestamp: deletionTime,
 	}, nil

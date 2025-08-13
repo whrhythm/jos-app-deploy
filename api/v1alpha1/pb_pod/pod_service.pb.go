@@ -252,8 +252,10 @@ func (x *DeletePodRequest) GetGracePeriodSeconds() int64 {
 // 删除 Pod 响应
 type DeletePodResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Message           string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	DeletionTimestamp *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=deletion_timestamp,json=deletionTimestamp,proto3" json:"deletion_timestamp,omitempty"`
+	Code              int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success           bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message           string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	DeletionTimestamp *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deletion_timestamp,json=deletionTimestamp,proto3" json:"deletion_timestamp,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -286,6 +288,20 @@ func (x *DeletePodResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeletePodResponse.ProtoReflect.Descriptor instead.
 func (*DeletePodResponse) Descriptor() ([]byte, []int) {
 	return file_pod_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DeletePodResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DeletePodResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 func (x *DeletePodResponse) GetMessage() string {
@@ -1451,10 +1467,12 @@ const file_pod_service_proto_rawDesc = "" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n" +
 	"\bpod_name\x18\x02 \x01(\tR\apodName\x12\x14\n" +
 	"\x05force\x18\x03 \x01(\bR\x05force\x120\n" +
-	"\x14grace_period_seconds\x18\x04 \x01(\x03R\x12gracePeriodSeconds\"x\n" +
-	"\x11DeletePodResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\x12I\n" +
-	"\x12deletion_timestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x11deletionTimestamp\"\x82\x02\n" +
+	"\x14grace_period_seconds\x18\x04 \x01(\x03R\x12gracePeriodSeconds\"\xa6\x01\n" +
+	"\x11DeletePodResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12I\n" +
+	"\x12deletion_timestamp\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x11deletionTimestamp\"\x82\x02\n" +
 	"\x11GetPodLogsRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x19\n" +
 	"\bpod_name\x18\x02 \x01(\tR\apodName\x12\x1c\n" +

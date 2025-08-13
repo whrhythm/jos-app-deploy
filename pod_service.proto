@@ -38,8 +38,10 @@ message DeletePodRequest {
 
 // 删除 Pod 响应
 message DeletePodResponse {
-  string message = 1;
-  google.protobuf.Timestamp deletion_timestamp = 2;
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  google.protobuf.Timestamp deletion_timestamp = 4;
 }
 
 // 获取 Pod 日志请求
