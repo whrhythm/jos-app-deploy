@@ -28,6 +28,7 @@ const (
 	APISIXGatewayService_DeleteCerts_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteCerts"
 	APISIXGatewayService_CreateUpdateTLS_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
 	APISIXGatewayService_GetServiceList_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetServiceList"
+	APISIXGatewayService_GetNodeInfo_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo"
 )
 
 // APISIXGatewayServiceClient is the client API for APISIXGatewayService service.
@@ -50,6 +51,8 @@ type APISIXGatewayServiceClient interface {
 	CreateUpdateTLS(ctx context.Context, in *CreateUPdateTLSRequest, opts ...grpc.CallOption) (*CreateUPdateTLSResponse, error)
 	// 获取service list
 	GetServiceList(ctx context.Context, in *GetServiceListRequest, opts ...grpc.CallOption) (*GetServiceListResponse, error)
+	// 获取节点IP地址
+	GetNodeInfo(ctx context.Context, in *GetNodeInfoRequest, opts ...grpc.CallOption) (*GetNodeInfoResponse, error)
 }
 
 type aPISIXGatewayServiceClient struct {
@@ -150,6 +153,16 @@ func (c *aPISIXGatewayServiceClient) GetServiceList(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) GetNodeInfo(ctx context.Context, in *GetNodeInfoRequest, opts ...grpc.CallOption) (*GetNodeInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNodeInfoResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_GetNodeInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APISIXGatewayServiceServer is the server API for APISIXGatewayService service.
 // All implementations must embed UnimplementedAPISIXGatewayServiceServer
 // for forward compatibility.
@@ -170,6 +183,8 @@ type APISIXGatewayServiceServer interface {
 	CreateUpdateTLS(context.Context, *CreateUPdateTLSRequest) (*CreateUPdateTLSResponse, error)
 	// 获取service list
 	GetServiceList(context.Context, *GetServiceListRequest) (*GetServiceListResponse, error)
+	// 获取节点IP地址
+	GetNodeInfo(context.Context, *GetNodeInfoRequest) (*GetNodeInfoResponse, error)
 	mustEmbedUnimplementedAPISIXGatewayServiceServer()
 }
 
@@ -206,6 +221,9 @@ func (UnimplementedAPISIXGatewayServiceServer) CreateUpdateTLS(context.Context, 
 }
 func (UnimplementedAPISIXGatewayServiceServer) GetServiceList(context.Context, *GetServiceListRequest) (*GetServiceListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetServiceList not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) GetNodeInfo(context.Context, *GetNodeInfoRequest) (*GetNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeInfo not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) mustEmbedUnimplementedAPISIXGatewayServiceServer() {}
 func (UnimplementedAPISIXGatewayServiceServer) testEmbeddedByValue()                              {}
@@ -390,6 +408,24 @@ func _APISIXGatewayService_GetServiceList_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_GetNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNodeInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).GetNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_GetNodeInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).GetNodeInfo(ctx, req.(*GetNodeInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // APISIXGatewayService_ServiceDesc is the grpc.ServiceDesc for APISIXGatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -432,6 +468,10 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetServiceList",
 			Handler:    _APISIXGatewayService_GetServiceList_Handler,
+		},
+		{
+			MethodName: "GetNodeInfo",
+			Handler:    _APISIXGatewayService_GetNodeInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

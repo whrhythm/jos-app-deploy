@@ -480,6 +480,27 @@ func local_request_APISIXGatewayService_GetServiceList_0(ctx context.Context, ma
 	return msg, metadata, err
 }
 
+func request_APISIXGatewayService_GetNodeInfo_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetNodeInfoRequest
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetNodeInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_APISIXGatewayService_GetNodeInfo_0(ctx context.Context, marshaler runtime.Marshaler, server APISIXGatewayServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetNodeInfoRequest
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetNodeInfo(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterAPISIXGatewayServiceHandlerServer registers the http handlers for service APISIXGatewayService to "mux".
 // UnaryRPC     :call APISIXGatewayServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -665,6 +686,26 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 			return
 		}
 		forward_APISIXGatewayService_GetServiceList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_APISIXGatewayService_GetNodeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo", runtime.WithHTTPPathPattern("/prod/v1alpha1/node/info"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_APISIXGatewayService_GetNodeInfo_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_GetNodeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -859,6 +900,23 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		}
 		forward_APISIXGatewayService_GetServiceList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_APISIXGatewayService_GetNodeInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo", runtime.WithHTTPPathPattern("/prod/v1alpha1/node/info"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_APISIXGatewayService_GetNodeInfo_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_APISIXGatewayService_GetNodeInfo_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
@@ -872,6 +930,7 @@ var (
 	pattern_APISIXGatewayService_DeleteCerts_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"prod", "v1alpha1", "namespace", "certs", "name"}, ""))
 	pattern_APISIXGatewayService_CreateUpdateTLS_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4}, []string{"prod", "v1alpha1", "namespace", "certs", "update"}, ""))
 	pattern_APISIXGatewayService_GetServiceList_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"prod", "v1alpha1", "namespace", "service"}, ""))
+	pattern_APISIXGatewayService_GetNodeInfo_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"prod", "v1alpha1", "node", "info"}, ""))
 )
 
 var (
@@ -884,4 +943,5 @@ var (
 	forward_APISIXGatewayService_DeleteCerts_0     = runtime.ForwardResponseMessage
 	forward_APISIXGatewayService_CreateUpdateTLS_0 = runtime.ForwardResponseMessage
 	forward_APISIXGatewayService_GetServiceList_0  = runtime.ForwardResponseMessage
+	forward_APISIXGatewayService_GetNodeInfo_0     = runtime.ForwardResponseMessage
 )

@@ -204,6 +204,13 @@ message DeleteCertsResponse {
   string message = 3;
 }
 
+message GetNodeInfoRequest{}
+
+message GetNodeInfoResponse {
+  string role = 1;
+  string ip = 2;
+}
+
 // 网关配置服务
 service APISIXGatewayService {
   // 路由管理
@@ -265,6 +272,13 @@ service APISIXGatewayService {
   rpc GetServiceList (GetServiceListRequest) returns (GetServiceListResponse) {
     option (google.api.http) = {
       get: "/prod/v1alpha1/{namespace}/service"
+    };
+  }
+
+  // 获取节点IP地址
+  rpc GetNodeInfo (GetNodeInfoRequest) returns (GetNodeInfoResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/node/info"
     };
   }
 }

@@ -1789,6 +1789,94 @@ func (x *DeleteCertsResponse) GetMessage() string {
 	return ""
 }
 
+type GetNodeInfoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNodeInfoRequest) Reset() {
+	*x = GetNodeInfoRequest{}
+	mi := &file_routes_service_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNodeInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeInfoRequest) ProtoMessage() {}
+
+func (x *GetNodeInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeInfoRequest.ProtoReflect.Descriptor instead.
+func (*GetNodeInfoRequest) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{28}
+}
+
+type GetNodeInfoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Role          string                 `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
+	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNodeInfoResponse) Reset() {
+	*x = GetNodeInfoResponse{}
+	mi := &file_routes_service_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNodeInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeInfoResponse) ProtoMessage() {}
+
+func (x *GetNodeInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_routes_service_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeInfoResponse.ProtoReflect.Descriptor instead.
+func (*GetNodeInfoResponse) Descriptor() ([]byte, []int) {
+	return file_routes_service_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *GetNodeInfoResponse) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *GetNodeInfoResponse) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
 type UpstreamConfig_Node struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Host          string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`      // 节点主机
@@ -1800,7 +1888,7 @@ type UpstreamConfig_Node struct {
 
 func (x *UpstreamConfig_Node) Reset() {
 	*x = UpstreamConfig_Node{}
-	mi := &file_routes_service_proto_msgTypes[30]
+	mi := &file_routes_service_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1812,7 +1900,7 @@ func (x *UpstreamConfig_Node) String() string {
 func (*UpstreamConfig_Node) ProtoMessage() {}
 
 func (x *UpstreamConfig_Node) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[30]
+	mi := &file_routes_service_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1990,8 +2078,11 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x13DeleteCertsResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage2\x94\n" +
-	"\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"\x14\n" +
+	"\x12GetNodeInfoRequest\"9\n" +
+	"\x13GetNodeInfoResponse\x12\x12\n" +
+	"\x04role\x18\x01 \x01(\tR\x04role\x12\x0e\n" +
+	"\x02ip\x18\x02 \x01(\tR\x02ip2\x90\v\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
 	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
 	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"6\x82\xd3\xe4\x93\x020*./prod/v1alpha1/{namespace}/routes/{route_name}\x12\x85\x01\n" +
@@ -2002,7 +2093,8 @@ const file_routes_service_proto_rawDesc = "" +
 	"\tListCerts\x12\x1f.apisix.v1alpha1.ListTLSRequest\x1a .apisix.v1alpha1.ListTLSResponse\"-\x82\xd3\xe4\x93\x02'\x12%/prod/v1alpha1/{namespace}/certs/list\x12\x89\x01\n" +
 	"\vDeleteCerts\x12#.apisix.v1alpha1.DeleteCertsRequest\x1a$.apisix.v1alpha1.DeleteCertsResponse\"/\x82\xd3\xe4\x93\x02)*'/prod/v1alpha1/{namespace}/certs/{name}\x12\x98\x01\n" +
 	"\x0fCreateUpdateTLS\x12'.apisix.v1alpha1.CreateUPdateTLSRequest\x1a(.apisix.v1alpha1.CreateUPdateTLSResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/prod/v1alpha1/{namespace}/certs/update\x12\x8d\x01\n" +
-	"\x0eGetServiceList\x12&.apisix.v1alpha1.GetServiceListRequest\x1a'.apisix.v1alpha1.GetServiceListResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/prod/v1alpha1/{namespace}/serviceB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"\x0eGetServiceList\x12&.apisix.v1alpha1.GetServiceListRequest\x1a'.apisix.v1alpha1.GetServiceListResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/prod/v1alpha1/{namespace}/service\x12z\n" +
+	"\vGetNodeInfo\x12#.apisix.v1alpha1.GetNodeInfoRequest\x1a$.apisix.v1alpha1.GetNodeInfoResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/prod/v1alpha1/node/infoB\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_routes_service_proto_rawDescOnce sync.Once
@@ -2016,7 +2108,7 @@ func file_routes_service_proto_rawDescGZIP() []byte {
 	return file_routes_service_proto_rawDescData
 }
 
-var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_routes_service_proto_goTypes = []any{
 	(*RouteConfig)(nil),             // 0: apisix.v1alpha1.RouteConfig
 	(*UpstreamConfig)(nil),          // 1: apisix.v1alpha1.UpstreamConfig
@@ -2046,14 +2138,16 @@ var file_routes_service_proto_goTypes = []any{
 	(*GetServiceListResponse)(nil),  // 25: apisix.v1alpha1.GetServiceListResponse
 	(*DeleteCertsRequest)(nil),      // 26: apisix.v1alpha1.DeleteCertsRequest
 	(*DeleteCertsResponse)(nil),     // 27: apisix.v1alpha1.DeleteCertsResponse
-	nil,                             // 28: apisix.v1alpha1.RouteConfig.LabelsEntry
-	nil,                             // 29: apisix.v1alpha1.UpstreamConfig.LabelsEntry
-	(*UpstreamConfig_Node)(nil),     // 30: apisix.v1alpha1.UpstreamConfig.Node
+	(*GetNodeInfoRequest)(nil),      // 28: apisix.v1alpha1.GetNodeInfoRequest
+	(*GetNodeInfoResponse)(nil),     // 29: apisix.v1alpha1.GetNodeInfoResponse
+	nil,                             // 30: apisix.v1alpha1.RouteConfig.LabelsEntry
+	nil,                             // 31: apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	(*UpstreamConfig_Node)(nil),     // 32: apisix.v1alpha1.UpstreamConfig.Node
 }
 var file_routes_service_proto_depIdxs = []int32{
-	28, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
-	30, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
-	29, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	30, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
+	32, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
+	31, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
 	2,  // 3: apisix.v1alpha1.CreateRouteRequest.route_tls:type_name -> apisix.v1alpha1.RouteTLS
 	12, // 4: apisix.v1alpha1.CreateRouteRequest.rules:type_name -> apisix.v1alpha1.RouteRule
 	0,  // 5: apisix.v1alpha1.UpdateRouteRequest.route:type_name -> apisix.v1alpha1.RouteConfig
@@ -2075,17 +2169,19 @@ var file_routes_service_proto_depIdxs = []int32{
 	26, // 21: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:input_type -> apisix.v1alpha1.DeleteCertsRequest
 	21, // 22: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
 	23, // 23: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
-	4,  // 24: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
-	8,  // 25: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
-	10, // 26: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
-	15, // 27: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
-	17, // 28: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
-	20, // 29: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
-	27, // 30: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:output_type -> apisix.v1alpha1.DeleteCertsResponse
-	22, // 31: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
-	25, // 32: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
-	24, // [24:33] is the sub-list for method output_type
-	15, // [15:24] is the sub-list for method input_type
+	28, // 24: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:input_type -> apisix.v1alpha1.GetNodeInfoRequest
+	4,  // 25: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
+	8,  // 26: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
+	10, // 27: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
+	15, // 28: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
+	17, // 29: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
+	20, // 30: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
+	27, // 31: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:output_type -> apisix.v1alpha1.DeleteCertsResponse
+	22, // 32: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
+	25, // 33: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
+	29, // 34: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:output_type -> apisix.v1alpha1.GetNodeInfoResponse
+	25, // [25:35] is the sub-list for method output_type
+	15, // [15:25] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
 	15, // [15:15] is the sub-list for extension extendee
 	0,  // [0:15] is the sub-list for field type_name
@@ -2102,7 +2198,7 @@ func file_routes_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_routes_service_proto_rawDesc), len(file_routes_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   31,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
