@@ -1515,6 +1515,7 @@ func (x *CreateUPdateTLSResponse) GetMessage() string {
 type GetServiceListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	ReleaseName   string                 `protobuf:"bytes,2,opt,name=release_name,json=releaseName,proto3" json:"release_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1552,6 +1553,13 @@ func (*GetServiceListRequest) Descriptor() ([]byte, []int) {
 func (x *GetServiceListRequest) GetNamespace() string {
 	if x != nil {
 		return x.Namespace
+	}
+	return ""
+}
+
+func (x *GetServiceListRequest) GetReleaseName() string {
+	if x != nil {
+		return x.ReleaseName
 	}
 	return ""
 }
@@ -2129,9 +2137,10 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x03key\x18\x05 \x01(\tR\x03key\"G\n" +
 	"\x17CreateUPdateTLSResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"5\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"X\n" +
 	"\x15GetServiceListRequest\x12\x1c\n" +
-	"\tnamespace\x18\x01 \x01(\tR\tnamespace\":\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12!\n" +
+	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\":\n" +
 	"\x0eGetServiceData\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05ports\x18\x02 \x03(\x05R\x05ports\"\x95\x01\n" +

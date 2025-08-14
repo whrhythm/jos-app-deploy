@@ -178,6 +178,7 @@ message CreateUPdateTLSResponse {
 
 message GetServiceListRequest {
   string namespace = 1;
+  string release_name = 2;
 }
 
 message GetServiceData {

@@ -298,7 +298,9 @@ func (s *RoutesManageService) GetServiceList(ctx context.Context, req *pb.GetSer
 	}
 
 	// 获取指定命名空间下的所有 Service
-	services, err := clientset.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{})
+	services, err := clientset.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/instance=" + req.GetReleaseName(),
+	})
 	if err != nil {
 		return nil, status.Errorf(status.Code(err), "failed to list services: %v", err)
 	}
