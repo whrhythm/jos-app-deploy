@@ -206,9 +206,16 @@ message DeleteCertsResponse {
 
 message GetNodeInfoRequest{}
 
-message GetNodeInfoResponse {
+message GetNodeInfoData {
   string role = 1;
   string ip = 2;
+}
+
+message GetNodeInfoResponse {
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  GetNodeInfoData data = 4;
 }
 
 // 网关配置服务

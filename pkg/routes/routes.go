@@ -455,50 +455,13 @@ func (s *RoutesManageService) DeleteCerts(ctx context.Context, req *pb.DeleteCer
 func (s *RoutesManageService) GetNodeInfo(ctx context.Context, req *pb.GetNodeInfoRequest) (*pb.GetNodeInfoResponse, error) {
 	logger.L().Info("GetNodeInfo called")
 
-	// Initialize Kubernetes clientset
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		// 尝试使用本地 kubeconfig
-		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-		if err != nil {
-			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
-		}
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, status.Errorf(status.Code(err), "failed to create Kubernetes clientset: %v", err)
-	}
-
-	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{
-		LabelSelector: "node-role.kubernetes.io/control-plane", // 仅获取 master 节点
-	})
-	if err != nil {
-		return nil, status.Errorf(status.Code(err), "failed to list nodes: %v", err)
-	}
-
-	nodeInfo := &pb.GetNodeInfoResponse{
-		Role: "master",
-		Ip:   "",
-	}
-
-	if len(nodes.Items) == 0 {
-		nodeInfo.Ip = ""
-	} else {
-		for _, addr := range nodes.Items[0].Status.Addresses {
-			if addr.Type == corev1.NodeExternalIP {
-				nodeInfo.Ip = addr.Address
-				break
-			}
-		}
-		if nodeInfo.Ip == "" {
-			for _, addr := range nodes.Items[0].Status.Addresses {
-				if addr.Type == corev1.NodeInternalIP {
-					nodeInfo.Ip = addr.Address
-					break
-				}
-			}
-		}
-	}
-	return nodeInfo, nil
+	return &pb.GetNodeInfoResponse{
+		Code:    0,
+		Success: true,
+		Message: "Successfully retrieved node info",
+		Data: &pb.GetNodeInfoData{
+			Role: "主节点",
+			Ip:   os.Getenv("KUBERNETES_SERVICE_HOST"),
+		},
+	}, nil
 }
