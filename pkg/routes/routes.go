@@ -280,7 +280,7 @@ func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRou
 }
 
 func (s *RoutesManageService) GetServiceList(ctx context.Context, req *pb.GetServiceListRequest) (*pb.GetServiceListResponse, error) {
-	logger.L().Info("GetServiceList called", zap.String("namespace", req.GetNamespace()))
+	logger.L().Info("GetServiceList called", zap.String("release_name", req.GetReleaseName()))
 	namespace := req.GetNamespace()
 	// Initialize Kubernetes clientset
 	config, err := rest.InClusterConfig()
