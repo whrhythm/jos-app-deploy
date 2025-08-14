@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	pb "jos-deployment/api/v1alpha1/pb"
 	podpb "jos-deployment/api/v1alpha1/pb_pod"
@@ -37,19 +36,19 @@ func (i *JWTInterceptor) Interceptor() grpc.UnaryServerInterceptor {
 		// 1. 从上下文中获取元数据
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
-			return nil, errors.New("missing metadata")
+			return nil, status.Error(codes.Code(10401), "missing metadata")
 		}
 
 		// 2. 检查并获取 Authorization 头
 		authHeaders := md.Get("authorization")
 		if len(authHeaders) == 0 {
-			return nil, errors.New("missing authorization header")
+			return nil, status.Error(codes.Code(10401), "missing metadata")
 		}
 
 		// 3. 提取 Bearer token
 		tokenString := strings.TrimPrefix(authHeaders[0], "Bearer ")
 		if tokenString == "" {
-			return nil, errors.New("invalid authorization header format")
+			return nil, status.Error(codes.Code(10401), "missing metadata")
 		}
 
 		// 4. 创建不验证签名的 JWT 解析器
