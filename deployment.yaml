@@ -385,6 +385,8 @@ spec:
         app: jos-deploy-backend
     spec:
       serviceAccountName: jos-deploy-backend-sa
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
       containers:
         - name: jos-deploy-backend
           image: harbor.joiningos.com/library/jos-deploy:dev

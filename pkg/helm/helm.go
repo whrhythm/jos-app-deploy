@@ -261,8 +261,7 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 		// 过滤包含关键词的 charts
 		filteredCharts := make([]*pb.ChartInfo, 0)
 		for _, chart := range pagedCharts {
-			if strings.Contains(strings.ToLower(chart.Name), strings.ToLower(req.Keyword)) ||
-				strings.Contains(strings.ToLower(chart.Description), strings.ToLower(req.Keyword)) {
+			if strings.Contains(strings.ToLower(chart.Name), strings.ToLower(req.Keyword)) {
 				filteredCharts = append(filteredCharts, chart)
 			}
 		}
@@ -705,7 +704,6 @@ func (s *HelmManagerServer) ListInstalledCharts(ctx context.Context, req *pb.Lis
 		chartInfos = append(chartInfos, info)
 	}
 
-	// Convert to []*anypb.Any
 	var anyData []*anypb.Any
 	for _, chart := range chartInfos {
 		anyChart, err := anypb.New(chart)
