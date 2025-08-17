@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sso.v1alpha1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pkg/pb/;pb";
+
+message 
+
+service SSOService {
+  rpc GetSSOService (GetSSOServiceRequest) returns (GetSSOServiceResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/{namespace}/routes/{sso_name}"
+    };
+  }
+}

@@ -6,7 +6,9 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"io"
+	"jos-deployment/pkg/db"
 	"jos-deployment/pkg/logger"
+	"jos-deployment/pkg/model"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -288,6 +290,8 @@ func (s *HelmManagerServer) ListCharts(ctx context.Context, req *pb.ListChartsRe
 	}, nil
 }
 
+// 安装完应用之后，需要将用户，和应用写入数据库，进行维护
+
 // 实现按照helm chart方法
 func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallChartRequest) (*pb.InstallChartResponse, error) {
 	logger.L().Info("InstallChart called", zap.String("request", req.String()))
@@ -387,7 +391,15 @@ func (s *HelmManagerServer) InstallChart(ctx context.Context, req *pb.InstallCha
 		}
 
 		// 获取release info 中的 k8s 资源信息
-		parseAndPrintManifest(release.Manifest)
+		// parseAndPrintManifest(release.Manifest)
+		// 调用成功之后，更新jos_user_app 表
+		userApp := &model.JosUserApp{
+			AppName: req.ReleaseName,
+		}
+
+		if err := db.DB.PutJosUserApp(userApp); err != nil {
+			logger.L().Error("Failed to update jos_user_app", zap.Error(err))
+		}
 
 		return &pb.InstallChartResponse{
 			Code:          0,

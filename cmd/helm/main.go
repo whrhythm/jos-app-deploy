@@ -20,6 +20,7 @@ import (
 	pb "jos-deployment/api/v1alpha1/pb"
 	podpb "jos-deployment/api/v1alpha1/pb_pod"
 	routepb "jos-deployment/api/v1alpha1/pb_routes"
+	"jos-deployment/pkg/db"
 	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
 	"jos-deployment/pkg/server"
@@ -161,6 +162,17 @@ func writeErrorResponse(w http.ResponseWriter, statusCode int, message string) {
 }
 
 func main() {
+	// 初始化数据库
+	err := db.InitDB("./myapp.db")
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
+	// 测试连接
+	if err := db.DB.CheckConnection(); err != nil {
+		log.Fatalf("Database connection test failed: %v", err)
+	}
+
 	defer logger.Sync()
 	server.Server()
 
@@ -168,7 +180,7 @@ func main() {
 	ctx := context.Background()
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err := pb.RegisterHelmManagerServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
+	err = pb.RegisterHelmManagerServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", opts)
 	if err != nil {
 		log.Fatal("Failed to register gRPC handler:", err)
 	}

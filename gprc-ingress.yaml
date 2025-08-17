@@ -1,0 +1,21 @@
+# grpc-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grpc-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"  # 关键注解
+  namespace: joiningos
+spec:
+  ingressClassName: join-nginx
+  rules:
+  - host: grpc.joiningos.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jos-deploy-backend
+            port:
+              number: 50051
