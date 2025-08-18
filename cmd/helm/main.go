@@ -22,6 +22,7 @@ import (
 	routepb "jos-deployment/api/v1alpha1/pb_routes"
 	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
+	"jos-deployment/pkg/server"
 )
 
 func init() {
@@ -171,8 +172,8 @@ func main() {
 	// 	log.Fatalf("Database connection test failed: %v", err)
 	// }
 
-	// defer logger.Sync()
-	// server.Server()
+	defer logger.Sync()
+	server.Server()
 
 	// 启动 HTTP 网关
 	ctx := context.Background()
