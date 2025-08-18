@@ -237,13 +237,15 @@ func (s *RoutesManageService) CreateRoute(ctx context.Context, req *pb.CreateRou
 	}
 
 	// 创建 Ingress 对象
+	ingressClassName := "join-nginx"
 	ingress := &networkingv1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      routeName,
 			Namespace: namespace,
 		},
 		Spec: networkingv1.IngressSpec{
-			Rules: ingressRules,
+			IngressClassName: &ingressClassName,
+			Rules:            ingressRules,
 			// Add TLS configuration here if needed, e.g.:
 			// TLS: []networkingv1.IngressTLS{ ... },
 		},
