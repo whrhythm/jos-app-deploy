@@ -547,7 +547,7 @@ type InstallChartRequest struct {
 	Namespace     string                 `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`                        // 目标命名空间
 	DryRun        bool                   `protobuf:"varint,5,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`               // 检查chart文件是否合法
 	Values        string                 `protobuf:"bytes,6,opt,name=values,proto3" json:"values,omitempty"`                              // values.yaml 内容（JSON/YAML 字符串）
-	UserId        int32                  `protobuf:"varint,7,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`               // 用户ID
+	UserId        string                 `protobuf:"bytes,7,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                // 用户ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -624,11 +624,11 @@ func (x *InstallChartRequest) GetValues() string {
 	return ""
 }
 
-func (x *InstallChartRequest) GetUserId() int32 {
+func (x *InstallChartRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
-	return 0
+	return ""
 }
 
 type InstallChartResponse struct {
@@ -2444,7 +2444,7 @@ const file_helm_service_proto_rawDesc = "" +
 	"\tnamespace\x18\x04 \x01(\tR\tnamespace\x12\x17\n" +
 	"\adry_run\x18\x05 \x01(\bR\x06dryRun\x12\x16\n" +
 	"\x06values\x18\x06 \x01(\tR\x06values\x12\x17\n" +
-	"\auser_id\x18\a \x01(\x05R\x06userId\"\x8b\x03\n" +
+	"\auser_id\x18\a \x01(\tR\x06userId\"\x8b\x03\n" +
 	"\x14InstallChartResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12!\n" +
 	"\frelease_name\x18\x02 \x01(\tR\vreleaseName\x12%\n" +

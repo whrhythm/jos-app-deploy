@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	prometheusURL = "http://192.168.20.122:32437"
+	prometheusURL = "http://join-prometheus.kuber:9090"
 )
 
 type PodManagerServer struct {

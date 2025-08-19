@@ -176,7 +176,7 @@ message InstallChartRequest {
   string namespace =4;      // 目标命名空间
   bool dry_run = 5;         // 检查chart文件是否合法
   string values = 6;        // values.yaml 内容（JSON/YAML 字符串）
-  int32 user_id = 7;        // 用户ID
+  string user_id = 7;        // 用户ID
 }
 
 message InstallChartResponse {
