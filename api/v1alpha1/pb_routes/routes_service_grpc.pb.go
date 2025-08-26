@@ -29,6 +29,7 @@ const (
 	APISIXGatewayService_CreateUpdateTLS_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
 	APISIXGatewayService_GetServiceList_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetServiceList"
 	APISIXGatewayService_GetNodeInfo_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo"
+	APISIXGatewayService_JumpAndLogin_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/JumpAndLogin"
 )
 
 // APISIXGatewayServiceClient is the client API for APISIXGatewayService service.
@@ -53,6 +54,8 @@ type APISIXGatewayServiceClient interface {
 	GetServiceList(ctx context.Context, in *GetServiceListRequest, opts ...grpc.CallOption) (*GetServiceListResponse, error)
 	// 获取节点IP地址
 	GetNodeInfo(ctx context.Context, in *GetNodeInfoRequest, opts ...grpc.CallOption) (*GetNodeInfoResponse, error)
+	// 调转登录，统一认证
+	JumpAndLogin(ctx context.Context, in *JumpAndLoginRequest, opts ...grpc.CallOption) (*JumpAndLoginResponse, error)
 }
 
 type aPISIXGatewayServiceClient struct {
@@ -163,6 +166,16 @@ func (c *aPISIXGatewayServiceClient) GetNodeInfo(ctx context.Context, in *GetNod
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) JumpAndLogin(ctx context.Context, in *JumpAndLoginRequest, opts ...grpc.CallOption) (*JumpAndLoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JumpAndLoginResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_JumpAndLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APISIXGatewayServiceServer is the server API for APISIXGatewayService service.
 // All implementations must embed UnimplementedAPISIXGatewayServiceServer
 // for forward compatibility.
@@ -185,6 +198,8 @@ type APISIXGatewayServiceServer interface {
 	GetServiceList(context.Context, *GetServiceListRequest) (*GetServiceListResponse, error)
 	// 获取节点IP地址
 	GetNodeInfo(context.Context, *GetNodeInfoRequest) (*GetNodeInfoResponse, error)
+	// 调转登录，统一认证
+	JumpAndLogin(context.Context, *JumpAndLoginRequest) (*JumpAndLoginResponse, error)
 	mustEmbedUnimplementedAPISIXGatewayServiceServer()
 }
 
@@ -224,6 +239,9 @@ func (UnimplementedAPISIXGatewayServiceServer) GetServiceList(context.Context, *
 }
 func (UnimplementedAPISIXGatewayServiceServer) GetNodeInfo(context.Context, *GetNodeInfoRequest) (*GetNodeInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeInfo not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) JumpAndLogin(context.Context, *JumpAndLoginRequest) (*JumpAndLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JumpAndLogin not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) mustEmbedUnimplementedAPISIXGatewayServiceServer() {}
 func (UnimplementedAPISIXGatewayServiceServer) testEmbeddedByValue()                              {}
@@ -426,6 +444,24 @@ func _APISIXGatewayService_GetNodeInfo_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_JumpAndLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JumpAndLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).JumpAndLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_JumpAndLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).JumpAndLogin(ctx, req.(*JumpAndLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // APISIXGatewayService_ServiceDesc is the grpc.ServiceDesc for APISIXGatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -472,6 +508,10 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNodeInfo",
 			Handler:    _APISIXGatewayService_GetNodeInfo_Handler,
+		},
+		{
+			MethodName: "JumpAndLogin",
+			Handler:    _APISIXGatewayService_JumpAndLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

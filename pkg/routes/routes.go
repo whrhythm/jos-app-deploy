@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	pb "jos-deployment/api/v1alpha1/pb_routes"
 	"jos-deployment/pkg/logger"
 	"os"
@@ -468,4 +469,52 @@ func (s *RoutesManageService) GetNodeInfo(ctx context.Context, req *pb.GetNodeIn
 			Ip:   os.Getenv("KUBERNETES_SERVICE_HOST"),
 		},
 	}, nil
+}
+
+func (s *RoutesManageService) JumpAndLogin(ctx context.Context, req *pb.JumpAndLoginRequest) (*pb.JumpAndLoginResponse, error) {
+	logger.L().Info("JumpAndLogin called", zap.String("namespace", req.GetNamespace()), zap.String("ingress_name", req.GetIngressName()))
+	namespace := req.GetNamespace()
+	// ingressName := req.GetIngressName()
+	url := req.GetUrl()
+	label := req.GetLabel()
+
+	errRsp := &pb.JumpAndLoginResponse{
+		Code:    2,
+		Success: false,
+		Message: "",
+		Data:    nil,
+	}
+
+	if label == "xxx" {
+		// 查询数据库，判断逻辑上该用户是否具有访问该应用的权限
+		permit := true // 假设查询结果为允许访问
+		if !permit {
+			return errRsp, status.Errorf(403, "you do not have permission to access this application")
+		} else {
+			logger.L().Info("User has permission to access the application", zap.String("label", label))
+			// 触发认证流程
+			// 获取内部seago-sso服务地址
+			ssoService := fmt.Sprintf("http://seago-sso.%s.svc.cluster.local:8080", namespace)
+			url = pdmAuthWorkflow(ssoService)
+		}
+	}
+
+	return &pb.JumpAndLoginResponse{
+		Code:    0,
+		Success: true,
+		Message: "Successfully retrieved pod info",
+		Data: &pb.JumpAndLoginResponseData{
+			Url: url,
+		},
+	}, nil
+}
+
+func pdmAuthWorkflow(ssoService string) string {
+	// 1. 重定向用户到 SSO 登录页面
+	// 2. 用户登录后，SSO 会重定向回一个预定义的回调 URL，并附带一个授权码
+	// 3. 使用授权码向 SSO 服务器请求访问令牌（Access Token）
+	// 4. 使用访问令牌请求用户信息
+	// 5. 根据用户信息生成 JWT 或会话，并重定向用户到原始请求的应用 URL
+	// 注意：实际实现中需要处理错误情况、状态管理和安全性考虑
+	return ssoService + "/login?redirect_uri=http://your-app/callback"
 }
