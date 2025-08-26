@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package node.v1alpha1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./pkg/pb/;pb";
+
+message NodeInfo {
+  string name = 1;
+  string status = 2;
+  string internal_ip = 3;
+  string external_ip = 4;
+  string os_image = 5;
+  string kubelet_version = 6;
+  string container_runtime = 7;
+  map<string, string> labels = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message ListNodesRequest {
+  string keyword = 1;
+}
+
+message ListNodesResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+  repeated NodeInfo nodes = 4;
+}
+
+message AddNodeRequest {
+  string name = 1;
+  string ip = 2;
+  string ssh_user = 3;
+  string ssh_key = 4;
+  string os_image = 5;
+}
+
+message AddNodeResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+}
+
+message DeleteNodeRequest {
+  string name = 1;
+}
+
+message DeleteNodeResponse {
+  int32 code = 1;
+  string message = 2;
+  bool success = 3;
+}
+
+service NodeManagerService {
+  // 获取所有节点信息
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/nodes"
+    };
+  }
+
+  // 添加节点
+  rpc AddNode(AddNodeRequest) returns (AddNodeResponse) {
+    option (google.api.http) = {
+      post: "/prod/v1alpha1/nodes/add"
+      body: "*"
+    };
+  }
+
+  // 删除节点
+  rpc DeleteNode(DeleteNodeRequest) returns (DeleteNodeResponse) {
+    option (google.api.http) = {
+      delete: "/prod/v1alpha1/nodes/{name}"
+    };
+  }
+}
