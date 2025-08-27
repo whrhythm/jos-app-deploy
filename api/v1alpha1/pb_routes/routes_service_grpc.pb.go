@@ -19,17 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	APISIXGatewayService_CreateRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/CreateRoute"
-	APISIXGatewayService_DeleteRoute_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
-	APISIXGatewayService_GetRoute_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
-	APISIXGatewayService_ListRoutes_FullMethodName      = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
-	APISIXGatewayService_CreateUpstream_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
-	APISIXGatewayService_ListCerts_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/ListCerts"
-	APISIXGatewayService_DeleteCerts_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/DeleteCerts"
-	APISIXGatewayService_CreateUpdateTLS_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
-	APISIXGatewayService_GetServiceList_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetServiceList"
-	APISIXGatewayService_GetNodeInfo_FullMethodName     = "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo"
-	APISIXGatewayService_JumpAndLogin_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/JumpAndLogin"
+	APISIXGatewayService_CreateRoute_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/CreateRoute"
+	APISIXGatewayService_DeleteRoute_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
+	APISIXGatewayService_GetRoute_FullMethodName                = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
+	APISIXGatewayService_ListRoutes_FullMethodName              = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
+	APISIXGatewayService_CreateUpstream_FullMethodName          = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
+	APISIXGatewayService_ListCerts_FullMethodName               = "/apisix.v1alpha1.APISIXGatewayService/ListCerts"
+	APISIXGatewayService_DeleteCerts_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/DeleteCerts"
+	APISIXGatewayService_CreateUpdateTLS_FullMethodName         = "/apisix.v1alpha1.APISIXGatewayService/CreateUpdateTLS"
+	APISIXGatewayService_GetServiceList_FullMethodName          = "/apisix.v1alpha1.APISIXGatewayService/GetServiceList"
+	APISIXGatewayService_GetNodeInfo_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/GetNodeInfo"
+	APISIXGatewayService_JumpAndLogin_FullMethodName            = "/apisix.v1alpha1.APISIXGatewayService/JumpAndLogin"
+	APISIXGatewayService_GetDeployListFromPod_FullMethodName    = "/apisix.v1alpha1.APISIXGatewayService/GetDeployListFromPod"
+	APISIXGatewayService_GetDefaultHarborProject_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/GetDefaultHarborProject"
+	APISIXGatewayService_GetHarborProjectImages_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetHarborProjectImages"
+	APISIXGatewayService_CreateComponment_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/CreateComponment"
 )
 
 // APISIXGatewayServiceClient is the client API for APISIXGatewayService service.
@@ -56,6 +60,11 @@ type APISIXGatewayServiceClient interface {
 	GetNodeInfo(ctx context.Context, in *GetNodeInfoRequest, opts ...grpc.CallOption) (*GetNodeInfoResponse, error)
 	// 调转登录，统一认证
 	JumpAndLogin(ctx context.Context, in *JumpAndLoginRequest, opts ...grpc.CallOption) (*JumpAndLoginResponse, error)
+	GetDeployListFromPod(ctx context.Context, in *GetDeployListFromPodRequest, opts ...grpc.CallOption) (*GetDeployListFromPodResponse, error)
+	GetDefaultHarborProject(ctx context.Context, in *GetDefaultHarborProjectRequest, opts ...grpc.CallOption) (*GetDefaultHarborProjectResponse, error)
+	GetHarborProjectImages(ctx context.Context, in *GetHarborProjectImagesRequest, opts ...grpc.CallOption) (*GetHarborProjectImagesResponse, error)
+	// 创建一个额外的deployment/statefulset service
+	CreateComponment(ctx context.Context, in *CreateComponmentRequest, opts ...grpc.CallOption) (*CreateComponmentResponse, error)
 }
 
 type aPISIXGatewayServiceClient struct {
@@ -176,6 +185,46 @@ func (c *aPISIXGatewayServiceClient) JumpAndLogin(ctx context.Context, in *JumpA
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) GetDeployListFromPod(ctx context.Context, in *GetDeployListFromPodRequest, opts ...grpc.CallOption) (*GetDeployListFromPodResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeployListFromPodResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_GetDeployListFromPod_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) GetDefaultHarborProject(ctx context.Context, in *GetDefaultHarborProjectRequest, opts ...grpc.CallOption) (*GetDefaultHarborProjectResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDefaultHarborProjectResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_GetDefaultHarborProject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) GetHarborProjectImages(ctx context.Context, in *GetHarborProjectImagesRequest, opts ...grpc.CallOption) (*GetHarborProjectImagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetHarborProjectImagesResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_GetHarborProjectImages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) CreateComponment(ctx context.Context, in *CreateComponmentRequest, opts ...grpc.CallOption) (*CreateComponmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateComponmentResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_CreateComponment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APISIXGatewayServiceServer is the server API for APISIXGatewayService service.
 // All implementations must embed UnimplementedAPISIXGatewayServiceServer
 // for forward compatibility.
@@ -200,6 +249,11 @@ type APISIXGatewayServiceServer interface {
 	GetNodeInfo(context.Context, *GetNodeInfoRequest) (*GetNodeInfoResponse, error)
 	// 调转登录，统一认证
 	JumpAndLogin(context.Context, *JumpAndLoginRequest) (*JumpAndLoginResponse, error)
+	GetDeployListFromPod(context.Context, *GetDeployListFromPodRequest) (*GetDeployListFromPodResponse, error)
+	GetDefaultHarborProject(context.Context, *GetDefaultHarborProjectRequest) (*GetDefaultHarborProjectResponse, error)
+	GetHarborProjectImages(context.Context, *GetHarborProjectImagesRequest) (*GetHarborProjectImagesResponse, error)
+	// 创建一个额外的deployment/statefulset service
+	CreateComponment(context.Context, *CreateComponmentRequest) (*CreateComponmentResponse, error)
 	mustEmbedUnimplementedAPISIXGatewayServiceServer()
 }
 
@@ -242,6 +296,18 @@ func (UnimplementedAPISIXGatewayServiceServer) GetNodeInfo(context.Context, *Get
 }
 func (UnimplementedAPISIXGatewayServiceServer) JumpAndLogin(context.Context, *JumpAndLoginRequest) (*JumpAndLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JumpAndLogin not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) GetDeployListFromPod(context.Context, *GetDeployListFromPodRequest) (*GetDeployListFromPodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeployListFromPod not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) GetDefaultHarborProject(context.Context, *GetDefaultHarborProjectRequest) (*GetDefaultHarborProjectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultHarborProject not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) GetHarborProjectImages(context.Context, *GetHarborProjectImagesRequest) (*GetHarborProjectImagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHarborProjectImages not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) CreateComponment(context.Context, *CreateComponmentRequest) (*CreateComponmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateComponment not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) mustEmbedUnimplementedAPISIXGatewayServiceServer() {}
 func (UnimplementedAPISIXGatewayServiceServer) testEmbeddedByValue()                              {}
@@ -462,6 +528,78 @@ func _APISIXGatewayService_JumpAndLogin_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_GetDeployListFromPod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeployListFromPodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).GetDeployListFromPod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_GetDeployListFromPod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).GetDeployListFromPod(ctx, req.(*GetDeployListFromPodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_GetDefaultHarborProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDefaultHarborProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).GetDefaultHarborProject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_GetDefaultHarborProject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).GetDefaultHarborProject(ctx, req.(*GetDefaultHarborProjectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_GetHarborProjectImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHarborProjectImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).GetHarborProjectImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_GetHarborProjectImages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).GetHarborProjectImages(ctx, req.(*GetHarborProjectImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_CreateComponment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateComponmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).CreateComponment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_CreateComponment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).CreateComponment(ctx, req.(*CreateComponmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // APISIXGatewayService_ServiceDesc is the grpc.ServiceDesc for APISIXGatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -512,6 +650,22 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "JumpAndLogin",
 			Handler:    _APISIXGatewayService_JumpAndLogin_Handler,
+		},
+		{
+			MethodName: "GetDeployListFromPod",
+			Handler:    _APISIXGatewayService_GetDeployListFromPod_Handler,
+		},
+		{
+			MethodName: "GetDefaultHarborProject",
+			Handler:    _APISIXGatewayService_GetDefaultHarborProject_Handler,
+		},
+		{
+			MethodName: "GetHarborProjectImages",
+			Handler:    _APISIXGatewayService_GetHarborProjectImages_Handler,
+		},
+		{
+			MethodName: "CreateComponment",
+			Handler:    _APISIXGatewayService_CreateComponment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

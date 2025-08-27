@@ -237,6 +237,55 @@ message JumpAndLoginResponse {
   JumpAndLoginResponseData data = 4;
 }
 
+message GetDeployListFromPodRequest {
+  string name = 1;
+  string namespace = 2;
+}
+
+message GetDeployListFromPodResponseData {
+  string kind = 1;
+  string deploy_name = 2;
+  string service_name = 3;
+  string namespace = 4;
+}
+
+message GetDeployListFromPodResponse {
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  repeated GetDeployListFromPodResponseData data = 4;
+}
+
+message GetDefaultHarborProjectRequest {}
+message GetDefaultHarborProjectResponse {
+  repeated string project = 1;
+}
+
+message GetHarborProjectImagesRequest {
+  string project_name = 1;
+}
+
+message GetHarborImage {
+  string repository = 1;
+  repeated string tags = 2;
+}
+
+message GetHarborProjectImagesResponse {
+  repeated GetHarborImage harbor_image = 1;
+}
+
+message CreateComponmentRequest {
+  string name = 1;
+  string image_fule_name = 2;
+  GetDeployListFromPodResponseData deploy_info = 3;
+}
+
+message CreateComponmentResponse {
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;  
+}
+
 // 网关配置服务
 service APISIXGatewayService {
   // 路由管理
@@ -314,4 +363,43 @@ service APISIXGatewayService {
       post: "/prod/v1alpha1/app/login"
     };
   }
+
+  rpc GetDeployListFromPod(GetDeployListFromPodRequest) returns (GetDeployListFromPodResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/deploy/info"
+    };
+  }
+
+  rpc GetDefaultHarborProject(GetDefaultHarborProjectRequest) returns (GetDefaultHarborProjectResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/harbor/project"
+    };
+  }
+
+  rpc GetHarborProjectImages(GetHarborProjectImagesRequest) returns (GetHarborProjectImagesResponse) {
+    option (google.api.http) = {
+      get: "/prod/v1alpha1/harbor/images"
+    };
+  }
+
+  // 创建一个额外的deployment/statefulset service
+  rpc CreateComponment(CreateComponmentRequest) returns (CreateComponmentResponse) {
+    option (google.api.http) = {
+      post: "/prod/v1alpha1/comp/create"
+    };
+  }
+
+//  rpc UpdateComponment(UpdateComponmentRequest) returns (UpdateComponmentResponse) {
+//    option (google.api.http) = {
+//      post: "/prod/v1alpha1/comp/update"
+//    };
+//  }
+
+//  rpc DeleteComponment(DeleteComponmentRequest) returns (DeleteComponmentResponse) {
+//    option (google.api.http) = {
+//      delete: "/prod/v1alpha1/comp/delete"
+//    };
+//  }
 }
+
+
