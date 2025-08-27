@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"fmt"
+	pb "jos-deployment/api/v1alpha1/pb_routes"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -17,6 +18,7 @@ type ApisixManager interface {
 	// traffic: optional map of upstreamName->weight. If nil or empty, route will point to the single upstreamName.
 	CreateRoute(ctx context.Context, namespace, routeName, host, serviceName string, servicePort int32, upstreamName string, traffic map[string]int) error
 	DeleteUpstream(ctx context.Context, namespace, upstreamName string) error
+	ListAR(ctx context.Context, namespace string) ([]*unstructured.Unstructured, error)
 }
 
 type apisixManagerImpl struct {
@@ -120,4 +122,26 @@ func (a *apisixManagerImpl) CreateRoute(ctx context.Context, namespace, routeNam
 
 func (a *apisixManagerImpl) DeleteUpstream(ctx context.Context, namespace, upstreamName string) error {
 	return a.dyn.Resource(upstreamGVR).Namespace(namespace).Delete(ctx, upstreamName, metav1.DeleteOptions{})
+}
+
+func (a *apisixManagerImpl) ListAR(ctx context.Context, namespace string) ([]*unstructured.Unstructured, error) {
+	arList, err := a.dyn.Resource(routeGVR).Namespace(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list ApisixRoutes: %v", err)
+	}
+	result := make([]*unstructured.Unstructured, 0, len(arList.Items))
+	for i := range arList.Items {
+		result = append(result, &arList.Items[i])
+	}
+	return result, nil
+}
+
+func (s *RoutesManageService) CreateApisixRoute(ctx context.Context, req *pb.CreateApisixRouteRequest) (*pb.CreateApisixRouteResponse, error) {
+
+	return nil, nil
+}
+
+func (a *RoutesManageService) DeleteApisixRoute(ctx context.Context, req *pb.DeleteApisixRouteRequest) (*pb.DeleteApisixRouteResponse, error) {
+
+	return nil, nil
 }

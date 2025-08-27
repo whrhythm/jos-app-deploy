@@ -23,6 +23,9 @@ const (
 	APISIXGatewayService_DeleteRoute_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/DeleteRoute"
 	APISIXGatewayService_GetRoute_FullMethodName                = "/apisix.v1alpha1.APISIXGatewayService/GetRoute"
 	APISIXGatewayService_ListRoutes_FullMethodName              = "/apisix.v1alpha1.APISIXGatewayService/ListRoutes"
+	APISIXGatewayService_ListApisixRoutes_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/ListApisixRoutes"
+	APISIXGatewayService_DeleteApisixRoute_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/DeleteApisixRoute"
+	APISIXGatewayService_CreateApisixRoute_FullMethodName       = "/apisix.v1alpha1.APISIXGatewayService/CreateApisixRoute"
 	APISIXGatewayService_CreateUpstream_FullMethodName          = "/apisix.v1alpha1.APISIXGatewayService/CreateUpstream"
 	APISIXGatewayService_ListCerts_FullMethodName               = "/apisix.v1alpha1.APISIXGatewayService/ListCerts"
 	APISIXGatewayService_DeleteCerts_FullMethodName             = "/apisix.v1alpha1.APISIXGatewayService/DeleteCerts"
@@ -47,6 +50,10 @@ type APISIXGatewayServiceClient interface {
 	DeleteRoute(ctx context.Context, in *DeleteRouteRequest, opts ...grpc.CallOption) (*DeleteRouteResponse, error)
 	GetRoute(ctx context.Context, in *GetRouteRequest, opts ...grpc.CallOption) (*GetRouteResponse, error)
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (*ListRoutesResponse, error)
+	// apisix 相关配置
+	ListApisixRoutes(ctx context.Context, in *ListApisixRoutesRequest, opts ...grpc.CallOption) (*ListApisixRoutesResponse, error)
+	DeleteApisixRoute(ctx context.Context, in *DeleteApisixRouteRequest, opts ...grpc.CallOption) (*DeleteApisixRouteResponse, error)
+	CreateApisixRoute(ctx context.Context, in *CreateApisixRouteRequest, opts ...grpc.CallOption) (*CreateApisixRouteResponse, error)
 	// 上游服务管理
 	CreateUpstream(ctx context.Context, in *CreateUpstreamRequest, opts ...grpc.CallOption) (*CreateUpstreamResponse, error)
 	// 证书管理
@@ -109,6 +116,36 @@ func (c *aPISIXGatewayServiceClient) ListRoutes(ctx context.Context, in *ListRou
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListRoutesResponse)
 	err := c.cc.Invoke(ctx, APISIXGatewayService_ListRoutes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) ListApisixRoutes(ctx context.Context, in *ListApisixRoutesRequest, opts ...grpc.CallOption) (*ListApisixRoutesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListApisixRoutesResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_ListApisixRoutes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) DeleteApisixRoute(ctx context.Context, in *DeleteApisixRouteRequest, opts ...grpc.CallOption) (*DeleteApisixRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteApisixRouteResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_DeleteApisixRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aPISIXGatewayServiceClient) CreateApisixRoute(ctx context.Context, in *CreateApisixRouteRequest, opts ...grpc.CallOption) (*CreateApisixRouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateApisixRouteResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_CreateApisixRoute_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -236,6 +273,10 @@ type APISIXGatewayServiceServer interface {
 	DeleteRoute(context.Context, *DeleteRouteRequest) (*DeleteRouteResponse, error)
 	GetRoute(context.Context, *GetRouteRequest) (*GetRouteResponse, error)
 	ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error)
+	// apisix 相关配置
+	ListApisixRoutes(context.Context, *ListApisixRoutesRequest) (*ListApisixRoutesResponse, error)
+	DeleteApisixRoute(context.Context, *DeleteApisixRouteRequest) (*DeleteApisixRouteResponse, error)
+	CreateApisixRoute(context.Context, *CreateApisixRouteRequest) (*CreateApisixRouteResponse, error)
 	// 上游服务管理
 	CreateUpstream(context.Context, *CreateUpstreamRequest) (*CreateUpstreamResponse, error)
 	// 证书管理
@@ -275,6 +316,15 @@ func (UnimplementedAPISIXGatewayServiceServer) GetRoute(context.Context, *GetRou
 }
 func (UnimplementedAPISIXGatewayServiceServer) ListRoutes(context.Context, *ListRoutesRequest) (*ListRoutesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRoutes not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) ListApisixRoutes(context.Context, *ListApisixRoutesRequest) (*ListApisixRoutesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApisixRoutes not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) DeleteApisixRoute(context.Context, *DeleteApisixRouteRequest) (*DeleteApisixRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteApisixRoute not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) CreateApisixRoute(context.Context, *CreateApisixRouteRequest) (*CreateApisixRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApisixRoute not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) CreateUpstream(context.Context, *CreateUpstreamRequest) (*CreateUpstreamResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUpstream not implemented")
@@ -398,6 +448,60 @@ func _APISIXGatewayService_ListRoutes_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(APISIXGatewayServiceServer).ListRoutes(ctx, req.(*ListRoutesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_ListApisixRoutes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApisixRoutesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).ListApisixRoutes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_ListApisixRoutes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).ListApisixRoutes(ctx, req.(*ListApisixRoutesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_DeleteApisixRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApisixRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).DeleteApisixRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_DeleteApisixRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).DeleteApisixRoute(ctx, req.(*DeleteApisixRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _APISIXGatewayService_CreateApisixRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApisixRouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).CreateApisixRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_CreateApisixRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).CreateApisixRoute(ctx, req.(*CreateApisixRouteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -622,6 +726,18 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListRoutes",
 			Handler:    _APISIXGatewayService_ListRoutes_Handler,
+		},
+		{
+			MethodName: "ListApisixRoutes",
+			Handler:    _APISIXGatewayService_ListApisixRoutes_Handler,
+		},
+		{
+			MethodName: "DeleteApisixRoute",
+			Handler:    _APISIXGatewayService_DeleteApisixRoute_Handler,
+		},
+		{
+			MethodName: "CreateApisixRoute",
+			Handler:    _APISIXGatewayService_CreateApisixRoute_Handler,
 		},
 		{
 			MethodName: "CreateUpstream",

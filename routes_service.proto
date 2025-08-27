@@ -283,8 +283,21 @@ message CreateComponmentRequest {
 message CreateComponmentResponse {
   int32 code = 1;
   bool success = 2;
-  string message = 3;  
+  string message = 3;
 }
+
+message DeleteApisixRouteRequest {
+  string ar_name = 1;
+  string namespace = 2;
+}
+
+message DeleteApisixRouteResponse {}
+
+message CreateApisixRouteRequest {
+  string namespace = 1;
+}
+
+message CreateApisixRouteResponse {}
 
 // 网关配置服务
 service APISIXGatewayService {
@@ -295,7 +308,7 @@ service APISIXGatewayService {
       body: "*"
     };
   }
-    
+
   rpc DeleteRoute (DeleteRouteRequest) returns (DeleteRouteResponse) {
     option (google.api.http) = {
       delete: "/prod/v1alpha1/{namespace}/routes/{route_name}"
@@ -313,7 +326,20 @@ service APISIXGatewayService {
       get: "/prod/v1alpha1/{namespace}/routes/list"
     };
   }
-  
+  // apisix 相关配置
+  rpc DeleteApisixRoute (DeleteApisixRouteRequest) returns (DeleteApisixRouteResponse) {
+    option (google.api.http) = {
+      delete: "/prod/v1alpha1/{namespace}/ar/{ar_name}"
+    };
+  }
+
+  rpc CreateApisixRoute (CreateApisixRouteRequest) returns (CreateApisixRouteResponse) {
+    option (google.api.http) = {
+      post: "/prod/v1alpha1/{namespace}/ar/create"
+      body: "*"
+    };
+  }
+
   // 上游服务管理
   rpc CreateUpstream (CreateUpstreamRequest) returns (CreateUpstreamResponse) {
     option (google.api.http) = {

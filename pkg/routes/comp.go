@@ -13,8 +13,10 @@ import (
 	"jos-deployment/pkg/logger"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -66,9 +68,9 @@ func (s *RoutesManageService) GetDeployListFromPod(ctx context.Context, req *pb.
 			if start == -1 {
 				appName = owner.Name
 			} else {
-				appName = owner.Name[:start]
+				appName = owner.Name[start+1:]
 			}
-
+			logger.L().Info("App name derived from owner", zap.String("appName", appName))
 			// 根据两种标签获取service name
 			// seagoing.com.cn/service-code=appName
 			// 获取service list
@@ -142,9 +144,8 @@ func (s *RoutesManageService) GetDefaultHarborProject(ctx context.Context, req *
 		return errRsp, status.Errorf(status.Code(err), "failed to call harbor API: %v", err)
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return errRsp, status.Errorf(500, "harbor API returned status %d", resp.StatusCode)
+		return errRsp, status.Errorf(codes.Internal, "harbor API returned status %d", resp.StatusCode)
 	}
 
 	var projects []harborProj
@@ -168,9 +169,8 @@ func (s *RoutesManageService) GetHarborProjectImages(ctx context.Context, req *p
 
 	// 访问默认Harbor项目，获取project list
 	errRsp := &pb.GetHarborProjectImagesResponse{}
-
 	if req.GetProjectName() == "" {
-		return errRsp, status.Errorf(400, "missing project name")
+		return errRsp, status.Errorf(codes.InvalidArgument, "missing project name")
 	}
 
 	// build harbor API url (try v2.0 projects endpoint first)
@@ -202,9 +202,8 @@ func (s *RoutesManageService) GetHarborProjectImages(ctx context.Context, req *p
 		return errRsp, status.Errorf(status.Code(err), "failed to call harbor API: %v", err)
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return errRsp, status.Errorf(500, "harbor API returned status %d", resp.StatusCode)
+		return errRsp, status.Errorf(codes.Internal, "harbor API returned status %d", resp.StatusCode)
 	}
 
 	var repos []harborRepo
@@ -277,6 +276,12 @@ func (s *RoutesManageService) CreateComponment(ctx context.Context, req *pb.Crea
 		return errRsp, status.Errorf(status.Code(err), "failed to create deployment: %v", err)
 	}
 
+	// 创建 Service
+	err = createService(ctx, clientset, namespace, name, compName, service)
+	if err != nil {
+		return errRsp, status.Errorf(status.Code(err), "failed to create service: %v", err)
+	}
+
 	return &pb.CreateComponmentResponse{Code: 0, Message: "success", Success: true}, nil
 }
 
@@ -291,8 +296,9 @@ func createDeployment(ctx context.Context, clientset *kubernetes.Clientset, name
 	// deep copy and adjust
 	newDep := dep.DeepCopy()
 	// reset metadata that should not be carried over
+	newDepName := fmt.Sprintf("%s-%s", compName, name)
 	newDep.ObjectMeta = metav1.ObjectMeta{
-		Name:      fmt.Sprintf("%s-%s", compName, name),
+		Name:      newDepName,
 		Namespace: namespace,
 		Labels:    map[string]string{},
 	}
@@ -301,7 +307,7 @@ func createDeployment(ctx context.Context, clientset *kubernetes.Clientset, name
 		newDep.ObjectMeta.Labels[k] = v
 	}
 	// add our component label
-	newDep.ObjectMeta.Labels["joiningos.com/componment"] = "customize"
+	newDep.ObjectMeta.Labels["joiningos.com/mode"] = "customize"
 
 	// adjust selector: ensure matchLabels exists and includes our component label
 	if newDep.Spec.Selector == nil {
@@ -316,7 +322,8 @@ func createDeployment(ctx context.Context, clientset *kubernetes.Clientset, name
 	if newDep.Spec.Template.ObjectMeta.Labels == nil {
 		newDep.Spec.Template.ObjectMeta.Labels = map[string]string{}
 	}
-	newDep.Spec.Template.ObjectMeta.Labels["joiningos.com/componment"] = "customize"
+	newDep.Spec.Template.ObjectMeta.Labels["joiningos.com/componment"] = newDepName
+	newDep.Spec.Template.ObjectMeta.Labels["joiningos.com/mode"] = "customize"
 
 	// update container images (set for all containers)
 	// 目前支持一个容器
@@ -347,9 +354,10 @@ func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, 
 
 	// deep copy and adjust
 	newSts := sts.DeepCopy()
+	newStsName := fmt.Sprintf("%s-%s", compName, name)
 	// reset metadata that should not be carried over
 	newSts.ObjectMeta = metav1.ObjectMeta{
-		Name:      fmt.Sprintf("%s-%s", compName, name),
+		Name:      newStsName,
 		Namespace: namespace,
 		Labels:    map[string]string{},
 	}
@@ -358,7 +366,7 @@ func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, 
 		newSts.ObjectMeta.Labels[k] = v
 	}
 	// add our component label
-	newSts.ObjectMeta.Labels["joiningos.com/componment"] = "customize"
+	newSts.ObjectMeta.Labels["joiningos.com/mode"] = "customize"
 
 	// adjust selector: ensure matchLabels exists and includes our component label
 	if newSts.Spec.Selector == nil {
@@ -373,7 +381,8 @@ func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, 
 	if newSts.Spec.Template.ObjectMeta.Labels == nil {
 		newSts.Spec.Template.ObjectMeta.Labels = map[string]string{}
 	}
-	newSts.Spec.Template.ObjectMeta.Labels["joiningos.com/componment"] = "customize"
+	newSts.Spec.Template.ObjectMeta.Labels["joiningos.com/componment"] = newStsName
+	newSts.Spec.Template.ObjectMeta.Labels["joiningos.com/mode"] = "customize"
 
 	// update container images (set for all containers)
 	// 目前支持一个容器
@@ -392,4 +401,34 @@ func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, 
 	}
 
 	return nil
+}
+func createService(ctx context.Context, clientset *kubernetes.Clientset, namespace, name, compName, service string) error {
+	svc, err := clientset.CoreV1().Services(namespace).Get(ctx, service, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	newSvc := svc.DeepCopy()
+	newSvc.ObjectMeta = metav1.ObjectMeta{
+		Name:      fmt.Sprintf("%s-%s", compName, name),
+		Namespace: namespace,
+		Labels:    map[string]string{},
+	}
+	// preserve some labels from original service
+	for k, v := range svc.ObjectMeta.Labels {
+		newSvc.ObjectMeta.Labels[k] = v
+	}
+	// add our component label
+	newSvc.ObjectMeta.Labels["joiningos.com/mode"] = "customize"
+	// adjust selector to match our component label
+	if newSvc.Spec.Selector == nil {
+		newSvc.Spec.Selector = map[string]string{}
+	}
+	newSvc.Spec.Selector["joiningos.com/componment"] = fmt.Sprintf("%s-%s", compName, name)
+	// clear clusterIP to let k8s assign a new one
+	newSvc.Spec.ClusterIP = ""
+	newSvc.Spec.ClusterIPs = nil
+	// clear status
+	newSvc.Status = corev1.ServiceStatus{}
+	_, err = clientset.CoreV1().Services(namespace).Create(ctx, newSvc, metav1.CreateOptions{})
+	return err
 }
