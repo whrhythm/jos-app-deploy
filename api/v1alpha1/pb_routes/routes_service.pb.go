@@ -2359,7 +2359,10 @@ func (*GetDefaultHarborProjectRequest) Descriptor() ([]byte, []int) {
 
 type GetDefaultHarborProjectResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Project       []string               `protobuf:"bytes,1,rep,name=project,proto3" json:"project,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []string               `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2394,9 +2397,30 @@ func (*GetDefaultHarborProjectResponse) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{38}
 }
 
-func (x *GetDefaultHarborProjectResponse) GetProject() []string {
+func (x *GetDefaultHarborProjectResponse) GetCode() int32 {
 	if x != nil {
-		return x.Project
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetDefaultHarborProjectResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetDefaultHarborProjectResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetDefaultHarborProjectResponse) GetData() []string {
+	if x != nil {
+		return x.Data
 	}
 	return nil
 }
@@ -2499,7 +2523,10 @@ func (x *GetHarborImage) GetTags() []string {
 
 type GetHarborProjectImagesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HarborImage   []*GetHarborImage      `protobuf:"bytes,1,rep,name=harbor_image,json=harborImage,proto3" json:"harbor_image,omitempty"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Data          []*GetHarborImage      `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2534,9 +2561,30 @@ func (*GetHarborProjectImagesResponse) Descriptor() ([]byte, []int) {
 	return file_routes_service_proto_rawDescGZIP(), []int{41}
 }
 
-func (x *GetHarborProjectImagesResponse) GetHarborImage() []*GetHarborImage {
+func (x *GetHarborProjectImagesResponse) GetCode() int32 {
 	if x != nil {
-		return x.HarborImage
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetHarborProjectImagesResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetHarborProjectImagesResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetHarborProjectImagesResponse) GetData() []*GetHarborImage {
+	if x != nil {
+		return x.Data
 	}
 	return nil
 }
@@ -2661,86 +2709,6 @@ func (x *CreateComponmentResponse) GetMessage() string {
 	return ""
 }
 
-type ListApisixRoutesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListApisixRoutesRequest) Reset() {
-	*x = ListApisixRoutesRequest{}
-	mi := &file_routes_service_proto_msgTypes[44]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListApisixRoutesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListApisixRoutesRequest) ProtoMessage() {}
-
-func (x *ListApisixRoutesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[44]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListApisixRoutesRequest.ProtoReflect.Descriptor instead.
-func (*ListApisixRoutesRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{44}
-}
-
-func (x *ListApisixRoutesRequest) GetNamespace() string {
-	if x != nil {
-		return x.Namespace
-	}
-	return ""
-}
-
-type ListApisixRoutesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListApisixRoutesResponse) Reset() {
-	*x = ListApisixRoutesResponse{}
-	mi := &file_routes_service_proto_msgTypes[45]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListApisixRoutesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListApisixRoutesResponse) ProtoMessage() {}
-
-func (x *ListApisixRoutesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[45]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListApisixRoutesResponse.ProtoReflect.Descriptor instead.
-func (*ListApisixRoutesResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{45}
-}
-
 type DeleteApisixRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ArName        string                 `protobuf:"bytes,1,opt,name=ar_name,json=arName,proto3" json:"ar_name,omitempty"`
@@ -2751,7 +2719,7 @@ type DeleteApisixRouteRequest struct {
 
 func (x *DeleteApisixRouteRequest) Reset() {
 	*x = DeleteApisixRouteRequest{}
-	mi := &file_routes_service_proto_msgTypes[46]
+	mi := &file_routes_service_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2763,7 +2731,7 @@ func (x *DeleteApisixRouteRequest) String() string {
 func (*DeleteApisixRouteRequest) ProtoMessage() {}
 
 func (x *DeleteApisixRouteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[46]
+	mi := &file_routes_service_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2776,7 +2744,7 @@ func (x *DeleteApisixRouteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApisixRouteRequest.ProtoReflect.Descriptor instead.
 func (*DeleteApisixRouteRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{46}
+	return file_routes_service_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *DeleteApisixRouteRequest) GetArName() string {
@@ -2801,7 +2769,7 @@ type DeleteApisixRouteResponse struct {
 
 func (x *DeleteApisixRouteResponse) Reset() {
 	*x = DeleteApisixRouteResponse{}
-	mi := &file_routes_service_proto_msgTypes[47]
+	mi := &file_routes_service_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2813,7 +2781,7 @@ func (x *DeleteApisixRouteResponse) String() string {
 func (*DeleteApisixRouteResponse) ProtoMessage() {}
 
 func (x *DeleteApisixRouteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[47]
+	mi := &file_routes_service_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2826,7 +2794,7 @@ func (x *DeleteApisixRouteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApisixRouteResponse.ProtoReflect.Descriptor instead.
 func (*DeleteApisixRouteResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{47}
+	return file_routes_service_proto_rawDescGZIP(), []int{45}
 }
 
 type CreateApisixRouteRequest struct {
@@ -2838,7 +2806,7 @@ type CreateApisixRouteRequest struct {
 
 func (x *CreateApisixRouteRequest) Reset() {
 	*x = CreateApisixRouteRequest{}
-	mi := &file_routes_service_proto_msgTypes[48]
+	mi := &file_routes_service_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2850,7 +2818,7 @@ func (x *CreateApisixRouteRequest) String() string {
 func (*CreateApisixRouteRequest) ProtoMessage() {}
 
 func (x *CreateApisixRouteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[48]
+	mi := &file_routes_service_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2863,7 +2831,7 @@ func (x *CreateApisixRouteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApisixRouteRequest.ProtoReflect.Descriptor instead.
 func (*CreateApisixRouteRequest) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{48}
+	return file_routes_service_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CreateApisixRouteRequest) GetNamespace() string {
@@ -2881,7 +2849,7 @@ type CreateApisixRouteResponse struct {
 
 func (x *CreateApisixRouteResponse) Reset() {
 	*x = CreateApisixRouteResponse{}
-	mi := &file_routes_service_proto_msgTypes[49]
+	mi := &file_routes_service_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2893,7 +2861,7 @@ func (x *CreateApisixRouteResponse) String() string {
 func (*CreateApisixRouteResponse) ProtoMessage() {}
 
 func (x *CreateApisixRouteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[49]
+	mi := &file_routes_service_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2906,7 +2874,7 @@ func (x *CreateApisixRouteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApisixRouteResponse.ProtoReflect.Descriptor instead.
 func (*CreateApisixRouteResponse) Descriptor() ([]byte, []int) {
-	return file_routes_service_proto_rawDescGZIP(), []int{49}
+	return file_routes_service_proto_rawDescGZIP(), []int{47}
 }
 
 type UpstreamConfig_Node struct {
@@ -2920,7 +2888,7 @@ type UpstreamConfig_Node struct {
 
 func (x *UpstreamConfig_Node) Reset() {
 	*x = UpstreamConfig_Node{}
-	mi := &file_routes_service_proto_msgTypes[52]
+	mi := &file_routes_service_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2932,7 +2900,7 @@ func (x *UpstreamConfig_Node) String() string {
 func (*UpstreamConfig_Node) ProtoMessage() {}
 
 func (x *UpstreamConfig_Node) ProtoReflect() protoreflect.Message {
-	mi := &file_routes_service_proto_msgTypes[52]
+	mi := &file_routes_service_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3147,18 +3115,24 @@ const file_routes_service_proto_rawDesc = "" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x12E\n" +
 	"\x04data\x18\x04 \x03(\v21.apisix.v1alpha1.GetDeployListFromPodResponseDataR\x04data\" \n" +
-	"\x1eGetDefaultHarborProjectRequest\";\n" +
-	"\x1fGetDefaultHarborProjectResponse\x12\x18\n" +
-	"\aproject\x18\x01 \x03(\tR\aproject\"B\n" +
+	"\x1eGetDefaultHarborProjectRequest\"}\n" +
+	"\x1fGetDefaultHarborProjectResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x12\n" +
+	"\x04data\x18\x04 \x03(\tR\x04data\"B\n" +
 	"\x1dGetHarborProjectImagesRequest\x12!\n" +
 	"\fproject_name\x18\x01 \x01(\tR\vprojectName\"D\n" +
 	"\x0eGetHarborImage\x12\x1e\n" +
 	"\n" +
 	"repository\x18\x01 \x01(\tR\n" +
 	"repository\x12\x12\n" +
-	"\x04tags\x18\x02 \x03(\tR\x04tags\"d\n" +
-	"\x1eGetHarborProjectImagesResponse\x12B\n" +
-	"\fharbor_image\x18\x01 \x03(\v2\x1f.apisix.v1alpha1.GetHarborImageR\vharborImage\"\xa9\x01\n" +
+	"\x04tags\x18\x02 \x03(\tR\x04tags\"\x9d\x01\n" +
+	"\x1eGetHarborProjectImagesResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
+	"\x04data\x18\x04 \x03(\v2\x1f.apisix.v1alpha1.GetHarborImageR\x04data\"\xa9\x01\n" +
 	"\x17CreateComponmentRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12&\n" +
 	"\x0fimage_fule_name\x18\x02 \x01(\tR\rimageFuleName\x12R\n" +
@@ -3167,24 +3141,20 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x18CreateComponmentResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"7\n" +
-	"\x17ListApisixRoutesRequest\x12\x1c\n" +
-	"\tnamespace\x18\x01 \x01(\tR\tnamespace\"\x1a\n" +
-	"\x18ListApisixRoutesResponse\"Q\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"Q\n" +
 	"\x18DeleteApisixRouteRequest\x12\x17\n" +
 	"\aar_name\x18\x01 \x01(\tR\x06arName\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\"\x1b\n" +
 	"\x19DeleteApisixRouteResponse\"8\n" +
 	"\x18CreateApisixRouteRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\"\x1b\n" +
-	"\x19CreateApisixRouteResponse2\xd1\x14\n" +
+	"\x19CreateApisixRouteResponse2\xbb\x13\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
 	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
 	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"6\x82\xd3\xe4\x93\x020*./prod/v1alpha1/{namespace}/routes/{route_name}\x12\x85\x01\n" +
 	"\bGetRoute\x12 .apisix.v1alpha1.GetRouteRequest\x1a!.apisix.v1alpha1.GetRouteResponse\"4\x82\xd3\xe4\x93\x02.\x12,/prod/v1alpha1/{namespace}/routes/{route_id}\x12\x85\x01\n" +
 	"\n" +
-	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\".\x82\xd3\xe4\x93\x02(\x12&/prod/v1alpha1/{namespace}/routes/list\x12\x93\x01\n" +
-	"\x10ListApisixRoutes\x12(.apisix.v1alpha1.ListApisixRoutesRequest\x1a).apisix.v1alpha1.ListApisixRoutesResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/prod/v1alpha1/{namespace}/ar/list\x12\x9b\x01\n" +
+	"ListRoutes\x12\".apisix.v1alpha1.ListRoutesRequest\x1a#.apisix.v1alpha1.ListRoutesResponse\".\x82\xd3\xe4\x93\x02(\x12&/prod/v1alpha1/{namespace}/routes/list\x12\x9b\x01\n" +
 	"\x11DeleteApisixRoute\x12).apisix.v1alpha1.DeleteApisixRouteRequest\x1a*.apisix.v1alpha1.DeleteApisixRouteResponse\"/\x82\xd3\xe4\x93\x02)*'/prod/v1alpha1/{namespace}/ar/{ar_name}\x12\x9b\x01\n" +
 	"\x11CreateApisixRoute\x12).apisix.v1alpha1.CreateApisixRouteRequest\x1a*.apisix.v1alpha1.CreateApisixRouteResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/prod/v1alpha1/{namespace}/ar/create\x12\x99\x01\n" +
 	"\x0eCreateUpstream\x12&.apisix.v1alpha1.CreateUpstreamRequest\x1a'.apisix.v1alpha1.CreateUpstreamResponse\"6\x82\xd3\xe4\x93\x020:\bupstream\"$/prod/v1alpha1/{namespace}/upstreams\x12}\n" +
@@ -3211,7 +3181,7 @@ func file_routes_service_proto_rawDescGZIP() []byte {
 	return file_routes_service_proto_rawDescData
 }
 
-var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 53)
+var file_routes_service_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
 var file_routes_service_proto_goTypes = []any{
 	(*RouteConfig)(nil),                      // 0: apisix.v1alpha1.RouteConfig
 	(*UpstreamConfig)(nil),                   // 1: apisix.v1alpha1.UpstreamConfig
@@ -3257,20 +3227,18 @@ var file_routes_service_proto_goTypes = []any{
 	(*GetHarborProjectImagesResponse)(nil),   // 41: apisix.v1alpha1.GetHarborProjectImagesResponse
 	(*CreateComponmentRequest)(nil),          // 42: apisix.v1alpha1.CreateComponmentRequest
 	(*CreateComponmentResponse)(nil),         // 43: apisix.v1alpha1.CreateComponmentResponse
-	(*ListApisixRoutesRequest)(nil),          // 44: apisix.v1alpha1.ListApisixRoutesRequest
-	(*ListApisixRoutesResponse)(nil),         // 45: apisix.v1alpha1.ListApisixRoutesResponse
-	(*DeleteApisixRouteRequest)(nil),         // 46: apisix.v1alpha1.DeleteApisixRouteRequest
-	(*DeleteApisixRouteResponse)(nil),        // 47: apisix.v1alpha1.DeleteApisixRouteResponse
-	(*CreateApisixRouteRequest)(nil),         // 48: apisix.v1alpha1.CreateApisixRouteRequest
-	(*CreateApisixRouteResponse)(nil),        // 49: apisix.v1alpha1.CreateApisixRouteResponse
-	nil,                                      // 50: apisix.v1alpha1.RouteConfig.LabelsEntry
-	nil,                                      // 51: apisix.v1alpha1.UpstreamConfig.LabelsEntry
-	(*UpstreamConfig_Node)(nil),              // 52: apisix.v1alpha1.UpstreamConfig.Node
+	(*DeleteApisixRouteRequest)(nil),         // 44: apisix.v1alpha1.DeleteApisixRouteRequest
+	(*DeleteApisixRouteResponse)(nil),        // 45: apisix.v1alpha1.DeleteApisixRouteResponse
+	(*CreateApisixRouteRequest)(nil),         // 46: apisix.v1alpha1.CreateApisixRouteRequest
+	(*CreateApisixRouteResponse)(nil),        // 47: apisix.v1alpha1.CreateApisixRouteResponse
+	nil,                                      // 48: apisix.v1alpha1.RouteConfig.LabelsEntry
+	nil,                                      // 49: apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	(*UpstreamConfig_Node)(nil),              // 50: apisix.v1alpha1.UpstreamConfig.Node
 }
 var file_routes_service_proto_depIdxs = []int32{
-	50, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
-	52, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
-	51, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
+	48, // 0: apisix.v1alpha1.RouteConfig.labels:type_name -> apisix.v1alpha1.RouteConfig.LabelsEntry
+	50, // 1: apisix.v1alpha1.UpstreamConfig.nodes:type_name -> apisix.v1alpha1.UpstreamConfig.Node
+	49, // 2: apisix.v1alpha1.UpstreamConfig.labels:type_name -> apisix.v1alpha1.UpstreamConfig.LabelsEntry
 	2,  // 3: apisix.v1alpha1.CreateRouteRequest.route_tls:type_name -> apisix.v1alpha1.RouteTLS
 	12, // 4: apisix.v1alpha1.CreateRouteRequest.rules:type_name -> apisix.v1alpha1.RouteRule
 	0,  // 5: apisix.v1alpha1.UpdateRouteRequest.route:type_name -> apisix.v1alpha1.RouteConfig
@@ -3286,46 +3254,44 @@ var file_routes_service_proto_depIdxs = []int32{
 	29, // 15: apisix.v1alpha1.GetNodeInfoResponse.data:type_name -> apisix.v1alpha1.GetNodeInfoData
 	32, // 16: apisix.v1alpha1.JumpAndLoginResponse.data:type_name -> apisix.v1alpha1.JumpAndLoginResponseData
 	35, // 17: apisix.v1alpha1.GetDeployListFromPodResponse.data:type_name -> apisix.v1alpha1.GetDeployListFromPodResponseData
-	40, // 18: apisix.v1alpha1.GetHarborProjectImagesResponse.harbor_image:type_name -> apisix.v1alpha1.GetHarborImage
+	40, // 18: apisix.v1alpha1.GetHarborProjectImagesResponse.data:type_name -> apisix.v1alpha1.GetHarborImage
 	35, // 19: apisix.v1alpha1.CreateComponmentRequest.deploy_info:type_name -> apisix.v1alpha1.GetDeployListFromPodResponseData
 	3,  // 20: apisix.v1alpha1.APISIXGatewayService.CreateRoute:input_type -> apisix.v1alpha1.CreateRouteRequest
 	7,  // 21: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:input_type -> apisix.v1alpha1.DeleteRouteRequest
 	9,  // 22: apisix.v1alpha1.APISIXGatewayService.GetRoute:input_type -> apisix.v1alpha1.GetRouteRequest
 	13, // 23: apisix.v1alpha1.APISIXGatewayService.ListRoutes:input_type -> apisix.v1alpha1.ListRoutesRequest
-	44, // 24: apisix.v1alpha1.APISIXGatewayService.ListApisixRoutes:input_type -> apisix.v1alpha1.ListApisixRoutesRequest
-	46, // 25: apisix.v1alpha1.APISIXGatewayService.DeleteApisixRoute:input_type -> apisix.v1alpha1.DeleteApisixRouteRequest
-	48, // 26: apisix.v1alpha1.APISIXGatewayService.CreateApisixRoute:input_type -> apisix.v1alpha1.CreateApisixRouteRequest
-	16, // 27: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
-	18, // 28: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
-	26, // 29: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:input_type -> apisix.v1alpha1.DeleteCertsRequest
-	21, // 30: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
-	23, // 31: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
-	28, // 32: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:input_type -> apisix.v1alpha1.GetNodeInfoRequest
-	31, // 33: apisix.v1alpha1.APISIXGatewayService.JumpAndLogin:input_type -> apisix.v1alpha1.JumpAndLoginRequest
-	34, // 34: apisix.v1alpha1.APISIXGatewayService.GetDeployListFromPod:input_type -> apisix.v1alpha1.GetDeployListFromPodRequest
-	37, // 35: apisix.v1alpha1.APISIXGatewayService.GetDefaultHarborProject:input_type -> apisix.v1alpha1.GetDefaultHarborProjectRequest
-	39, // 36: apisix.v1alpha1.APISIXGatewayService.GetHarborProjectImages:input_type -> apisix.v1alpha1.GetHarborProjectImagesRequest
-	42, // 37: apisix.v1alpha1.APISIXGatewayService.CreateComponment:input_type -> apisix.v1alpha1.CreateComponmentRequest
-	4,  // 38: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
-	8,  // 39: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
-	10, // 40: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
-	15, // 41: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
-	45, // 42: apisix.v1alpha1.APISIXGatewayService.ListApisixRoutes:output_type -> apisix.v1alpha1.ListApisixRoutesResponse
-	47, // 43: apisix.v1alpha1.APISIXGatewayService.DeleteApisixRoute:output_type -> apisix.v1alpha1.DeleteApisixRouteResponse
-	49, // 44: apisix.v1alpha1.APISIXGatewayService.CreateApisixRoute:output_type -> apisix.v1alpha1.CreateApisixRouteResponse
-	17, // 45: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
-	20, // 46: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
-	27, // 47: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:output_type -> apisix.v1alpha1.DeleteCertsResponse
-	22, // 48: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
-	25, // 49: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
-	30, // 50: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:output_type -> apisix.v1alpha1.GetNodeInfoResponse
-	33, // 51: apisix.v1alpha1.APISIXGatewayService.JumpAndLogin:output_type -> apisix.v1alpha1.JumpAndLoginResponse
-	36, // 52: apisix.v1alpha1.APISIXGatewayService.GetDeployListFromPod:output_type -> apisix.v1alpha1.GetDeployListFromPodResponse
-	38, // 53: apisix.v1alpha1.APISIXGatewayService.GetDefaultHarborProject:output_type -> apisix.v1alpha1.GetDefaultHarborProjectResponse
-	41, // 54: apisix.v1alpha1.APISIXGatewayService.GetHarborProjectImages:output_type -> apisix.v1alpha1.GetHarborProjectImagesResponse
-	43, // 55: apisix.v1alpha1.APISIXGatewayService.CreateComponment:output_type -> apisix.v1alpha1.CreateComponmentResponse
-	38, // [38:56] is the sub-list for method output_type
-	20, // [20:38] is the sub-list for method input_type
+	44, // 24: apisix.v1alpha1.APISIXGatewayService.DeleteApisixRoute:input_type -> apisix.v1alpha1.DeleteApisixRouteRequest
+	46, // 25: apisix.v1alpha1.APISIXGatewayService.CreateApisixRoute:input_type -> apisix.v1alpha1.CreateApisixRouteRequest
+	16, // 26: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:input_type -> apisix.v1alpha1.CreateUpstreamRequest
+	18, // 27: apisix.v1alpha1.APISIXGatewayService.ListCerts:input_type -> apisix.v1alpha1.ListTLSRequest
+	26, // 28: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:input_type -> apisix.v1alpha1.DeleteCertsRequest
+	21, // 29: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:input_type -> apisix.v1alpha1.CreateUPdateTLSRequest
+	23, // 30: apisix.v1alpha1.APISIXGatewayService.GetServiceList:input_type -> apisix.v1alpha1.GetServiceListRequest
+	28, // 31: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:input_type -> apisix.v1alpha1.GetNodeInfoRequest
+	31, // 32: apisix.v1alpha1.APISIXGatewayService.JumpAndLogin:input_type -> apisix.v1alpha1.JumpAndLoginRequest
+	34, // 33: apisix.v1alpha1.APISIXGatewayService.GetDeployListFromPod:input_type -> apisix.v1alpha1.GetDeployListFromPodRequest
+	37, // 34: apisix.v1alpha1.APISIXGatewayService.GetDefaultHarborProject:input_type -> apisix.v1alpha1.GetDefaultHarborProjectRequest
+	39, // 35: apisix.v1alpha1.APISIXGatewayService.GetHarborProjectImages:input_type -> apisix.v1alpha1.GetHarborProjectImagesRequest
+	42, // 36: apisix.v1alpha1.APISIXGatewayService.CreateComponment:input_type -> apisix.v1alpha1.CreateComponmentRequest
+	4,  // 37: apisix.v1alpha1.APISIXGatewayService.CreateRoute:output_type -> apisix.v1alpha1.CreateRouteResponse
+	8,  // 38: apisix.v1alpha1.APISIXGatewayService.DeleteRoute:output_type -> apisix.v1alpha1.DeleteRouteResponse
+	10, // 39: apisix.v1alpha1.APISIXGatewayService.GetRoute:output_type -> apisix.v1alpha1.GetRouteResponse
+	15, // 40: apisix.v1alpha1.APISIXGatewayService.ListRoutes:output_type -> apisix.v1alpha1.ListRoutesResponse
+	45, // 41: apisix.v1alpha1.APISIXGatewayService.DeleteApisixRoute:output_type -> apisix.v1alpha1.DeleteApisixRouteResponse
+	47, // 42: apisix.v1alpha1.APISIXGatewayService.CreateApisixRoute:output_type -> apisix.v1alpha1.CreateApisixRouteResponse
+	17, // 43: apisix.v1alpha1.APISIXGatewayService.CreateUpstream:output_type -> apisix.v1alpha1.CreateUpstreamResponse
+	20, // 44: apisix.v1alpha1.APISIXGatewayService.ListCerts:output_type -> apisix.v1alpha1.ListTLSResponse
+	27, // 45: apisix.v1alpha1.APISIXGatewayService.DeleteCerts:output_type -> apisix.v1alpha1.DeleteCertsResponse
+	22, // 46: apisix.v1alpha1.APISIXGatewayService.CreateUpdateTLS:output_type -> apisix.v1alpha1.CreateUPdateTLSResponse
+	25, // 47: apisix.v1alpha1.APISIXGatewayService.GetServiceList:output_type -> apisix.v1alpha1.GetServiceListResponse
+	30, // 48: apisix.v1alpha1.APISIXGatewayService.GetNodeInfo:output_type -> apisix.v1alpha1.GetNodeInfoResponse
+	33, // 49: apisix.v1alpha1.APISIXGatewayService.JumpAndLogin:output_type -> apisix.v1alpha1.JumpAndLoginResponse
+	36, // 50: apisix.v1alpha1.APISIXGatewayService.GetDeployListFromPod:output_type -> apisix.v1alpha1.GetDeployListFromPodResponse
+	38, // 51: apisix.v1alpha1.APISIXGatewayService.GetDefaultHarborProject:output_type -> apisix.v1alpha1.GetDefaultHarborProjectResponse
+	41, // 52: apisix.v1alpha1.APISIXGatewayService.GetHarborProjectImages:output_type -> apisix.v1alpha1.GetHarborProjectImagesResponse
+	43, // 53: apisix.v1alpha1.APISIXGatewayService.CreateComponment:output_type -> apisix.v1alpha1.CreateComponmentResponse
+	37, // [37:54] is the sub-list for method output_type
+	20, // [20:37] is the sub-list for method input_type
 	20, // [20:20] is the sub-list for extension type_name
 	20, // [20:20] is the sub-list for extension extendee
 	0,  // [0:20] is the sub-list for field type_name
@@ -3342,7 +3308,7 @@ func file_routes_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_routes_service_proto_rawDesc), len(file_routes_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   53,
+			NumMessages:   51,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

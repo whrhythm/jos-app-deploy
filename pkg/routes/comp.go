@@ -160,7 +160,10 @@ func (s *RoutesManageService) GetDefaultHarborProject(ctx context.Context, req *
 	}
 
 	return &pb.GetDefaultHarborProjectResponse{
-		Project: names,
+		Code:    0,
+		Success: true,
+		Message: "success",
+		Data:    names,
 	}, nil
 }
 
@@ -178,15 +181,10 @@ func (s *RoutesManageService) GetHarborProjectImages(ctx context.Context, req *p
 	if !strings.HasPrefix(harborBase, "http") {
 		harborBase = "http://" + harborBase
 	}
-	apiUrl := harborBase + "/api/v2.0/projects/" + req.GetProjectName() + "/repositories?with_tag=true"
-
+	apiUrl := harborBase + "/api/v2.0/projects/" + req.GetProjectName() + "/repositories"
 	// simple HTTP request with basic auth
-	type harborTag struct {
-		Name string `json:"name"`
-	}
 	type harborRepo struct {
-		Name string      `json:"name"`
-		Tags []harborTag `json:"tags"`
+		Name string `json:"name"`
 	}
 
 	client := &http.Client{}
@@ -206,6 +204,7 @@ func (s *RoutesManageService) GetHarborProjectImages(ctx context.Context, req *p
 		return errRsp, status.Errorf(codes.Internal, "harbor API returned status %d", resp.StatusCode)
 	}
 
+	// decode into a generic structure so we can handle different tag shapes
 	var repos []harborRepo
 	dec := json.NewDecoder(resp.Body)
 	if err := dec.Decode(&repos); err != nil {
@@ -215,17 +214,71 @@ func (s *RoutesManageService) GetHarborProjectImages(ctx context.Context, req *p
 	var images []*pb.GetHarborImage
 	for _, r := range repos {
 		var tags []string
-		for _, t := range r.Tags {
-			tags = append(tags, t.Name)
-		}
+		tags = append(tags, getImageTags(req.GetProjectName(), r.Name)...)
 		images = append(images, &pb.GetHarborImage{
 			Repository: r.Name,
 			Tags:       tags,
 		})
 	}
+
 	return &pb.GetHarborProjectImagesResponse{
-		HarborImage: images,
+		Code:    0,
+		Success: true,
+		Message: "success",
+		Data:    images,
 	}, nil
+}
+
+func getImageTags(projectName, repoName string) []string {
+	harborBase := defaultHarborAddress
+	if !strings.HasPrefix(harborBase, "http") {
+		harborBase = "http://" + harborBase
+	}
+	repoName = strings.TrimPrefix(repoName, projectName+"/")
+	apiUrl := harborBase + "/api/v2.0/projects/" + projectName + "/repositories/" + repoName + "/artifacts"
+
+	type harborTag struct {
+		Name string `json:"name"`
+	}
+
+	client := &http.Client{}
+	reqHttp, err := http.NewRequest("GET", apiUrl, nil)
+	if err != nil {
+		logger.L().Error("failed to create request", zap.Error(err))
+		return nil
+	}
+	reqHttp.SetBasicAuth(defaultHarborUserName, defaultHarborPassword)
+	reqHttp.Header.Set("Accept", "application/json")
+
+	resp, err := client.Do(reqHttp)
+	if err != nil {
+		logger.L().Error("failed to call harbor API", zap.Error(err))
+		return nil
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		logger.L().Error("harbor API returned error status", zap.Int("status", resp.StatusCode))
+		return nil
+	}
+
+	var artifacts []struct {
+		Tags []harborTag `json:"tags"`
+	}
+
+	dec := json.NewDecoder(resp.Body)
+	logger.L().Info("dec", zap.Any("decoder", dec))
+	if err := dec.Decode(&artifacts); err != nil {
+		logger.L().Error("failed to parse harbor response", zap.Error(err))
+		return nil
+	}
+	logger.L().Info("artifacts", zap.Any("artifacts", artifacts))
+	var tags []string
+	for _, art := range artifacts {
+		for _, tag := range art.Tags {
+			tags = append(tags, tag.Name)
+		}
+	}
+	return tags
 }
 
 func (s *RoutesManageService) CreateComponment(ctx context.Context, req *pb.CreateComponmentRequest) (*pb.CreateComponmentResponse, error) {

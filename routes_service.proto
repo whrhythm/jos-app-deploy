@@ -258,7 +258,10 @@ message GetDeployListFromPodResponse {
 
 message GetDefaultHarborProjectRequest {}
 message GetDefaultHarborProjectResponse {
-  repeated string project = 1;
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  repeated string data = 4;
 }
 
 message GetHarborProjectImagesRequest {
@@ -271,7 +274,10 @@ message GetHarborImage {
 }
 
 message GetHarborProjectImagesResponse {
-  repeated GetHarborImage harbor_image = 1;
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+  repeated GetHarborImage data = 4;
 }
 
 message CreateComponmentRequest {
