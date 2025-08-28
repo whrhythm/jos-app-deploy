@@ -292,6 +292,18 @@ message CreateComponmentResponse {
   string message = 3;
 }
 
+message DeleteComponmentRequest {
+  string release_name = 1;
+  string namespace = 2;
+  string pod_name = 3;
+}
+
+message DeleteComponmentResponse {
+  int32 code = 1;
+  bool success = 2;
+  string message = 3;
+}
+
 message DeleteApisixRouteRequest {
   string ar_name = 1;
   string namespace = 2;
@@ -418,6 +430,7 @@ service APISIXGatewayService {
   rpc CreateComponment(CreateComponmentRequest) returns (CreateComponmentResponse) {
     option (google.api.http) = {
       post: "/prod/v1alpha1/comp/create"
+      body: "*"
     };
   }
 
@@ -427,11 +440,11 @@ service APISIXGatewayService {
 //    };
 //  }
 
-//  rpc DeleteComponment(DeleteComponmentRequest) returns (DeleteComponmentResponse) {
-//    option (google.api.http) = {
-//      delete: "/prod/v1alpha1/comp/delete"
-//    };
-//  }
+  rpc DeleteComponment(DeleteComponmentRequest) returns (DeleteComponmentResponse) {
+    option (google.api.http) = {
+      delete: "/prod/v1alpha1/comp/delete"
+    };
+  }
 }
 
 

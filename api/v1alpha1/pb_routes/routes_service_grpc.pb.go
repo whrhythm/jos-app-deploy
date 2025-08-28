@@ -36,6 +36,7 @@ const (
 	APISIXGatewayService_GetDefaultHarborProject_FullMethodName = "/apisix.v1alpha1.APISIXGatewayService/GetDefaultHarborProject"
 	APISIXGatewayService_GetHarborProjectImages_FullMethodName  = "/apisix.v1alpha1.APISIXGatewayService/GetHarborProjectImages"
 	APISIXGatewayService_CreateComponment_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/CreateComponment"
+	APISIXGatewayService_DeleteComponment_FullMethodName        = "/apisix.v1alpha1.APISIXGatewayService/DeleteComponment"
 )
 
 // APISIXGatewayServiceClient is the client API for APISIXGatewayService service.
@@ -70,6 +71,7 @@ type APISIXGatewayServiceClient interface {
 	GetHarborProjectImages(ctx context.Context, in *GetHarborProjectImagesRequest, opts ...grpc.CallOption) (*GetHarborProjectImagesResponse, error)
 	// 创建一个额外的deployment/statefulset service
 	CreateComponment(ctx context.Context, in *CreateComponmentRequest, opts ...grpc.CallOption) (*CreateComponmentResponse, error)
+	DeleteComponment(ctx context.Context, in *DeleteComponmentRequest, opts ...grpc.CallOption) (*DeleteComponmentResponse, error)
 }
 
 type aPISIXGatewayServiceClient struct {
@@ -250,6 +252,16 @@ func (c *aPISIXGatewayServiceClient) CreateComponment(ctx context.Context, in *C
 	return out, nil
 }
 
+func (c *aPISIXGatewayServiceClient) DeleteComponment(ctx context.Context, in *DeleteComponmentRequest, opts ...grpc.CallOption) (*DeleteComponmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteComponmentResponse)
+	err := c.cc.Invoke(ctx, APISIXGatewayService_DeleteComponment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APISIXGatewayServiceServer is the server API for APISIXGatewayService service.
 // All implementations must embed UnimplementedAPISIXGatewayServiceServer
 // for forward compatibility.
@@ -282,6 +294,7 @@ type APISIXGatewayServiceServer interface {
 	GetHarborProjectImages(context.Context, *GetHarborProjectImagesRequest) (*GetHarborProjectImagesResponse, error)
 	// 创建一个额外的deployment/statefulset service
 	CreateComponment(context.Context, *CreateComponmentRequest) (*CreateComponmentResponse, error)
+	DeleteComponment(context.Context, *DeleteComponmentRequest) (*DeleteComponmentResponse, error)
 	mustEmbedUnimplementedAPISIXGatewayServiceServer()
 }
 
@@ -342,6 +355,9 @@ func (UnimplementedAPISIXGatewayServiceServer) GetHarborProjectImages(context.Co
 }
 func (UnimplementedAPISIXGatewayServiceServer) CreateComponment(context.Context, *CreateComponmentRequest) (*CreateComponmentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateComponment not implemented")
+}
+func (UnimplementedAPISIXGatewayServiceServer) DeleteComponment(context.Context, *DeleteComponmentRequest) (*DeleteComponmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteComponment not implemented")
 }
 func (UnimplementedAPISIXGatewayServiceServer) mustEmbedUnimplementedAPISIXGatewayServiceServer() {}
 func (UnimplementedAPISIXGatewayServiceServer) testEmbeddedByValue()                              {}
@@ -670,6 +686,24 @@ func _APISIXGatewayService_CreateComponment_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _APISIXGatewayService_DeleteComponment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteComponmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APISIXGatewayServiceServer).DeleteComponment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: APISIXGatewayService_DeleteComponment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APISIXGatewayServiceServer).DeleteComponment(ctx, req.(*DeleteComponmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // APISIXGatewayService_ServiceDesc is the grpc.ServiceDesc for APISIXGatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -744,6 +778,10 @@ var APISIXGatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateComponment",
 			Handler:    _APISIXGatewayService_CreateComponment_Handler,
+		},
+		{
+			MethodName: "DeleteComponment",
+			Handler:    _APISIXGatewayService_DeleteComponment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 
 	pb "jos-deployment/api/v1alpha1/pb"
 
@@ -453,6 +454,27 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 		}, err
 	}
 
+	// 卸载 标签为 app.kubernetes.io/instance=releaseName 的deployment/statefulset/service
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create k8s clientset: %v", err)
+	}
+	labelSelector := fmt.Sprintf("app.kubernetes.io/instance=%s", req.GetReleaseName())
+
+	// 没做错误处理
+	// TODO
+	UninstallDep(ctx, labelSelector, clientset, nameSpace)
+	UninstallSts(ctx, labelSelector, clientset, nameSpace)
+	UninstallSvc(ctx, labelSelector, clientset, nameSpace)
+
 	return &pb.UninstallChartResponse{
 		Code:    0,
 		Message: "Chart uninstalled successfully",
@@ -522,6 +544,65 @@ func PushChartToHarbor(filePath, repoName, fileName string) (string, error) {
 
 	// 返回 chart URL
 	return fmt.Sprintf("%s/charts/%s", harborEntry.URL, fileName), nil
+}
+
+func UninstallDep(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+	deploymentsClient := clientset.AppsV1().Deployments(namespace)
+	deletePolicy := metav1.DeletePropagationForeground
+	if err := deploymentsClient.DeleteCollection(ctx, metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	}, metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}); err != nil {
+		logger.L().Error("Failed to delete deployments", zap.Error(err))
+	} else {
+		logger.L().Info("Deployments deleted successfully", zap.String("labelSelector", labelSelector), zap.String("namespace", namespace))
+	}
+}
+
+func UninstallSts(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+	statefulsetsClient := clientset.AppsV1().StatefulSets(namespace)
+	deletePolicy := metav1.DeletePropagationForeground
+	if err := statefulsetsClient.DeleteCollection(ctx, metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	}, metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}); err != nil {
+		logger.L().Error("Failed to delete statefulsets", zap.Error(err))
+	} else {
+		logger.L().Info("Statefulsets deleted successfully", zap.String("labelSelector", labelSelector), zap.String("namespace", namespace))
+	}
+}
+
+func UninstallSvc(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+	servicesClient := clientset.CoreV1().Services(namespace)
+	deletePolicy := metav1.DeletePropagationForeground
+
+	svcList, err := servicesClient.List(ctx, metav1.ListOptions{
+		LabelSelector: labelSelector,
+	})
+	if err != nil {
+		logger.L().Error("Failed to list services", zap.Error(err))
+		return
+	}
+
+	var delErrs []string
+	for _, svc := range svcList.Items {
+		if err := servicesClient.Delete(ctx, svc.Name, metav1.DeleteOptions{
+			PropagationPolicy: &deletePolicy,
+		}); err != nil {
+			logger.L().Error("Failed to delete service", zap.String("service", svc.Name), zap.Error(err))
+			delErrs = append(delErrs, svc.Name)
+		} else {
+			logger.L().Info("Service deleted", zap.String("service", svc.Name), zap.String("namespace", namespace))
+		}
+	}
+
+	if len(delErrs) == 0 {
+		logger.L().Info("Services deleted successfully", zap.String("labelSelector", labelSelector), zap.String("namespace", namespace))
+	} else {
+		logger.L().Error("Some services failed to delete", zap.Strings("services", delErrs))
+	}
 }
 
 func refreshChartRepository() error {
@@ -794,6 +875,7 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 	// 构建 PodStatus 列表
 	var podStatuses []*pb.PodStatus
 	for _, pod := range podList.Items {
+		restartCount := 0
 		podStatus := &pb.PodStatus{
 			Name:       pod.Name,
 			Ip:         pod.Status.PodIP,
@@ -815,7 +897,9 @@ func (s *HelmManagerServer) ListPodStatus(ctx context.Context, req *pb.ListPodSt
 				readyCount++
 			}
 			podStatus.Containers = append(podStatus.Containers, containerStatus)
+			restartCount += int(container.RestartCount)
 		}
+		podStatus.Restarts = int32(restartCount)
 		readStatus := fmt.Sprintf("%d/%d", readyCount, len(pod.Status.ContainerStatuses))
 		podStatus.Ready = readStatus
 		age := metav1.Now().Sub(pod.CreationTimestamp.Time) // 计算 Pod 的年龄

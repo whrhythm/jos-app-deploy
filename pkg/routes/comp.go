@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	pb "jos-deployment/api/v1alpha1/pb_routes"
+	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
 
 	"go.uber.org/zap"
@@ -63,7 +64,25 @@ func (s *RoutesManageService) GetDeployListFromPod(ctx context.Context, req *pb.
 			logger.L().Info("Pod owner", zap.String("name", owner.Name),
 				zap.String("kind", owner.Kind),
 				zap.String("apiVersion", owner.APIVersion))
-
+			// 如果owner.Kind是ReplicaSet，则查找对应的Deployment
+			if owner.Kind == "ReplicaSet" {
+				rs, err := clientset.AppsV1().ReplicaSets(namespace).Get(ctx, owner.Name, metav1.GetOptions{})
+				if err != nil {
+					logger.L().Error("failed to get ReplicaSet", zap.String("name", owner.Name), zap.Error(err))
+					return &pb.GetDeployListFromPodResponse{
+						Code:    1,
+						Success: false,
+						Message: fmt.Sprintf("failed to get ReplicaSet: %v", err),
+					}, nil
+				}
+				for _, rsOwner := range rs.OwnerReferences {
+					if rsOwner.Controller != nil && *rsOwner.Controller && rsOwner.Kind == "Deployment" {
+						owner.Name = rsOwner.Name
+						owner.Kind = rsOwner.Kind
+						break
+					}
+				}
+			}
 			serviceNames := findServicesForPod(ctx, clientset, namespace, pod)
 			if len(serviceNames) > 0 {
 				serviceName = serviceNames[0]
@@ -295,10 +314,18 @@ func (s *RoutesManageService) CreateComponment(ctx context.Context, req *pb.Crea
 	logger.L().Info("CreateComponment called")
 	name := req.GetName()
 	namespace := req.GetDeployInfo().Namespace
-	compName := req.GetName()
+	compName := req.GetDeployInfo().DeployName
 	image := req.GetImageFuleName()
 	controlledBy := req.GetDeployInfo().Kind
 	service := req.GetDeployInfo().ServiceName
+
+	logger.L().Info("CreateComponment params", zap.String("name", name),
+		zap.String("namespace", namespace),
+		zap.String("compName", compName),
+		zap.String("image", image),
+		zap.String("controlledBy", controlledBy),
+		zap.String("service", service),
+	)
 
 	if namespace == "" || compName == "" || image == "" || controlledBy == "" || service == "" {
 		return &pb.CreateComponmentResponse{Code: 1, Message: "missing required fields", Success: false}, nil
@@ -349,8 +376,8 @@ func (s *RoutesManageService) CreateComponment(ctx context.Context, req *pb.Crea
 }
 
 func createDeployment(ctx context.Context, clientset *kubernetes.Clientset, namespace, name, compName, image string) error {
+	logger.L().Info("CreateDeployment called", zap.String("namespace", namespace), zap.String("name", name), zap.String("compName", compName), zap.String("image", image))
 	// 更新名字为compName, kind 为controlledBy的资源
-	// get the existing deployment
 	dep, err := clientset.AppsV1().Deployments(namespace).Get(ctx, compName, metav1.GetOptions{})
 	if err != nil {
 		return err
@@ -408,8 +435,7 @@ func createDeployment(ctx context.Context, clientset *kubernetes.Clientset, name
 }
 
 func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, name, compName, image string) error {
-	// 更新名字为compName, kind 为controlledBy的资源
-	// get the existing deployment
+	logger.L().Info("CreateSts called", zap.String("namespace", namespace), zap.String("name", name), zap.String("compName", compName), zap.String("image", image))
 	sts, err := clientset.AppsV1().StatefulSets(namespace).Get(ctx, compName, metav1.GetOptions{})
 	if err != nil {
 		return err
@@ -465,6 +491,7 @@ func createSts(ctx context.Context, clientset *kubernetes.Clientset, namespace, 
 
 	return nil
 }
+
 func createService(ctx context.Context, clientset *kubernetes.Clientset, namespace, name, compName, service string) error {
 	svc, err := clientset.CoreV1().Services(namespace).Get(ctx, service, metav1.GetOptions{})
 	if err != nil {
@@ -494,4 +521,31 @@ func createService(ctx context.Context, clientset *kubernetes.Clientset, namespa
 	newSvc.Status = corev1.ServiceStatus{}
 	_, err = clientset.CoreV1().Services(namespace).Create(ctx, newSvc, metav1.CreateOptions{})
 	return err
+}
+
+func (s *RoutesManageService) DeleteComponment(ctx context.Context, req *pb.DeleteComponmentRequest) (*pb.DeleteComponmentResponse, error) {
+	logger.L().Info("DeleteComponment called")
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create k8s clientset: %v", err)
+	}
+	selectLabels := fmt.Sprintf("app.kubernetes.io/instance=%s,joiningos.com/mode=customize", req.GetReleaseName())
+	helm.UninstallDep(ctx, selectLabels, clientset, req.GetNamespace())
+	helm.UninstallSts(ctx, selectLabels, clientset, req.GetNamespace())
+	// TODO
+	//helm.UninstallSvc(ctx, selectLabels, clientset, req.GetNamespace())
+
+	return &pb.DeleteComponmentResponse{
+		Code:    0,
+		Success: true,
+		Message: "success",
+	}, nil
 }
