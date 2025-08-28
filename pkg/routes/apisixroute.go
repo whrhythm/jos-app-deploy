@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 	pb "jos-deployment/api/v1alpha1/pb_routes"
+	"jos-deployment/pkg/logger"
+	"os"
+	"path/filepath"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // ApisixManager provides operations for creating ApisixUpstream and ApisixRoute CRs.
@@ -136,12 +140,89 @@ func (a *apisixManagerImpl) ListAR(ctx context.Context, namespace string) ([]*un
 	return result, nil
 }
 
+// apiVersion: apisix.apache.org/v2
+// kind: ApisixRoute
+// metadata:
+//
+//	name: weighted-routing-example
+//	namespace: default
+//
+// spec:
+//
+//	http:
+//	- name: rule1
+//	  match:
+//	    hosts:
+//	    - example.com
+//	    paths:
+//	    - /api/v1/*
+//	  backends:
+//	  # 第一个服务 - 权重 70%
+//	  - serviceName: service-a
+//	    servicePort: 80
+//	    weight: 70
+//	  # 第二个服务 - 权重 30%
+//	  - serviceName: service-b
+//	    servicePort: 80
+//	    weight: 30
+//	  # 可选的插件配置
 func (s *RoutesManageService) CreateApisixRoute(ctx context.Context, req *pb.CreateApisixRouteRequest) (*pb.CreateApisixRouteResponse, error) {
+	logger.L().Info("CreateApisixRoute called")
+	// // Initialize Kubernetes clientset
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	// 尝试使用本地 kubeconfig
+	// 	kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+	// 	config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	// 	if err != nil {
+	// 		return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+	// 	}
+	// }
+	// clientset, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	return nil, status.Errorf(status.Code(err), "failed to create Kubernetes clientset: %v", err)
+	// }
 
-	return nil, nil
+	// hosts := req.Http[0].Host
+	// paths := req.Http[0].Paths
+	// backends := req.Http[0].Backends
+	// if len(req.Http) == 0 {
+	// 	// 配置http服务
+
+	// } else {
+	// 	// 配置grpc服务
+	// }
+
+	return &pb.CreateApisixRouteResponse{}, nil
 }
 
 func (a *RoutesManageService) DeleteApisixRoute(ctx context.Context, req *pb.DeleteApisixRouteRequest) (*pb.DeleteApisixRouteResponse, error) {
+	namespace := req.GetNamespace()
+	if namespace == "" {
+		namespace = "default"
+	}
 
-	return nil, nil
+	cfg, err := rest.InClusterConfig()
+	if err != nil {
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		cfg, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return &pb.DeleteApisixRouteResponse{}, fmt.Errorf("failed to build kube config: %v", err)
+		}
+	}
+	dyn, err := dynamic.NewForConfig(cfg)
+	if err != nil {
+		return &pb.DeleteApisixRouteResponse{}, fmt.Errorf("failed to create dynamic client: %v", err)
+	}
+
+	arName := req.GetArName()
+	if arName == "" {
+		return &pb.DeleteApisixRouteResponse{}, fmt.Errorf("ar_name is empty")
+	}
+
+	err = dyn.Resource(routeGVR).Namespace(namespace).Delete(ctx, arName, metav1.DeleteOptions{})
+	if err != nil {
+		return &pb.DeleteApisixRouteResponse{}, fmt.Errorf("failed to delete ApisixRoute: %v", err)
+	}
+	return &pb.DeleteApisixRouteResponse{}, nil
 }

@@ -104,7 +104,7 @@ message RouteBackend {
 
 // 规则
 message RouteRule {
-  string host = 1;
+  string host = 1; // 访问使用的，比如domainName
   repeated RouteBackend paths = 2;
 }
 
@@ -311,8 +311,29 @@ message DeleteApisixRouteRequest {
 
 message DeleteApisixRouteResponse {}
 
+message ARBackend {
+  string service_name = 1;
+  string service_port = 2;
+  int32 weight = 3;
+}
+
+message ARHttp {
+  string hosts = 1;
+  string paths = 2;
+  repeated ARBackend backend = 3;
+}
+
+message ARStream {
+  int32 ingress_port = 1;
+  repeated ARBackend backend = 2;
+}
+
 message CreateApisixRouteRequest {
-  string namespace = 1;
+  string ar_name = 1;
+  string namespace = 2;
+  // ingressClassName 后台指定
+  repeated ARHttp http = 3;
+  repeated ARStream stream = 4;
 }
 
 message CreateApisixRouteResponse {}
