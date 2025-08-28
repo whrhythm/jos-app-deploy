@@ -58,34 +58,15 @@ func (s *RoutesManageService) GetDeployListFromPod(ctx context.Context, req *pb.
 	// 提取Controller信息
 	var data []*pb.GetDeployListFromPodResponseData
 	for _, owner := range pod.OwnerReferences {
-		appName := ""
+		serviceName := ""
 		if owner.Controller != nil && *owner.Controller {
 			logger.L().Info("Pod owner", zap.String("name", owner.Name),
 				zap.String("kind", owner.Kind),
 				zap.String("apiVersion", owner.APIVersion))
-			// 截取owner.name 截取第一个"-""之后的内容
-			start := strings.Index(owner.Name, "-")
-			if start == -1 {
-				appName = owner.Name
-			} else {
-				appName = owner.Name[start+1:]
-			}
-			logger.L().Info("App name derived from owner", zap.String("appName", appName))
-			// 根据两种标签获取service name
-			// seagoing.com.cn/service-code=appName
-			// 获取service list
-			var serviceName string
-			serviceList, err := clientset.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{
-				LabelSelector: "seagoing.com.cn/service-code=" + appName,
-			})
-			if err != nil {
-				return &pb.GetDeployListFromPodResponse{Code: 1, Success: false, Message: "failed to list services: " + err.Error()}, nil
-			}
 
-			if len(serviceList.Items) != 1 {
-				serviceName = ""
-			} else {
-				serviceName = serviceList.Items[0].Name
+			serviceNames := findServicesForPod(ctx, clientset, namespace, pod)
+			if len(serviceNames) > 0 {
+				serviceName = serviceNames[0]
 			}
 			data = append(data, &pb.GetDeployListFromPodResponseData{
 				Namespace:   namespace,
@@ -111,6 +92,35 @@ func (s *RoutesManageService) GetDeployListFromPod(ctx context.Context, req *pb.
 		Message: "success",
 		Data:    data,
 	}, nil
+}
+
+func findServicesForPod(ctx context.Context, clientset *kubernetes.Clientset, namespace string, pod *corev1.Pod) []string {
+	// Find services that select this pod
+	services, err := clientset.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		logger.L().Error("failed to list services", zap.Error(err))
+		return nil
+	}
+
+	var serviceNames []string
+	for _, svc := range services.Items {
+		if len(svc.Spec.Selector) == 0 {
+			continue
+		}
+		matches := true
+		logger.L().Info("Service Selector", zap.Any("selector", svc.Spec.Selector))
+		for key, val := range svc.Spec.Selector {
+			if podVal, ok := pod.Labels[key]; !ok || podVal != val {
+				matches = false
+				break
+			}
+		}
+		if matches {
+			serviceNames = append(serviceNames, svc.Name)
+		}
+	}
+
+	return serviceNames
 }
 
 func (s *RoutesManageService) GetDefaultHarborProject(ctx context.Context, req *pb.GetDefaultHarborProjectRequest) (*pb.GetDefaultHarborProjectResponse, error) {
