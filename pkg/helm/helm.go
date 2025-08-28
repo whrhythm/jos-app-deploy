@@ -471,9 +471,9 @@ func (s *HelmManagerServer) UninstallChart(ctx context.Context, req *pb.Uninstal
 
 	// 没做错误处理
 	// TODO
-	UninstallDep(ctx, labelSelector, clientset, nameSpace)
-	UninstallSts(ctx, labelSelector, clientset, nameSpace)
-	UninstallSvc(ctx, labelSelector, clientset, nameSpace)
+	UninstallDep(ctx, labelSelector, nameSpace, clientset)
+	UninstallSts(ctx, labelSelector, nameSpace, clientset)
+	UninstallSvc(ctx, labelSelector, nameSpace, clientset)
 
 	return &pb.UninstallChartResponse{
 		Code:    0,
@@ -546,7 +546,7 @@ func PushChartToHarbor(filePath, repoName, fileName string) (string, error) {
 	return fmt.Sprintf("%s/charts/%s", harborEntry.URL, fileName), nil
 }
 
-func UninstallDep(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+func UninstallDep(ctx context.Context, labelSelector, namespace string, clientset *kubernetes.Clientset) {
 	deploymentsClient := clientset.AppsV1().Deployments(namespace)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := deploymentsClient.DeleteCollection(ctx, metav1.DeleteOptions{
@@ -560,7 +560,7 @@ func UninstallDep(ctx context.Context, labelSelector string, clientset *kubernet
 	}
 }
 
-func UninstallSts(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+func UninstallSts(ctx context.Context, labelSelector, namespace string, clientset *kubernetes.Clientset) {
 	statefulsetsClient := clientset.AppsV1().StatefulSets(namespace)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := statefulsetsClient.DeleteCollection(ctx, metav1.DeleteOptions{
@@ -574,7 +574,7 @@ func UninstallSts(ctx context.Context, labelSelector string, clientset *kubernet
 	}
 }
 
-func UninstallSvc(ctx context.Context, labelSelector string, clientset *kubernetes.Clientset, namespace string) {
+func UninstallSvc(ctx context.Context, labelSelector, namespace string, clientset *kubernetes.Clientset) {
 	servicesClient := clientset.CoreV1().Services(namespace)
 	deletePolicy := metav1.DeletePropagationForeground
 

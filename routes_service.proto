@@ -442,7 +442,7 @@ service APISIXGatewayService {
 
   rpc DeleteComponment(DeleteComponmentRequest) returns (DeleteComponmentResponse) {
     option (google.api.http) = {
-      delete: "/prod/v1alpha1/comp/delete"
+      delete: "/prod/v1alpha1/{namespace}/comp/delete/{pod_name}"
     };
   }
 }

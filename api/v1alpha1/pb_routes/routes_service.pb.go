@@ -3276,7 +3276,7 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x19DeleteApisixRouteResponse\"8\n" +
 	"\x18CreateApisixRouteRequest\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\"\x1b\n" +
-	"\x19CreateApisixRouteResponse2\xcc\x14\n" +
+	"\x19CreateApisixRouteResponse2\xe3\x14\n" +
 	"\x14APISIXGatewayService\x12\x86\x01\n" +
 	"\vCreateRoute\x12#.apisix.v1alpha1.CreateRouteRequest\x1a$.apisix.v1alpha1.CreateRouteResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/prod/v1alpha1/{namespace}/routes\x12\x90\x01\n" +
 	"\vDeleteRoute\x12#.apisix.v1alpha1.DeleteRouteRequest\x1a$.apisix.v1alpha1.DeleteRouteResponse\"6\x82\xd3\xe4\x93\x020*./prod/v1alpha1/{namespace}/routes/{route_name}\x12\x85\x01\n" +
@@ -3295,8 +3295,8 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x14GetDeployListFromPod\x12,.apisix.v1alpha1.GetDeployListFromPodRequest\x1a-.apisix.v1alpha1.GetDeployListFromPodResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/prod/v1alpha1/deploy/info\x12\xa3\x01\n" +
 	"\x17GetDefaultHarborProject\x12/.apisix.v1alpha1.GetDefaultHarborProjectRequest\x1a0.apisix.v1alpha1.GetDefaultHarborProjectResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/prod/v1alpha1/harbor/project\x12\x9f\x01\n" +
 	"\x16GetHarborProjectImages\x12..apisix.v1alpha1.GetHarborProjectImagesRequest\x1a/.apisix.v1alpha1.GetHarborProjectImagesResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/prod/v1alpha1/harbor/images\x12\x8e\x01\n" +
-	"\x10CreateComponment\x12(.apisix.v1alpha1.CreateComponmentRequest\x1a).apisix.v1alpha1.CreateComponmentResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/prod/v1alpha1/comp/create\x12\x8b\x01\n" +
-	"\x10DeleteComponment\x12(.apisix.v1alpha1.DeleteComponmentRequest\x1a).apisix.v1alpha1.DeleteComponmentResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/prod/v1alpha1/comp/deleteB\x0eZ\f./pkg/pb/;pbb\x06proto3"
+	"\x10CreateComponment\x12(.apisix.v1alpha1.CreateComponmentRequest\x1a).apisix.v1alpha1.CreateComponmentResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/prod/v1alpha1/comp/create\x12\xa2\x01\n" +
+	"\x10DeleteComponment\x12(.apisix.v1alpha1.DeleteComponmentRequest\x1a).apisix.v1alpha1.DeleteComponmentResponse\"9\x82\xd3\xe4\x93\x023*1/prod/v1alpha1/{namespace}/comp/delete/{pod_name}B\x0eZ\f./pkg/pb/;pbb\x06proto3"
 
 var (
 	file_routes_service_proto_rawDescOnce sync.Once

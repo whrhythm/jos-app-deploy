@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	pb "jos-deployment/api/v1alpha1/pb_routes"
-	"jos-deployment/pkg/helm"
 	"jos-deployment/pkg/logger"
 
 	"go.uber.org/zap"
@@ -524,7 +523,14 @@ func createService(ctx context.Context, clientset *kubernetes.Clientset, namespa
 }
 
 func (s *RoutesManageService) DeleteComponment(ctx context.Context, req *pb.DeleteComponmentRequest) (*pb.DeleteComponmentResponse, error) {
-	logger.L().Info("DeleteComponment called")
+	logger.L().Info("DeleteComponment called", zap.String("namespace", req.GetNamespace()), zap.String("podName", req.GetPodName()))
+	deployInfo, err := s.GetDeployListFromPod(ctx, &pb.GetDeployListFromPodRequest{
+		Namespace: req.GetNamespace(),
+		Name:      req.GetPodName(),
+	})
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to get deploy info from pod: %v", err)
+	}
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
@@ -537,11 +543,38 @@ func (s *RoutesManageService) DeleteComponment(ctx context.Context, req *pb.Dele
 	if err != nil {
 		return nil, status.Errorf(status.Code(err), "failed to create k8s clientset: %v", err)
 	}
-	selectLabels := fmt.Sprintf("app.kubernetes.io/instance=%s,joiningos.com/mode=customize", req.GetReleaseName())
-	helm.UninstallDep(ctx, selectLabels, clientset, req.GetNamespace())
-	helm.UninstallSts(ctx, selectLabels, clientset, req.GetNamespace())
-	// TODO
-	//helm.UninstallSvc(ctx, selectLabels, clientset, req.GetNamespace())
+	switch deployInfo.Data[0].Kind {
+	case "Deployment":
+		// 删除 Deployment
+		err = clientset.AppsV1().Deployments(req.GetNamespace()).Delete(ctx, deployInfo.Data[0].DeployName, metav1.DeleteOptions{
+			PropagationPolicy: func() *metav1.DeletionPropagation {
+				p := metav1.DeletePropagationForeground
+				return &p
+			}(),
+		})
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to delete deployment: %v", err)
+		}
+	case "StatefulSet":
+		// 删除 StatefulSet
+		err = clientset.AppsV1().StatefulSets(req.GetNamespace()).Delete(ctx, deployInfo.Data[0].DeployName, metav1.DeleteOptions{
+			PropagationPolicy: func() *metav1.DeletionPropagation {
+				p := metav1.DeletePropagationForeground
+				return &p
+			}(),
+		})
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to delete statefulset: %v", err)
+		}
+	default:
+		return &pb.DeleteComponmentResponse{
+			Code:    1,
+			Success: false,
+			Message: "unsupported kind",
+		}, nil
+	}
+
+	// TODO 没有删除Service
 
 	return &pb.DeleteComponmentResponse{
 		Code:    0,

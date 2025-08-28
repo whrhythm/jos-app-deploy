@@ -768,15 +768,32 @@ func local_request_APISIXGatewayService_CreateComponment_0(ctx context.Context, 
 	return msg, metadata, err
 }
 
-var filter_APISIXGatewayService_DeleteComponment_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_APISIXGatewayService_DeleteComponment_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0, "pod_name": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 
 func request_APISIXGatewayService_DeleteComponment_0(ctx context.Context, marshaler runtime.Marshaler, client APISIXGatewayServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq DeleteComponmentRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	val, ok = pathParams["pod_name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pod_name")
+	}
+	protoReq.PodName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pod_name", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -792,7 +809,24 @@ func local_request_APISIXGatewayService_DeleteComponment_0(ctx context.Context, 
 	var (
 		protoReq DeleteComponmentRequest
 		metadata runtime.ServerMetadata
+		err      error
 	)
+	val, ok := pathParams["namespace"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+	}
+	protoReq.Namespace, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+	}
+	val, ok = pathParams["pod_name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pod_name")
+	}
+	protoReq.PodName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pod_name", err)
+	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -1155,7 +1189,7 @@ func RegisterAPISIXGatewayServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteComponment", runtime.WithHTTPPathPattern("/prod/v1alpha1/comp/delete"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteComponment", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/comp/delete/{pod_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1502,7 +1536,7 @@ func RegisterAPISIXGatewayServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteComponment", runtime.WithHTTPPathPattern("/prod/v1alpha1/comp/delete"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/apisix.v1alpha1.APISIXGatewayService/DeleteComponment", runtime.WithHTTPPathPattern("/prod/v1alpha1/{namespace}/comp/delete/{pod_name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1536,7 +1570,7 @@ var (
 	pattern_APISIXGatewayService_GetDefaultHarborProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"prod", "v1alpha1", "harbor", "project"}, ""))
 	pattern_APISIXGatewayService_GetHarborProjectImages_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"prod", "v1alpha1", "harbor", "images"}, ""))
 	pattern_APISIXGatewayService_CreateComponment_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"prod", "v1alpha1", "comp", "create"}, ""))
-	pattern_APISIXGatewayService_DeleteComponment_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"prod", "v1alpha1", "comp", "delete"}, ""))
+	pattern_APISIXGatewayService_DeleteComponment_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"prod", "v1alpha1", "namespace", "comp", "delete", "pod_name"}, ""))
 )
 
 var (
