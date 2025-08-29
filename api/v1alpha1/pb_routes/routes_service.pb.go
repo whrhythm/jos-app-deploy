@@ -2920,7 +2920,7 @@ func (*DeleteApisixRouteResponse) Descriptor() ([]byte, []int) {
 type ARBackend struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ServiceName   string                 `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	ServicePort   string                 `protobuf:"bytes,2,opt,name=service_port,json=servicePort,proto3" json:"service_port,omitempty"`
+	ServicePort   int32                  `protobuf:"varint,2,opt,name=service_port,json=servicePort,proto3" json:"service_port,omitempty"`
 	Weight        int32                  `protobuf:"varint,3,opt,name=weight,proto3" json:"weight,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2963,11 +2963,11 @@ func (x *ARBackend) GetServiceName() string {
 	return ""
 }
 
-func (x *ARBackend) GetServicePort() string {
+func (x *ARBackend) GetServicePort() int32 {
 	if x != nil {
 		return x.ServicePort
 	}
-	return ""
+	return 0
 }
 
 func (x *ARBackend) GetWeight() int32 {
@@ -2981,7 +2981,7 @@ type ARHttp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Hosts         string                 `protobuf:"bytes,1,opt,name=hosts,proto3" json:"hosts,omitempty"`
 	Paths         string                 `protobuf:"bytes,2,opt,name=paths,proto3" json:"paths,omitempty"`
-	Backend       []*ARBackend           `protobuf:"bytes,3,rep,name=backend,proto3" json:"backend,omitempty"`
+	Backends      []*ARBackend           `protobuf:"bytes,3,rep,name=backends,proto3" json:"backends,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3030,9 +3030,9 @@ func (x *ARHttp) GetPaths() string {
 	return ""
 }
 
-func (x *ARHttp) GetBackend() []*ARBackend {
+func (x *ARHttp) GetBackends() []*ARBackend {
 	if x != nil {
-		return x.Backend
+		return x.Backends
 	}
 	return nil
 }
@@ -3040,7 +3040,7 @@ func (x *ARHttp) GetBackend() []*ARBackend {
 type ARStream struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IngressPort   int32                  `protobuf:"varint,1,opt,name=ingress_port,json=ingressPort,proto3" json:"ingress_port,omitempty"`
-	Backend       []*ARBackend           `protobuf:"bytes,2,rep,name=backend,proto3" json:"backend,omitempty"`
+	Backend       *ARBackend             `protobuf:"bytes,2,opt,name=backend,proto3" json:"backend,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3082,7 +3082,7 @@ func (x *ARStream) GetIngressPort() int32 {
 	return 0
 }
 
-func (x *ARStream) GetBackend() []*ARBackend {
+func (x *ARStream) GetBackend() *ARBackend {
 	if x != nil {
 		return x.Backend
 	}
@@ -3473,15 +3473,15 @@ const file_routes_service_proto_rawDesc = "" +
 	"\x19DeleteApisixRouteResponse\"i\n" +
 	"\tARBackend\x12!\n" +
 	"\fservice_name\x18\x01 \x01(\tR\vserviceName\x12!\n" +
-	"\fservice_port\x18\x02 \x01(\tR\vservicePort\x12\x16\n" +
-	"\x06weight\x18\x03 \x01(\x05R\x06weight\"j\n" +
+	"\fservice_port\x18\x02 \x01(\x05R\vservicePort\x12\x16\n" +
+	"\x06weight\x18\x03 \x01(\x05R\x06weight\"l\n" +
 	"\x06ARHttp\x12\x14\n" +
 	"\x05hosts\x18\x01 \x01(\tR\x05hosts\x12\x14\n" +
-	"\x05paths\x18\x02 \x01(\tR\x05paths\x124\n" +
-	"\abackend\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.ARBackendR\abackend\"c\n" +
+	"\x05paths\x18\x02 \x01(\tR\x05paths\x126\n" +
+	"\bbackends\x18\x03 \x03(\v2\x1a.apisix.v1alpha1.ARBackendR\bbackends\"c\n" +
 	"\bARStream\x12!\n" +
 	"\fingress_port\x18\x01 \x01(\x05R\vingressPort\x124\n" +
-	"\abackend\x18\x02 \x03(\v2\x1a.apisix.v1alpha1.ARBackendR\abackend\"\xb1\x01\n" +
+	"\abackend\x18\x02 \x01(\v2\x1a.apisix.v1alpha1.ARBackendR\abackend\"\xb1\x01\n" +
 	"\x18CreateApisixRouteRequest\x12\x17\n" +
 	"\aar_name\x18\x01 \x01(\tR\x06arName\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12+\n" +
@@ -3601,7 +3601,7 @@ var file_routes_service_proto_depIdxs = []int32{
 	35, // 17: apisix.v1alpha1.GetDeployListFromPodResponse.data:type_name -> apisix.v1alpha1.GetDeployListFromPodResponseData
 	40, // 18: apisix.v1alpha1.GetHarborProjectImagesResponse.data:type_name -> apisix.v1alpha1.GetHarborImage
 	35, // 19: apisix.v1alpha1.CreateComponmentRequest.deploy_info:type_name -> apisix.v1alpha1.GetDeployListFromPodResponseData
-	48, // 20: apisix.v1alpha1.ARHttp.backend:type_name -> apisix.v1alpha1.ARBackend
+	48, // 20: apisix.v1alpha1.ARHttp.backends:type_name -> apisix.v1alpha1.ARBackend
 	48, // 21: apisix.v1alpha1.ARStream.backend:type_name -> apisix.v1alpha1.ARBackend
 	49, // 22: apisix.v1alpha1.CreateApisixRouteRequest.http:type_name -> apisix.v1alpha1.ARHttp
 	50, // 23: apisix.v1alpha1.CreateApisixRouteRequest.stream:type_name -> apisix.v1alpha1.ARStream

@@ -22,7 +22,7 @@ import (
 	pb "jos-deployment/api/v1alpha1/pb_pod"
 	"jos-deployment/pkg/logger"
 
-	"jos-deployment/pkg/helm"
+	"jos-deployment/handler/helm"
 
 	"github.com/prometheus/common/model"
 	"go.uber.org/zap"

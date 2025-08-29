@@ -1,0 +1,293 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	apisixv2 "github.com/apache/apisix-ingress-controller/pkg/client/clientset/versioned"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/clientcmd"
+)
+
+func createApisixRoute(client *apisixv2.Clientset, req *CreateApisixRouteRequest) error {
+	// 构造 ApisixRoute 对象
+	ar := &apisixv2.ApisixRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      req.ArName,
+			Namespace: req.Namespace,
+		},
+		Spec: apisixv2.ApisixRouteSpec{
+			HTTP:   convertHTTPRoutes(req.Http),
+			Stream: convertStreamRoutes(req.Stream),
+		},
+	}
+
+	// 创建资源
+	_, err := client.ApisixV2().ApisixRoutes(req.Namespace).Create(
+		context.TODO(),
+		ar,
+		metav1.CreateOptions{},
+	)
+	return err
+}
+
+func convertHTTPRoutes(httpRoutes []*ARHttp) []apisixv2.ApisixRouteHTTP {
+	var routes []apisixv2.ApisixRouteHTTP
+	for _, r := range httpRoutes {
+		route := apisixv2.ApisixRouteHTTP{
+			Name: fmt.Sprintf("http-route-%s", r.Hosts),
+			Match: apisixv2.ApisixRouteHTTPMatch{
+				Hosts:  []string{r.Hosts},
+				Paths:  []string{r.Paths},
+			},
+			Backends: convertBackends(r.Backend),
+		}
+		routes = append(routes, route)
+	}
+	return routes
+}
+
+func convertStreamRoutes(streamRoutes []*ARStream) []apisixv2.ApisixRouteStream {
+	var routes []apisixv2.ApisixRouteStream
+	for _, r := range streamRoutes {
+		route := apisixv2.ApisixRouteStream{
+			Name: fmt.Sprintf("stream-route-%d", r.IngressPort),
+			Match: apisixv2.ApisixRouteStreamMatch{
+				IngressPort: r.IngressPort,
+			},
+			Backend: apisixv2.ApisixRouteStreamBackend{
+				ServiceName: r.Backend[0].ServiceName,
+				ServicePort: r.Backend[0].ServicePort,
+			},
+		}
+		routes = append(routes, route)
+	}
+	return routes
+}
+
+func convertBackends(backends []*ARBackend) []apisixv2.ApisixRouteHTTPBackend {
+	var result []apisixv2.ApisixRouteHTTPBackend
+	for _, b := range backends {
+		result = append(result, apisixv2.ApisixRouteHTTPBackend{
+			ServiceName: b.ServiceName,
+			ServicePort: b.ServicePort,
+			Weight:      b.Weight,
+		})
+	}
+	return result
+}
+
+func main() {
+	// 1. 加载kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", clientcmd.RecommendedHomeFile)
+	if err != nil {
+		log.Fatalf("Error building kubeconfig: %v", err)
+	}
+
+	// 2. 创建客户端
+	client, err := apisixv2.NewForConfig(config)
+	if err != nil {
+		log.Fatalf("Error creating APISIX client: %v", err)
+	}
+
+	// 3. 准备请求数据
+	req := &CreateApisixRouteRequest{
+		ArName:    "demo-route",
+		Namespace: "default",
+		Http: []*ARHttp{
+			{
+				Hosts: "example.com",
+				Paths: "/*",
+				Backend: []*ARBackend{
+					{
+						ServiceName: "web-service",
+						ServicePort: "80",
+						Weight:      100,
+					},
+				},
+			},
+		},
+		Stream: []*ARStream{
+			{
+				IngressPort: 9000,
+				Backend: []*ARBackend{
+					{
+						ServiceName: "grpc-service",
+						ServicePort: "50051",
+					},
+				},
+			},
+		},
+	}
+
+	// 4. 创建路由
+	if err := createApisixRoute(client, req); err != nil {
+		log.Fatalf("Error creating ApisixRoute: %v", err)
+	}
+	fmt.Println("ApisixRoute created successfully")
+}
+
+
+func convertHTTPRoutes(httpRoutes []*pb.ARHttp) []apisixv2.ApisixRouteHTTP {
+	var routes []apisixv2.ApisixRouteHTTP
+	for _, r := range httpRoutes {
+		route := apisixv2.ApisixRouteHTTP{
+			Name: fmt.Sprintf("http-route-%s", r.Hosts),
+			Match: apisixv2.ApisixRouteHTTPMatch{
+				Hosts: []string{r.Hosts},
+				Paths: []string{r.Paths},
+			},
+			Backends: convertBackends(r.Backend),
+		}
+		routes = append(routes, route)
+	}
+	return routes
+}
+
+func convertStreamRoutes(streamRoutes []*pb.ARStream) []apisixv2.ApisixRouteStream {
+	var routes []apisixv2.ApisixRouteStream
+	for _, r := range streamRoutes {
+		route := apisixv2.ApisixRouteStream{
+			Name: fmt.Sprintf("stream-route-%d", r.IngressPort),
+			Match: apisixv2.ApisixRouteStreamMatch{
+				IngressPort: r.IngressPort,
+			},
+			Backend: apisixv2.ApisixRouteStreamBackend{
+				ServiceName: r.Backend[0].ServiceName,
+				ServicePort: r.Backend[0].ServicePort,
+			},
+		}
+		routes = append(routes, route)
+	}
+	return routes
+}
+
+func convertBackends(backends []*pb.ARBackend) []apisixv2.ApisixRouteHTTPBackend {
+	var result []apisixv2.ApisixRouteHTTPBackend
+	for _, b := range backends {
+		result = append(result, apisixv2.ApisixRouteHTTPBackend{
+			ServiceName: b.ServiceName,
+			ServicePort: b.ServicePort,
+			Weight:      b.Weight,
+		})
+	}
+	return result
+}
+
+
+func (s *RoutesManageService) CreateApisixRoute(ctx context.Context, req *pb.CreateApisixRouteRequest) (*pb.CreateApisixRouteResponse, error) {
+	logger.L().Info("CreateApisixRoute called")
+
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, status.Errorf(status.Code(err), "failed to create k8s config: %v", err)
+		}
+	}
+	client, err := apisixv2.NewForConfig(config)
+	if err != nil {
+		return nil, status.Errorf(status.Code(err), "failed to create apisix client: %v", err)
+	}
+	// 构造 ApisixRoute 对象
+	ar := &apisixv2.ApisixRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      req.ArName,
+			Namespace: req.Namespace,
+			Labels: map[string]string{
+				"app": "jos-app-deploy",
+			},
+		},
+		Spec: apisixv2.ApisixRouteSpec{
+			HTTP:   convertHTTPRoutes(req.Http),
+			Stream: convertStreamRoutes(req.Stream),
+		},
+	}
+	// 创建资源
+	_, err = client.ApisixV2().ApisixRoutes(req.Namespace).Create(
+		context.TODO(),
+		ar,
+		metav1.CreateOptions{},
+	)
+	return &pb.CreateApisixRouteResponse{}, nil
+}
+
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+
+	apisixv2 "github.com/apache/apisix-ingress-controller/pkg/kube/apisix/apis/config/v2"
+	apisixclient "github.com/apache/apisix-ingress-controller/pkg/kube/apisix/client/clientset/versioned"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/clientcmd"
+)
+
+func main() {
+	// 1. 加载kubeconfig
+	kubeconfig := os.Getenv("KUBECONFIG")
+	if kubeconfig == "" {
+		kubeconfig = clientcmd.RecommendedHomeFile
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		log.Fatalf("Error building kubeconfig: %v", err)
+	}
+
+	// 2. 创建APISIX客户端
+	client, err := apisixclient.NewForConfig(config)
+	if err != nil {
+		log.Fatalf("Error creating APISIX client: %v", err)
+	}
+
+	// 3. 构建ApisixRoute对象
+	route := &apisixv2.ApisixRoute{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "demo-route",
+			Namespace: "default",
+		},
+		Spec: apisixv2.ApisixRouteSpec{
+			HTTP: []apisixv2.ApisixRouteHTTP{
+				{
+					Name: "http-rule",
+					Match: apisixv2.ApisixRouteHTTPMatch{
+						Hosts: []string{"example.com"},
+						Paths: []string{"/*"},
+					},
+					Backends: []apisixv2.ApisixRouteHTTPBackend{
+						{
+							ServiceName: "web-service",
+							ServicePort: 80,
+							Weight:      100,
+						},
+					},
+					Plugins: []apisixv2.ApisixRouteHTTPPlugin{
+						{
+							Name: "key-auth",
+							Enable: true,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// 4. 创建ApisixRoute
+	created, err := client.ApisixV2().ApisixRoutes("default").Create(
+		context.TODO(),
+		route,
+		metav1.CreateOptions{},
+	)
+	if err != nil {
+		log.Fatalf("Error creating ApisixRoute: %v", err)
+	}
+
+	fmt.Printf("Successfully created ApisixRoute: %s\n", created.Name)
+}

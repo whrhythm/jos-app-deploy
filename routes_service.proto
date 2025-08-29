@@ -313,19 +313,19 @@ message DeleteApisixRouteResponse {}
 
 message ARBackend {
   string service_name = 1;
-  string service_port = 2;
+  int32 service_port = 2;
   int32 weight = 3;
 }
 
 message ARHttp {
   string hosts = 1;
   string paths = 2;
-  repeated ARBackend backend = 3;
+  repeated ARBackend backends = 3;
 }
 
 message ARStream {
   int32 ingress_port = 1;
-  repeated ARBackend backend = 2;
+  ARBackend backend = 2;
 }
 
 message CreateApisixRouteRequest {

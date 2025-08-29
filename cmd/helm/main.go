@@ -20,9 +20,9 @@ import (
 	pb "jos-deployment/api/v1alpha1/pb"
 	podpb "jos-deployment/api/v1alpha1/pb_pod"
 	routepb "jos-deployment/api/v1alpha1/pb_routes"
-	"jos-deployment/pkg/helm"
+	"jos-deployment/handler/helm"
+	"jos-deployment/handler/server"
 	"jos-deployment/pkg/logger"
-	"jos-deployment/pkg/server"
 )
 
 func init() {
