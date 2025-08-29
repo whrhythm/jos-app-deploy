@@ -7,9 +7,11 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "./pkg/pb/;pb";
 
-message 
+// 从镜像部署应用
+// 1. 给应用取一个 {{ name }}， 填写镜像地址 {{ docker_address }}; 确认 {{ post 接口 用来下载镜像文件，实时回传下载日志 }}
+// 从代码部署应用
 
-service SSOService {
+service ApplicationServices {
   rpc GetSSOService (GetSSOServiceRequest) returns (GetSSOServiceResponse) {
     option (google.api.http) = {
       get: "/prod/v1alpha1/{namespace}/routes/{sso_name}"
